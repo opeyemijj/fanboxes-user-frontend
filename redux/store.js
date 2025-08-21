@@ -1,6 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit"
 import { reducer } from "./rootReducer"
-import { ReturnType } from "react"
 
 export const store = configureStore({
   reducer,
@@ -10,5 +9,6 @@ export const store = configureStore({
     }),
 })
 
-export type RootState = ReturnType<typeof store.getState>
-export type AppDispatch = typeof store.dispatch
+// For TypeScript projects, these would be:
+// export type RootState = ReturnType<typeof store.getState>
+// export type AppDispatch = typeof store.dispatch

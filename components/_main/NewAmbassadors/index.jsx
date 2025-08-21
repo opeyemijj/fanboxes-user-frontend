@@ -1,3 +1,4 @@
+"use client"
 import { useSelector, useDispatch } from "react-redux"
 import AmbassadorCard from "@/components/_main/AmbassadorCard"
 import NewAmbassadorsSkeleton from "@/components/ui/skeletons/NewAmbassadorsSkeleton"

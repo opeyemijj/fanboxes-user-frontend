@@ -1,3 +1,4 @@
+"use client"
 import { useSelector, useDispatch } from "react-redux"
 import BoxCard from "@/components/_main/BoxCard"
 import LatestBoxesSkeleton from "@/components/ui/skeletons/LatestBoxesSkeleton"
