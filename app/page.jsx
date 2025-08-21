@@ -8,17 +8,32 @@ import Categories from "@/components/_main/Categories"
 import TrendingSidebar from "@/components/_main/TrendingSidebar"
 import Footer from "@/components/_main/Footer"
 import { useProgressiveLoading } from "@/hooks/useProgressiveLoading"
+import { useInitialDataFetch } from "@/hooks/useInitialDataFetch"
 
 export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState("all")
 
   const { isLoading } = useProgressiveLoading(["hero", "latestBoxes", "newAmbassadors", "trending"], 800)
 
+  const { isLoading: dataLoading, hasError } = useInitialDataFetch()
+
   return (
     <div className="bg-white text-black">
       <Header />
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24">
+        {dataLoading && (
+          <div className="text-center py-8">
+            <p>Loading initial data...</p>
+          </div>
+        )}
+
+        {hasError && (
+          <div className="text-center py-8 text-red-600">
+            <p>Error loading data. Please refresh the page.</p>
+          </div>
+        )}
+
         <div className="flex flex-col lg:flex-row gap-6">
           <div className="w-full lg:w-2/3 xl:w-3/4">
             <HeroCarousel loading={isLoading("hero")} />

@@ -20,13 +20,10 @@ function getToken() {
   return ""
 }
 
-const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.BASE_URL || "https://49a225b3beeb.ngrok-free.app"
+const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.BASE_URL
 const http = axios.create({
   baseURL: baseURL + `/api`,
-  timeout: 30000,
-  headers: {
-    "ngrok-skip-browser-warning": "true",
-  },
+  timeout: 30000
 })
 
 http.interceptors.request.use(

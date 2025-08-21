@@ -24,7 +24,6 @@ export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const pathname = usePathname();
   const { logout } = useAuth();
-  console.log("User data in Header:", user);
 
   useEffect(() => {
     setIsLoggedIn(user?.isAuthenticated && user?.user?.token);
