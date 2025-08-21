@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Search } from "lucide-react"
-import { TrendingBoxCard } from "@/components/_main/TrendingBoxCard"
+import { TrendingBoxCard } from "./trending-box-card"
 import AmbassadorCard from "@/components/_main/AmbassadorCard"
 import { trendingBoxes, trendingAmbassadors } from "@/lib/data-v2"
 

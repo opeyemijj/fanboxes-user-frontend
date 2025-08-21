@@ -12,22 +12,20 @@ export default function TrendingSidebar() {
   const [activeTab, setActiveTab] = useState("boxes")
 
   return (
-    <aside className="p-6 sticky top-24 rounded-xl bg-[#EFEFEF] dark:bg-gray-800 transition-colors duration-200">
+    <aside className="p-6  sticky top-24 rounded-xl" style={{ backgroundColor: "#EFEFEF" }}>
       <div className="relative mb-6">
-        <Input placeholder="Search" className="pr-10 dark:bg-gray-700 dark:text-white dark:border-gray-600" />
-        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-300" />
+        <Input placeholder="Search" className="pr-10" />
+        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
       </div>
 
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-2xl font-bold dark:text-white">Trending</h3>
+        <h3 className="text-2xl font-bold">Trending</h3>
         <div className="flex items-center gap-1 ml-auto">
           <Button
             onClick={() => setActiveTab("boxes")}
             size="sm"
-            className={`rounded text-[10px] px-1.5 py-0.5 transition-colors duration-200 ${
-              activeTab === "boxes"
-                ? "bg-black dark:bg-white text-white dark:text-black"
-                : "bg-white dark:bg-gray-600 text-black dark:text-white hover:bg-gray-300 dark:hover:bg-gray-500"
+            className={`rounded text-[10px] px-1.5 py-0.5 ${
+              activeTab === "boxes" ? "bg-black text-white" : "bg-white text-black hover:bg-gray-300"
             }`}
           >
             BOXES
@@ -35,10 +33,8 @@ export default function TrendingSidebar() {
           <Button
             onClick={() => setActiveTab("ambassadors")}
             size="sm"
-            className={`rounded text-[10px] px-1.5 py-0.5 transition-colors duration-200 ${
-              activeTab === "ambassadors"
-                ? "bg-black dark:bg-white text-white dark:text-black"
-                : "bg-white dark:bg-gray-600 text-black dark:text-white hover:bg-gray-300 dark:hover:bg-gray-500"
+            className={`rounded text-[10px] px-1.5 py-0.5 ${
+              activeTab === "ambassadors" ? "bg-black text-white" : "bg-white text-black hover:bg-gray-300"
             }`}
           >
             AMBASSADORS

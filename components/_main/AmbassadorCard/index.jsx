@@ -19,7 +19,7 @@ export default function AmbassadorCard({ ambassador }) {
 
   return (
     <Link href={`/ambassadors/${slug}`} className="group block">
-      <div className="relative rounded-lg overflow-hidden bg-gray-800 dark:bg-gray-700 aspect-[3/2]">
+      <div className="relative rounded-lg overflow-hidden bg-gray-800 aspect-[3/2]">
         <Image
           src={ambassador.image || "/placeholder.svg"}
           alt={ambassador.name || "Ambassador"}
@@ -41,13 +41,13 @@ export default function AmbassadorCard({ ambassador }) {
         )}
 
         {/* View Button */}
-        <Button className="absolute bottom-4 right-4 bg-black/70 dark:bg-white/90 text-white dark:text-black rounded-full h-10 w-20 opacity-100">
+        <Button className="absolute bottom-4 right-4 bg-black/70 text-white rounded-full h-10 w-20 opacity-100">
           <span className="flex items-center text-sm">
             VIEW <span className="ml-2">→</span>
           </span>
         </Button>
       </div>
-      <p className="font-bold mt-3 text-sm text-black dark:text-white">{ambassador.name || "Unknown Ambassador"}</p>
+      <p className="font-bold mt-3 text-sm">{ambassador.name || "Unknown Ambassador"}</p>
     </Link>
   )
 }

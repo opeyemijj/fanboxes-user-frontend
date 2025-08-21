@@ -35,9 +35,9 @@ export default function Categories({ categories = [], selectedCategory = "all", 
             key={category.id}
             onClick={() => onCategoryChange(category.id)}
             className={`rounded-full transition-all duration-200 ${
-              selectedCategory === category.id ? "text-black dark:text-black" : "text-white dark:text-white"
+              selectedCategory === category.id ? "text-black" : "text-white"
             }`}
-            variant={selectedCategory === category.id ? "default" : "ghost"}
+            variant={selectedCategory === category.id ? "default" : "outline"}
             style={{
               backgroundColor: selectedCategory === category.id ? "#11F2EB" : "#98989F",
             }}

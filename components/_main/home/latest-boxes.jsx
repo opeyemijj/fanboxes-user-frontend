@@ -1,4 +1,4 @@
-import { BoxCard } from "@/components/_main/BoxCard"
+import { BoxCard } from "./box-card"
 import { latestBoxes } from "@/lib/data-v2"
 
 export default function LatestBoxes() {

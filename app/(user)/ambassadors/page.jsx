@@ -45,39 +45,42 @@ export default function AmbassadorsPage() {
   }, [selectedCategory, searchTerm, sortBy])
 
   return (
-    <div className="bg-white dark:bg-gray-900 text-black dark:text-white transition-colors duration-200">
+    <div className="bg-white text-black">
       <Header />
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24">
         <div className="flex flex-col lg:flex-row gap-8 mt-8">
           <div className="w-full lg:w-3/3 xl:w-4/4">
             <div className="flex items-center justify-between mb-6">
               <h1 className="text-5xl font-bold">Our ambassadors</h1>
-              <div className="text-sm text-gray-500 dark:text-gray-400">
+              <div className="text-sm text-gray-500">
                 {filteredAmbassadors.length} ambassador{filteredAmbassadors.length !== 1 ? "s" : ""} found
               </div>
             </div>
             <div className="mb-8 flex flex-col lg:flex-row gap-8">
               <div className="w-full lg:w-2/3 xl:w-3/4">
-                <AmbassadorCategories
-                  categories={categories}
-                  selectedCategory={selectedCategory}
-                  onCategoryChange={setSelectedCategory}
-                />
+                 <AmbassadorCategories
+                categories={categories}
+                selectedCategory={selectedCategory}
+                onCategoryChange={setSelectedCategory}
+              />
               </div>
-
+             
               <div className="w-full lg:w-1/3 xl:w-1/4">
-                <AmbassadorFilterSidebar
-                  searchTerm={searchTerm}
-                  onSearchChange={setSearchTerm}
-                  sortBy={sortBy}
-                  onSortChange={setSortBy}
-                />
-              </div>
+            <AmbassadorFilterSidebar
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+              sortBy={sortBy}
+              onSortChange={setSortBy}
+            />
+          </div>
             </div>
-            <div className="p-5 rounded-lg mb-4 bg-[#EFEFEF] dark:bg-gray-800 transition-colors duration-200">
-              <AmbassadorGrid ambassadors={filteredAmbassadors} />
+            <div className="p-5 rounded-lg mb-4" style={{backgroundColor:"#EFEFEF"}}>
+              
+             <AmbassadorGrid ambassadors={filteredAmbassadors} />
+
             </div>
           </div>
+          
         </div>
       </main>
       <Footer />

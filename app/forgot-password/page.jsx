@@ -2,7 +2,9 @@
 import { useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/Button"
-import { Layout } from "@/components/Layout"
+import { ArrowLeft, Mail } from "lucide-react"
+import Header from "@/components/_main/Header"
+import Footer from "@/components/_main/Footer"
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("")
@@ -13,6 +15,7 @@ export default function ForgotPasswordPage() {
     e.preventDefault()
     setIsLoading(true)
 
+    // Simulate password reset email sending
     setTimeout(() => {
       setIsLoading(false)
       setIsSubmitted(true)
@@ -21,93 +24,109 @@ export default function ForgotPasswordPage() {
 
   if (isSubmitted) {
     return (
-      <Layout>
-        <div className="flex items-center justify-center p-4 pt-32 pb-16">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex flex-col">
+        <Header />
+
+        <main className="flex-1 flex items-center justify-center p-4 pt-32 pb-16">
           <div className="w-full max-w-md">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 border border-gray-200 dark:border-gray-700 text-center">
-              <div className="w-16 h-16 bg-[#11F2EB]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-[#11F2EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                  />
-                </svg>
+            {/* Success Card */}
+            <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 text-center">
+              <div className="w-16 h-16 bg-[#11F2EB] rounded-full flex items-center justify-center mx-auto mb-6">
+                <Mail className="h-8 w-8 text-white" />
               </div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Check Your Email</h1>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">
+
+              <h1 className="text-2xl font-bold text-gray-900 mb-4">Check your email</h1>
+              <p className="text-gray-600 mb-6">
                 We've sent a password reset link to <strong>{email}</strong>
               </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-                Didn't receive the email? Check your spam folder or try again.
-              </p>
-              <div className="space-y-3">
+
+              <div className="space-y-4">
                 <Button
                   onClick={() => setIsSubmitted(false)}
-                  className="w-full bg-black hover:bg-gray-800 text-white font-semibold py-3 px-4 rounded-md transition-colors"
+                  className="w-full bg-[#11F2EB] hover:bg-[#0DD4C7] text-white font-semibold py-3 rounded-xl transition-colors"
                 >
-                  Try Again
+                  Send another email
                 </Button>
+
                 <Link href="/login">
-                  <Button
-                    variant="ghost"
-                    className="w-full text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-                  >
-                    Back to Login
+                  <Button variant="ghost" className="w-full text-gray-600 hover:text-gray-800 transition-colors">
+                    Back to login
                   </Button>
                 </Link>
               </div>
             </div>
           </div>
-        </div>
-      </Layout>
+        </main>
+
+        <Footer />
+      </div>
     )
   }
 
   return (
-    <Layout>
-      <div className="flex items-center justify-center p-4 pt-32 pb-16">
-        <div className="w-full max-w-md">
-          <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Forgot Password?</h1>
-            <p className="text-gray-600 dark:text-gray-400">No worries, we'll send you reset instructions</p>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex flex-col">
+      <Header />
 
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 border border-gray-200 dark:border-gray-700">
+      <main className="flex-1 flex items-center justify-center p-4 pt-32 pb-16">
+        <div className="w-full max-w-md">
+          {/* Forgot Password Card */}
+          <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+            {/* Back to login link */}
+            <Link
+              href="/login"
+              className="inline-flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors mb-6"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span className="text-sm">Back to login</span>
+            </Link>
+
+            <div className="text-center mb-8">
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">Forgot your password?</h1>
+              <p className="text-gray-600">
+                No worries! Enter your email address and we'll send you a link to reset your password.
+              </p>
+            </div>
+
+            {/* Reset Form */}
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Email Address
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                  Email address
                 </label>
                 <input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-[#11F2EB] focus:border-transparent transition-colors text-gray-900 dark:text-white"
-                  placeholder="Enter your email address"
                   required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#11F2EB] focus:border-transparent transition-colors bg-white text-gray-900 placeholder-gray-500"
+                  placeholder="Enter your email address"
                 />
               </div>
 
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-black hover:bg-gray-800 text-white font-semibold py-3 px-4 rounded-md transition-colors disabled:opacity-50"
+                className="w-full bg-[#11F2EB] hover:bg-[#0DD4C7] text-white font-semibold py-3 rounded-xl transition-colors"
               >
-                {isLoading ? "Sending..." : "Send Reset Instructions"}
+                {isLoading ? "Sending reset link..." : "Send reset link"}
               </Button>
             </form>
 
-            <div className="mt-6 text-center">
-              <Link href="/login" className="text-sm text-[#11F2EB] hover:text-[#0DD4C7] transition-colors">
-                ← Back to Login
-              </Link>
+            {/* Additional help */}
+            <div className="text-center mt-6">
+              <p className="text-sm text-gray-600">
+                Remember your password?{" "}
+                <Link href="/login" className="text-[#11F2EB] hover:text-[#0DD4C7] font-medium transition-colors">
+                  Sign in
+                </Link>
+              </p>
             </div>
           </div>
         </div>
-      </div>
-    </Layout>
+      </main>
+
+      <Footer />
+    </div>
   )
 }

@@ -14,7 +14,7 @@ export default function BoxSpinPage({ params }) {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-900 text-black dark:text-white transition-colors duration-200">
+    <div className="bg-white text-black">
       <Header />
       <main className="pt-20">
         <BoxSpinner box={box} />

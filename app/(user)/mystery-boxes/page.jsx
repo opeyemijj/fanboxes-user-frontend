@@ -154,14 +154,14 @@ export default function MysteryBoxesPage() {
   }, [boxesToUse, selectedCategory, searchTerm, sortBy])
 
   return (
-    <div className="bg-white dark:bg-gray-900 text-black dark:text-white transition-colors duration-200">
+    <div className="bg-white text-black">
       <Header />
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24">
         <div className="flex flex-col lg:flex-row gap-8 mt-8">
           <div className="w-full lg:w-3/3 xl:w-4/4">
             <div className="flex items-center justify-between mb-6">
               <h1 className="text-5xl font-bold">Mystery boxes</h1>
-              <div className="text-sm text-gray-500 dark:text-gray-400">
+              <div className="text-sm text-gray-500">
                 {filteredBoxes.length} box{filteredBoxes.length !== 1 ? "es" : ""} found
               </div>
             </div>
@@ -184,7 +184,7 @@ export default function MysteryBoxesPage() {
               </div>
             </div>
 
-            <div className="bg-[#EFEFEF] dark:bg-gray-800 rounded-lg p-6 transition-colors duration-200">
+            <div className="bg-[#EFEFEF] rounded-lg p-6">
               <BoxGrid boxes={filteredBoxes} />
             </div>
           </div>

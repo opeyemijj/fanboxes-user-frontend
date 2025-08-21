@@ -54,12 +54,12 @@ export default function BoxSpinner({ box }) {
             </div>
           </div>
           <div className="flex items-center space-x-3">
-            <Button variant="outline" className="hover:bg-gray-100 hover:border-gray-200 rounded-full">
+            <Button variant="outline" className="bg-gray-100 border-gray-200 rounded-full">
               <span className="mr-2">🔔</span>
               GET UPDATES
             </Button>
             <Link href={`/ambassadors/${box.ambassadorSlug}`}>
-              <Button variant="outline" className="hover:bg-gray-100 hover:border-gray-200 rounded-full">
+              <Button variant="outline" className="bg-gray-100 border-gray-200 rounded-full">
                 VIEW PROFILE
                 <span className="ml-2">→</span>
               </Button>

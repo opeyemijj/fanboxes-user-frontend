@@ -5,43 +5,27 @@ const AuthContext = createContext({})
 
 export function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [user, setUser] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
+    // Check authentication status on mount
     const authStatus = localStorage.getItem("isAuthenticated")
-    const userData = localStorage.getItem("userData")
-
-    if (authStatus === "true") {
-      setIsAuthenticated(true)
-      if (userData) {
-        setUser(JSON.parse(userData))
-      } else {
-        setUser({ name: "WILLIAM", avatar: "/images/user-william.png" })
-      }
-    }
+    setIsAuthenticated(authStatus === "true")
     setIsLoading(false)
   }, [])
 
-  const login = (userData = null) => {
-    setIsAuthenticated(true)
-    const defaultUser = { name: "WILLIAM", avatar: "/images/user-william.png" }
-    const user = userData || defaultUser
-    setUser(user)
+  const login = () => {
     localStorage.setItem("isAuthenticated", "true")
-    localStorage.setItem("userData", JSON.stringify(user))
+    setIsAuthenticated(true)
   }
 
   const logout = () => {
+    localStorage.removeItem("isAuthenticated")
     setIsAuthenticated(false)
-    setUser(null)
-    localStorage.setItem("isAuthenticated", "false")
-    localStorage.removeItem("userData")
   }
 
   const value = {
     isAuthenticated,
-    user,
     isLoading,
     login,
     logout,
