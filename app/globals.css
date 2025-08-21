@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 247 250 252; /* #F7FAFC Light Gray */
+    --foreground: 45 55 72; /* #2D3748 Dark Gray */
+    --card: 255 255 255; /* #FFFFFF White */
+    --card-foreground: 45 55 72; /* #2D3748 Dark Gray */
+    --popover: 255 255 255; /* #FFFFFF White */
+    --popover-foreground: 45 55 72; /* #2D3748 Dark Gray */
+    --primary: 181 244 235; /* #11F2EB Cyan */
+    --primary-foreground: 255 255 255; /* #FFFFFF White */
+    --secondary: 11 197 194; /* #0BC5C2 Darker Cyan */
+    --secondary-foreground: 255 255 255; /* #FFFFFF White */
+    --muted: 247 250 252; /* #F7FAFC Light Gray */
+    --muted-foreground: 45 55 72; /* #2D3748 Dark Gray */
+    --accent: 11 197 194; /* #0BC5C2 Darker Cyan */
+    --accent-foreground: 255 255 255; /* #FFFFFF White */
+    --destructive: 220 38 38; /* #DC2626 Red */
+    --destructive-foreground: 255 255 255; /* #FFFFFF White */
+    --border: 226 232 240; /* #E2E8F0 Light Gray */
+    --input: 255 255 255; /* #FFFFFF White */
+    --ring: 181 244 235; /* #11F2EB Cyan */
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 17 24 39; /* Dark background */
+    --foreground: 248 250 252; /* Light text */
+    --card: 31 41 55; /* Dark card */
+    --card-foreground: 248 250 252; /* Light text */
+    --popover: 31 41 55; /* Dark popover */
+    --popover-foreground: 248 250 252; /* Light text */
+    --primary: 181 244 235; /* #11F2EB Cyan */
+    --primary-foreground: 17 24 39; /* Dark text */
+    --secondary: 55 65 81; /* Dark secondary */
+    --secondary-foreground: 248 250 252; /* Light text */
+    --muted: 55 65 81; /* Dark muted */
+    --muted-foreground: 156 163 175; /* Gray text */
+    --accent: 55 65 81; /* Dark accent */
+    --accent-foreground: 248 250 252; /* Light text */
+    --destructive: 239 68 68; /* Light red */
+    --destructive-foreground: 248 250 252; /* Light text */
+    --border: 55 65 81; /* Dark border */
+    --input: 55 65 81; /* Dark input */
+    --ring: 181 244 235; /* #11F2EB Cyan */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Custom animations for the prize popup */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.prize-popup-enter {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Backdrop blur effect */
+.backdrop-blur-sm {
+  backdrop-filter: blur(4px);
+}
