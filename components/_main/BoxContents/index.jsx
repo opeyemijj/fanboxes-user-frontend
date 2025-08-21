@@ -1,7 +1,12 @@
 import Image from "next/image"
 import { Button } from "@/components/Button"
+import BoxContentsSkeleton from "@/components/ui/skeletons/BoxContentsSkeleton"
 
-export default function BoxContents({ box }) {
+export default function BoxContents({ box, loading = false }) {
+  if (loading) {
+    return <BoxContentsSkeleton />
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
       <section className="bg-[#EFEFEF] py-8 rounded-lg">

@@ -16,7 +16,10 @@ export default function ProductCard({ item }) {
         <div className="absolute top-2 left-2 bg-gray-900/50 text-white text-xs font-semibold px-2 py-1 rounded-full">
           ${item.price.toLocaleString()}
         </div>
-        <Button className="absolute bottom-4 right-4 bg-black text-white rounded-full h-10 w-32 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <Button
+          variant="cyan"
+          className="absolute bottom-4 right-4 rounded-full h-10 w-32 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        >
           Buy Now <ArrowRight className="ml-2 h-4 w-4" />
         </Button>
       </div>
@@ -27,3 +30,5 @@ export default function ProductCard({ item }) {
     </div>
   )
 }
+
+export { ProductCard }

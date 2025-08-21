@@ -1,5 +1,5 @@
 import Image from "next/image"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/Button"
 import { Bell, ArrowRight, Hexagon } from "lucide-react"
 
 export default function HeroSection() {
@@ -21,11 +21,11 @@ export default function HeroSection() {
             </div>
           </div>
           <div className="flex items-center space-x-2 mt-4 md:mt-0">
-            <Button variant="outline" className="bg-gray-100 border-gray-200">
+            <Button variant="outline">
               <Bell className="h-4 w-4 mr-2" />
               Get Updates
             </Button>
-            <Button variant="outline" className="bg-gray-100 border-gray-200">
+            <Button variant="outline">
               View Profile
               <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
@@ -81,7 +81,10 @@ export default function HeroSection() {
                 height={160}
                 className="object-contain drop-shadow-2xl"
               />
-              <Button className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-20 w-40 rounded-full bg-cyan-400 hover:bg-cyan-500 text-black font-bold text-lg shadow-lg shadow-cyan-500/50">
+              <Button
+                variant="cyan"
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-20 w-40 rounded-full font-bold text-lg shadow-lg shadow-cyan-500/50"
+              >
                 <div className="flex items-center">
                   SPIN FOR
                   <Hexagon className="h-5 w-5 mx-1" />

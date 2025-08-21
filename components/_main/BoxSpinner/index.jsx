@@ -101,7 +101,8 @@ export default function BoxSpinner({ box }) {
               <Button
                 onClick={handleSpin}
                 disabled={isSpinning}
-                className="h-20 w-48 rounded-full bg-cyan-400 hover:bg-cyan-500 text-black font-bold text-lg shadow-lg shadow-cyan-500/50 disabled:opacity-50 transition-all duration-300"
+                variant="cyan"
+                className="h-20 w-48 rounded-full font-bold text-lg shadow-lg shadow-cyan-500/50 disabled:opacity-50 transition-all duration-300"
               >
                 <div className="flex items-center">
                   {isSpinning ? "SPINNING..." : "SPIN FOR"}

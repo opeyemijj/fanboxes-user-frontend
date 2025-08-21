@@ -1,5 +1,5 @@
 import Image from "next/image"
-import { Button } from "@/components/button"
+import { Button } from "@/components/Button"
 import { ArrowRight } from "lucide-react"
 import { newAmbassadors } from "@/lib/data-v2"
 

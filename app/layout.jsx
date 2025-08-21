@@ -1,5 +1,7 @@
 import "./globals.css"
 import { AuthProvider } from "@/components/AuthProvider"
+import { LoadingProvider } from "@/components/LoadingProvider"
+import ReduxProvider from "@/components/ReduxProvider"
 
 export const metadata = {
   title: "Fanboxes - Mystery Boxes",
@@ -16,7 +18,11 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <AuthProvider>{children}</AuthProvider>
+        <ReduxProvider>
+          <AuthProvider>
+            <LoadingProvider>{children}</LoadingProvider>
+          </AuthProvider>
+        </ReduxProvider>
       </body>
     </html>
   )

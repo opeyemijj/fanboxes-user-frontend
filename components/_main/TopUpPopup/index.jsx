@@ -122,7 +122,7 @@ export default function TopUpPopup({ isOpen, onClose }) {
         </Button>
 
         {/* Deposit Button */}
-        <Button className="w-full py-3 bg-cyan-400 hover:bg-cyan-500 text-black rounded-lg font-bold flex items-center justify-center space-x-2">
+        <Button variant="cyan" className="w-full py-3 rounded-lg font-bold flex items-center justify-center space-x-2">
           <span>DEPOSIT</span>
           <ArrowRight className="h-4 w-4" />
         </Button>

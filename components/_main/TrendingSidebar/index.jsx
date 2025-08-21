@@ -6,10 +6,15 @@ import { Button } from "@/components/Button"
 import { Search } from "lucide-react"
 import TrendingBoxCard from "@/components/_main/TrendingBoxCard"
 import AmbassadorCard from "@/components/_main/AmbassadorCard"
+import TrendingSidebarSkeleton from "@/components/ui/skeletons/TrendingSidebarSkeleton"
 import { trendingBoxes, trendingAmbassadors } from "@/lib/data-v2"
 
-export default function TrendingSidebar() {
+export default function TrendingSidebar({ loading = false }) {
   const [activeTab, setActiveTab] = useState("boxes")
+
+  if (loading) {
+    return <TrendingSidebarSkeleton />
+  }
 
   return (
     <aside className="p-6  sticky top-24 rounded-xl" style={{ backgroundColor: "#EFEFEF" }}>

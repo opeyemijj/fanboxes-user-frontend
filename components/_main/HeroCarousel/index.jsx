@@ -3,6 +3,7 @@ import { useState, useEffect } from "react"
 import Image from "next/image"
 import { Button } from "@/components/Button"
 import Link from "next/link"
+import HeroCarouselSkeleton from "@/components/ui/skeletons/HeroCarouselSkeleton"
 
 const banners = [
   {
@@ -34,7 +35,7 @@ const banners = [
   },
 ]
 
-export default function HeroCarousel() {
+export default function HeroCarousel({ loading = false }) {
   const [currentSlide, setCurrentSlide] = useState(0)
 
   // Auto-advance carousel every 5 seconds
@@ -55,6 +56,10 @@ export default function HeroCarousel() {
 
   const goToSlide = (index) => {
     setCurrentSlide(index)
+  }
+
+  if (loading) {
+    return <HeroCarouselSkeleton />
   }
 
   return (

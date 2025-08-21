@@ -1,5 +1,5 @@
 import Image from "next/image"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/Button"
 import { ArrowRight } from "lucide-react"
 import Link from "next/link"
 
@@ -19,7 +19,7 @@ export default function Hero() {
           Every box is a <span className="text-cyan-400">new adventure</span>
         </h1>
         <Link href="/">
-          <Button className="mt-6 bg-white text-black font-bold hover:bg-gray-200">
+          <Button variant="secondary" className="mt-6 bg-white text-black font-bold">
             GET STARTED <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </Link>

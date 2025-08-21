@@ -1,7 +1,28 @@
+import { useSelector, useDispatch } from "react-redux"
 import BoxCard from "@/components/_main/BoxCard"
-import { latestBoxes } from "@/lib/data-v2"
+import LatestBoxesSkeleton from "@/components/ui/skeletons/LatestBoxesSkeleton"
+import ErrorDisplay from "@/components/ui/ErrorDisplay"
+import { fetchProducts } from "@/redux/slices/product"
 
-export default function LatestBoxes() {
+export default function LatestBoxes({ loading = false }) {
+  const dispatch = useDispatch()
+  const { products, loading: productsLoading, error } = useSelector((state) => state.product)
+
+  if (error) {
+    return (
+      <section>
+        <h2 className="text-3xl font-bold mb-6">Latest boxes</h2>
+        <ErrorDisplay error={error} onRetry={() => dispatch(fetchProducts())} />
+      </section>
+    )
+  }
+
+  if (loading || productsLoading) {
+    return <LatestBoxesSkeleton />
+  }
+
+  const latestBoxes = products.slice(0, 6)
+
   return (
     <section>
       <h2 className="text-3xl font-bold mb-6">Latest boxes</h2>

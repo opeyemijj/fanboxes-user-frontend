@@ -81,7 +81,10 @@ export default function HeroSection() {
                 height={160}
                 className="object-contain drop-shadow-2xl"
               />
-              <Button className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-20 w-40 rounded-full bg-cyan-400 hover:bg-cyan-500 text-black font-bold text-lg shadow-lg shadow-cyan-500/50">
+              <Button
+                variant="cyan"
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-20 w-40 rounded-full font-bold text-lg shadow-lg shadow-cyan-500/50"
+              >
                 <div className="flex items-center">
                   SPIN FOR
                   <Hexagon className="h-5 w-5 mx-1" />

@@ -1,7 +1,28 @@
+import { useSelector, useDispatch } from "react-redux"
 import AmbassadorCard from "@/components/_main/AmbassadorCard"
-import { newAmbassadors } from "@/lib/data-v2"
+import NewAmbassadorsSkeleton from "@/components/ui/skeletons/NewAmbassadorsSkeleton"
+import ErrorDisplay from "@/components/ui/ErrorDisplay"
+import { fetchShops } from "@/redux/slices/shops"
 
-export default function NewAmbassadors() {
+export default function NewAmbassadors({ loading = false }) {
+  const dispatch = useDispatch()
+  const { shops, loading: shopsLoading, error } = useSelector((state) => state.shops)
+
+  if (error) {
+    return (
+      <section className="mt-2">
+        <h2 className="text-3xl font-bold mb-6">New ambassadors</h2>
+        <ErrorDisplay error={error} onRetry={() => dispatch(fetchShops())} />
+      </section>
+    )
+  }
+
+  if (loading || shopsLoading) {
+    return <NewAmbassadorsSkeleton />
+  }
+
+  const newAmbassadors = shops.slice(0, 6)
+
   return (
     <section className="mt-2">
       <h2 className="text-3xl font-bold mb-6">New ambassadors</h2>

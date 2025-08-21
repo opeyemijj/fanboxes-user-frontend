@@ -7,9 +7,12 @@ import NewAmbassadors from "@/components/_main/NewAmbassadors"
 import Categories from "@/components/_main/Categories"
 import TrendingSidebar from "@/components/_main/TrendingSidebar"
 import Footer from "@/components/_main/Footer"
+import { useProgressiveLoading } from "@/hooks/useProgressiveLoading"
 
 export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState("all")
+
+  const { isLoading } = useProgressiveLoading(["hero", "latestBoxes", "newAmbassadors", "trending"], 800)
 
   return (
     <div className="bg-white text-black">
@@ -18,18 +21,18 @@ export default function HomePage() {
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24">
         <div className="flex flex-col lg:flex-row gap-6">
           <div className="w-full lg:w-2/3 xl:w-3/4">
-            <HeroCarousel />
+            <HeroCarousel loading={isLoading("hero")} />
             <div className="bg-[#EFEFEF] rounded-lg p-4 mb-6 mt-6">
-              <LatestBoxes />
+              <LatestBoxes loading={isLoading("latestBoxes")} />
             </div>
             <div className="bg-[#EFEFEF] rounded-lg p-4 mb-6">
-              <NewAmbassadors />
+              <NewAmbassadors loading={isLoading("newAmbassadors")} />
             </div>
             <h2 className="text-3xl font-bold mb-4">Our Categories</h2>
             <Categories selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} />
           </div>
           <div className="w-full lg:w-1/3 xl:w-1/4">
-            <TrendingSidebar />
+            <TrendingSidebar loading={isLoading("trending")} />
           </div>
         </div>
       </main>

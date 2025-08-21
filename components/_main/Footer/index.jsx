@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Box, Instagram, Twitter } from "lucide-react"
+import { Instagram, Twitter } from "lucide-react"
 import Image from "next/image"
 
 export default function Footer() {
@@ -9,13 +9,13 @@ export default function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
           <div className="col-span-2 md:col-span-1">
             <div className="flex items-center space-x-2 mb-4">
-              <Image 
-                  src="/favicon.png"   // or "/favicon.png" depending on what you saved in public/
-                  alt="Logo"
-                  width={32}           // same as h-8 (8 * 4px = 32px)
-                  height={32}
-                  className="h-8 w-8"
-                />
+              <Image
+                src="/favicon.png" // or "/favicon.png" depending on what you saved in public/
+                alt="Logo"
+                width={32} // same as h-8 (8 * 4px = 32px)
+                height={32}
+                className="h-8 w-8"
+              />
               <span className="font-bold text-2xl text-black">fanboxes</span>
             </div>
           </div>
@@ -23,17 +23,17 @@ export default function Footer() {
             <h4 className="font-bold text-black mb-4">Navigation</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="#" className="hover:text-black">
+                <Link href="#" className="hover:text-[#11F2EB] transition-colors">
                   Mystery boxes
                 </Link>
               </li>
               <li>
-                <Link href="/ambassadors" className="hover:text-black">
+                <Link href="/ambassadors" className="hover:text-[#11F2EB] transition-colors">
                   Our ambassadors
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-black">
+                <Link href="#" className="hover:text-[#11F2EB] transition-colors">
                   How it works
                 </Link>
               </li>
@@ -43,17 +43,17 @@ export default function Footer() {
             <h4 className="font-bold text-black mb-4">Legal</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="#" className="hover:text-black">
+                <Link href="#" className="hover:text-[#11F2EB] transition-colors">
                   Our policy
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-black">
+                <Link href="#" className="hover:text-[#11F2EB] transition-colors">
                   Reviews
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-black">
+                <Link href="#" className="hover:text-[#11F2EB] transition-colors">
                   FAQ
                 </Link>
               </li>
@@ -64,13 +64,13 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               <li className="flex items-center space-x-2">
                 <Instagram className="h-4 w-4" />
-                <Link href="#" className="hover:text-black">
+                <Link href="#" className="hover:text-[#11F2EB] transition-colors">
                   Instagram
                 </Link>
               </li>
               <li className="flex items-center space-x-2">
                 <Twitter className="h-4 w-4" />
-                <Link href="#" className="hover:text-black">
+                <Link href="#" className="hover:text-[#11F2EB] transition-colors">
                   TikTok
                 </Link>
               </li>

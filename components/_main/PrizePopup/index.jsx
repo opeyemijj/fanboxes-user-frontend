@@ -70,7 +70,8 @@ export default function PrizePopup({ isOpen, onClose, prize, spinCost }) {
               </Button>
 
               <Button
-                className="flex items-center space-x-2 px-6 py-3 bg-cyan-400 hover:bg-cyan-500 text-black rounded-lg font-bold"
+                variant="cyan"
+                className="flex items-center space-x-2 px-6 py-3 rounded-lg font-bold"
                 onClick={onClose}
               >
                 <span>SPIN FOR</span>
