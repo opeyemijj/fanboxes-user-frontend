@@ -1,42 +1,49 @@
-"use client"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
-import { Button } from "@/components/Button"
-import { Eye, EyeOff } from "lucide-react"
-import { useAuth } from "@/components/AuthProvider"
-import Header from "@/components/_main/Header"
-import Footer from "@/components/_main/Footer"
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Button } from "@/components/Button";
+import { Eye, EyeOff, X } from "lucide-react";
+import { useAuth } from "@/components/AuthProvider";
+import Header from "@/components/_main/Header";
+import Footer from "@/components/_main/Footer";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
-  const { login } = useAuth()
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const router = useRouter();
+  const { login } = useAuth();
 
   const handleLogin = async (e) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
 
-    // Simulate login process
-    setTimeout(() => {
-      login()
-      setIsLoading(false)
-      router.push("/")
-    }, 1000)
-  }
+    const { success, message } = await login(email, password);
+    if (!success) {
+      setError(message || "Login failed");
+      setIsLoading(false);
+      return;
+    }
+
+    setEmail("");
+    setPassword("");
+    setIsLoading(false);
+    router.push("/");
+  };
 
   const handleGoogleLogin = () => {
-    setIsLoading(true)
+    setIsLoading(true);
     // Simulate Google login
     setTimeout(() => {
-      login()
-      setIsLoading(false)
-      router.push("/")
-    }, 1000)
-  }
+      login();
+      setIsLoading(false);
+      router.push("/");
+    }, 1000);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex flex-col">
@@ -47,7 +54,9 @@ export default function LoginPage() {
           {/* Login Card */}
           <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
             <div className="text-center mb-8">
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome back</h1>
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                Welcome back
+              </h1>
               <p className="text-gray-600">Sign in to your fanboxes account</p>
             </div>
 
@@ -84,14 +93,33 @@ export default function LoginPage() {
                 <div className="w-full border-t border-gray-200"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white text-gray-500">or continue with email</span>
+                <span className="px-4 bg-white text-gray-500">
+                  or continue with email
+                </span>
               </div>
             </div>
 
             {/* Login Form */}
             <form onSubmit={handleLogin} className="space-y-6">
+              {/* Error message display */}
+              {error && (
+                <div className="relative p-3 rounded-lg bg-red-100 border border-red-300 text-red-700 text-sm flex items-start">
+                  <span className="flex-1">{error}</span>
+                  <button
+                    type="button"
+                    onClick={() => setError("")}
+                    className="ml-2 text-red-500 hover:text-red-700 transition-colors"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              )}
+
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
                   Email address
                 </label>
                 <input
@@ -106,7 +134,10 @@ export default function LoginPage() {
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
                   Password
                 </label>
                 <div className="relative">
@@ -124,7 +155,11 @@ export default function LoginPage() {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
                   >
-                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
                   </button>
                 </div>
               </div>
@@ -136,11 +171,17 @@ export default function LoginPage() {
                     type="checkbox"
                     className="h-4 w-4 text-[#11F2EB] focus:ring-[#11F2EB] border-gray-300 rounded"
                   />
-                  <label htmlFor="remember" className="ml-2 block text-sm text-gray-700">
+                  <label
+                    htmlFor="remember"
+                    className="ml-2 block text-sm text-gray-700"
+                  >
                     Remember me
                   </label>
                 </div>
-                <Link href="/forgot-password" className="text-sm text-[#11F2EB] hover:text-[#0DD4C7] transition-colors">
+                <Link
+                  href="/forgot-password"
+                  className="text-sm text-[#0DD4C7] hover:text-[#11F2EB] transition-colors"
+                >
                   Forgot password?
                 </Link>
               </div>
@@ -148,7 +189,7 @@ export default function LoginPage() {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-[#11F2EB] hover:bg-[#0DD4C7] text-white font-semibold py-3 rounded-xl transition-colors"
+                className="w-full bg-[#0DD4C7] hover:bg-[#11F2EB] text-white font-semibold py-3 rounded-xl transition-colors"
               >
                 {isLoading ? "Signing in..." : "Sign in"}
               </Button>
@@ -158,7 +199,10 @@ export default function LoginPage() {
             <div className="text-center mt-6">
               <p className="text-gray-600">
                 Don't have an account?{" "}
-                <Link href="/signup" className="text-[#11F2EB] hover:text-[#0DD4C7] font-medium transition-colors">
+                <Link
+                  href="/signup"
+                  className="text-[#0DD4C7] hover:text-[#11F2EB] font-medium transition-colors"
+                >
                   Sign up
                 </Link>
               </p>
@@ -169,5 +213,5 @@ export default function LoginPage() {
 
       <Footer />
     </div>
-  )
+  );
 }
