@@ -1,30 +1,46 @@
-"use client"
-import { useState } from "react"
-import Link from "next/link"
-import Image from "next/image"
-import { usePathname } from "next/navigation"
-import { Button } from "@/components/Button"
-import { Hexagon, ChevronDown, User, Package, RotateCcw, Settings, LogOut } from "lucide-react"
-import TopUpPopup from "../TopUpPopup"
-import { useAuth } from "@/components/AuthProvider"
+"use client";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
+import { Button } from "@/components/Button";
+import {
+  Hexagon,
+  ChevronDown,
+  User,
+  Package,
+  RotateCcw,
+  Settings,
+  LogOut,
+} from "lucide-react";
+import TopUpPopup from "../TopUpPopup";
+import { useAuth } from "@/components/AuthProvider";
+import { useSelector } from "react-redux";
 
 export default function Header() {
-  const [showTopUpPopup, setShowTopUpPopup] = useState(false)
-  const [showProfileDropdown, setShowProfileDropdown] = useState(false)
-  const pathname = usePathname()
-  const { isAuthenticated, logout } = useAuth()
+  const user = useSelector((state) => state.user);
+  const [showTopUpPopup, setShowTopUpPopup] = useState(false);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const pathname = usePathname();
+  const { logout } = useAuth();
+  console.log("User data in Header:", user);
+
+  useEffect(() => {
+    setIsLoggedIn(user?.isAuthenticated && user?.user?.token);
+  }, [user]);
 
   const handleLogout = () => {
-    logout()
-    setShowProfileDropdown(false)
-  }
+    logout();
+    setShowProfileDropdown(false);
+  };
 
   const dropdownItems = [
     { icon: User, label: "My Profile", href: "/profile" },
     { icon: Package, label: "My Orders", href: "/orders" },
     { icon: RotateCcw, label: "My Spins", href: "/spins" },
     { icon: Settings, label: "Account Settings", href: "/settings" },
-  ]
+  ];
 
   return (
     <>
@@ -33,7 +49,13 @@ export default function Header() {
           <div className="flex items-center justify-between h-20">
             <div className="flex items-center space-x-8">
               <Link href="/" className="flex items-center space-x-2">
-                <Image src="/favicon.png" alt="Logo" width={32} height={32} className="h-8 w-8" />
+                <Image
+                  src="/favicon.png"
+                  alt="Logo"
+                  width={32}
+                  height={32}
+                  className="h-8 w-8"
+                />
                 <span className="font-bold text-2xl">fanboxes</span>
               </Link>
               <nav className="hidden md:flex items-center space-x-4">
@@ -65,7 +87,7 @@ export default function Header() {
             </div>
 
             <div className="flex items-center space-x-4">
-              {isAuthenticated ? (
+              {isLoggedIn ? (
                 <>
                   <Button
                     onClick={() => setShowTopUpPopup(true)}
@@ -77,12 +99,19 @@ export default function Header() {
                   </Button>
                   <div className="relative">
                     <button
-                      onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+                      onClick={() =>
+                        setShowProfileDropdown(!showProfileDropdown)
+                      }
                       className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
                     >
-                      <span className="hidden sm:inline font-semibold text-sm">WILLIAM</span>
+                      <span className="hidden sm:inline font-semibold text-sm">
+                        {user?.user?.firstName || ""}
+                      </span>
                       <Image
-                        src="/images/user-william.png"
+                        src={
+                          user?.user?.avatar ||
+                          `https://ui-avatars.com/api/?name=${user?.user?.firstName}+${user?.user?.lastName}&size=128&rounded=true`
+                        }
                         alt="User Avatar"
                         width={32}
                         height={32}
@@ -96,15 +125,24 @@ export default function Header() {
                         <div className="px-4 py-3 border-b border-gray-100">
                           <div className="flex items-center space-x-3">
                             <Image
-                              src="/images/user-william.png"
+                              src={
+                                user?.user?.avatar ||
+                                `https://ui-avatars.com/api/?name=${user?.user?.firstName}+${user?.user?.lastName}&size=128&rounded=true`
+                              }
                               alt="User Avatar"
                               width={40}
                               height={40}
                               className="rounded-full bg-gray-300"
                             />
                             <div>
-                              <p className="font-semibold text-sm text-gray-900">William</p>
-                              <p className="text-xs text-gray-500">william@example.com</p>
+                              <p className="font-semibold text-sm text-gray-900">
+                                {user?.user?.firstName +
+                                  " " +
+                                  user?.user?.lastName || ""}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                {user?.user?.email || ""}
+                              </p>
                             </div>
                           </div>
                         </div>
@@ -162,7 +200,10 @@ export default function Header() {
       </header>
 
       {/* Top Up Popup */}
-      <TopUpPopup isOpen={showTopUpPopup} onClose={() => setShowTopUpPopup(false)} />
+      <TopUpPopup
+        isOpen={showTopUpPopup}
+        onClose={() => setShowTopUpPopup(false)}
+      />
     </>
-  )
+  );
 }
