@@ -1,7 +1,7 @@
-import Image from "next/image"
-import { Button } from "@/components/Button"
-import { ArrowRight } from "lucide-react"
-import { newAmbassadors } from "@/lib/data-v2"
+import Image from "next/image";
+import { Button } from "@/components/Button";
+import { ArrowRight } from "lucide-react";
+import { newAmbassadors } from "@/lib/data-v2";
 
 export default function NewAmbassadors() {
   return (
@@ -32,5 +32,5 @@ export default function NewAmbassadors() {
         ))}
       </div>
     </section>
-  )
+  );
 }

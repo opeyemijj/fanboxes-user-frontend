@@ -1,15 +1,15 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Search } from "lucide-react"
-import { TrendingBoxCard } from "./trending-box-card"
-import AmbassadorCard from "@/components/_main/AmbassadorCard"
-import { trendingBoxes, trendingAmbassadors } from "@/lib/data-v2"
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Search } from "lucide-react";
+import { TrendingBoxCard } from "./trending-box-card";
+import AmbassadorCard from "@/components/_main/AmbassadorCard";
+import { trendingBoxes, trendingAmbassadors } from "@/lib/data-v2";
 
 export default function TrendingSidebar() {
-  const [activeTab, setActiveTab] = useState("boxes")
+  const [activeTab, setActiveTab] = useState("boxes");
 
   return (
     <aside className="bg-gray-50 p-6 rounded-lg sticky top-24">
@@ -24,7 +24,9 @@ export default function TrendingSidebar() {
           onClick={() => setActiveTab("boxes")}
           size="sm"
           className={`rounded-full ${
-            activeTab === "boxes" ? "bg-black text-white" : "bg-gray-200 text-black hover:bg-gray-300"
+            activeTab === "boxes"
+              ? "bg-black text-white"
+              : "bg-gray-200 text-black hover:bg-gray-300"
           }`}
         >
           BOXES
@@ -33,7 +35,9 @@ export default function TrendingSidebar() {
           onClick={() => setActiveTab("ambassadors")}
           size="sm"
           className={`rounded-full ${
-            activeTab === "ambassadors" ? "bg-black text-white" : "bg-gray-200 text-black hover:bg-gray-300"
+            activeTab === "ambassadors"
+              ? "bg-black text-white"
+              : "bg-gray-200 text-black hover:bg-gray-300"
           }`}
         >
           AMBASSADORS
@@ -55,5 +59,5 @@ export default function TrendingSidebar() {
         </div>
       )}
     </aside>
-  )
+  );
 }

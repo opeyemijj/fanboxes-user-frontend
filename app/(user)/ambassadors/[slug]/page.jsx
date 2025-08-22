@@ -1,21 +1,41 @@
-import Header from "@/components/_main/Header"
-import AmbassadorProfile from "@/components/_main/AmbassadorProfile"
-import AmbassadorBoxes from "@/components/_main/AmbassadorBoxes"
-import AmbassadorTopSidebar from "@/components/_main/AmbassadorTopSidebar"
-import YouMightLike from "@/components/_main/YouMightLike"
-import Footer from "@/components/_main/Footer"
-import { enhancedAmbassadors, enhancedMysteryBoxes, filterBoxesByCreator } from "@/lib/enhanced-data"
-import { notFound } from "next/navigation"
+"use client";
+import Header from "@/components/_main/Header";
+import AmbassadorProfile from "@/components/_main/AmbassadorProfile";
+import AmbassadorBoxes from "@/components/_main/AmbassadorBoxes";
+import AmbassadorTopSidebar from "@/components/_main/AmbassadorTopSidebar";
+import YouMightLike from "@/components/_main/YouMightLike";
+import Footer from "@/components/_main/Footer";
+import {
+  enhancedAmbassadors,
+  enhancedMysteryBoxes,
+  filterBoxesByCreator,
+} from "@/lib/enhanced-data";
+import { notFound } from "next/navigation";
+import { useSelector } from "react-redux";
 
 export default function AmbassadorProfilePage({ params }) {
-  const ambassador = enhancedAmbassadors.find((amb) => amb?.slug === params?.slug)
+  const {
+    shops,
+    loading: shopsLoading,
+    error,
+  } = useSelector((state) => state.shops);
+
+  const {
+    products,
+    loading: productsLoading,
+    error: productsError,
+  } = useSelector((state) => state.product);
+  console.log(shops, "Check the shop");
+
+  const ambassador = shops?.find((amb) => amb?.slug === params?.slug);
 
   if (!ambassador) {
-    notFound()
+    notFound();
   }
 
   // Get ambassador's boxes
-  const ambassadorBoxes = filterBoxesByCreator(enhancedMysteryBoxes, ambassador.id)
+  const ambassadorBoxes = filterBoxesByCreator(products, ambassador);
+  console.log(ambassadorBoxes, "check how many box are here");
 
   return (
     <div className="bg-white text-black">
@@ -26,7 +46,7 @@ export default function AmbassadorProfilePage({ params }) {
             <div
               className="absolute inset-0 bg-cover bg-center"
               style={{
-                backgroundImage: `url(${ambassador.bannerImage})`,
+                backgroundImage: `url(${ambassador?.cover?.url})`,
               }}
             />
             <div className="absolute inset-0 bg-black/20" />
@@ -37,17 +57,23 @@ export default function AmbassadorProfilePage({ params }) {
           <div className="flex flex-col lg:flex-row gap-8 relative z-10">
             <div className="w-full lg:w-2/3 xl:w-3/4">
               <AmbassadorProfile ambassador={ambassador} />
-              <AmbassadorBoxes ambassador={ambassador} boxes={ambassadorBoxes} />
+              <AmbassadorBoxes
+                ambassador={ambassador}
+                boxes={ambassadorBoxes}
+              />
             </div>
             <div className="w-full lg:w-1/3 xl:w-1/4">
-              <AmbassadorTopSidebar ambassador={ambassador} boxes={ambassadorBoxes} />
+              <AmbassadorTopSidebar
+                ambassador={ambassador}
+                boxes={ambassadorBoxes}
+              />
             </div>
           </div>
         </div>
 
-        <YouMightLike />
+        {/* <YouMightLike /> */}
       </main>
       <Footer />
     </div>
-  )
+  );
 }

@@ -1,37 +1,38 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Image from "next/image"
-import { Button } from "@/components/Button"
-import Link from "next/link"
-import PrizePopup from "../PrizePopup"
+import { useState } from "react";
+import Image from "next/image";
+import { Button } from "@/components/Button";
+import Link from "next/link";
+import PrizePopup from "../PrizePopup";
 
 export default function BoxSpinner({ box }) {
-  const [isSpinning, setIsSpinning] = useState(false)
-  const [showPrizePopup, setShowPrizePopup] = useState(false)
-  const [selectedPrize, setSelectedPrize] = useState(null)
+  const [isSpinning, setIsSpinning] = useState(false);
+  const [showPrizePopup, setShowPrizePopup] = useState(false);
+  const [selectedPrize, setSelectedPrize] = useState(null);
 
   const handleSpin = () => {
-    setIsSpinning(true)
+    setIsSpinning(true);
 
     // Simulate spinning animation
     setTimeout(() => {
-      setIsSpinning(false)
+      setIsSpinning(false);
 
       // Select a random prize from the box contents or prize items
-      const availablePrizes = box.contents || box.prizeItems || []
+      const availablePrizes = box?.priceSale || box?.prizeItems || [];
       if (availablePrizes.length > 0) {
-        const randomPrize = availablePrizes[Math.floor(Math.random() * availablePrizes.length)]
-        setSelectedPrize(randomPrize)
-        setShowPrizePopup(true)
+        const randomPrize =
+          availablePrizes[Math.floor(Math.random() * availablePrizes.length)];
+        setSelectedPrize(randomPrize);
+        setShowPrizePopup(true);
       }
-    }, 3000)
-  }
+    }, 3000);
+  };
 
   const closePrizePopup = () => {
-    setShowPrizePopup(false)
-    setSelectedPrize(null)
-  }
+    setShowPrizePopup(false);
+    setSelectedPrize(null);
+  };
 
   return (
     <>
@@ -41,25 +42,31 @@ export default function BoxSpinner({ box }) {
           <div className="flex items-center space-x-4">
             <div className="w-16 h-16 bg-[#11F2EB] rounded-full flex items-center justify-center overflow-hidden">
               <Image
-                src={box.ambassadorImage || "/placeholder.svg"}
-                alt={box.ambassadorName}
+                src={box?.images[0]?.url || "/placeholder.svg"}
+                alt={box?.ambassadorName}
                 width={64}
                 height={64}
                 className="w-full h-full object-cover rounded-full"
               />
             </div>
             <div>
-              <h1 className="text-3xl font-bold">{box.ambassadorName}</h1>
-              <p className="text-gray-500">{box.title}</p>
+              <h1 className="text-3xl font-bold">{box?.shopDetails?.title}</h1>
+              <p className="text-gray-500">{box?.name}</p>
             </div>
           </div>
           <div className="flex items-center space-x-3">
-            <Button variant="outline" className="bg-gray-100 border-gray-200 rounded-full">
+            <Button
+              variant="outline"
+              className="bg-gray-100 border-gray-200 rounded-full"
+            >
               <span className="mr-2">🔔</span>
               GET UPDATES
             </Button>
-            <Link href={`/ambassadors/${box.ambassadorSlug}`}>
-              <Button variant="outline" className="bg-gray-100 border-gray-200 rounded-full">
+            <Link href={`/ambassadors/${box?.ambassadorSlug}`}>
+              <Button
+                variant="outline"
+                className="bg-gray-100 border-gray-200 rounded-full"
+              >
                 VIEW PROFILE
                 <span className="ml-2">→</span>
               </Button>
@@ -78,10 +85,12 @@ export default function BoxSpinner({ box }) {
               isSpinning ? "animate-spin" : ""
             }`}
           >
-            {box.prizeItems?.map((item, index) => (
+            {box?.prizeItems?.map((item, index) => (
               <div
                 key={index}
-                className={`relative transition-all duration-1000 ${isSpinning ? "animate-bounce" : ""}`}
+                className={`relative transition-all duration-1000 ${
+                  isSpinning ? "animate-bounce" : ""
+                }`}
                 style={{
                   animationDelay: `${index * 0.2}s`,
                 }}
@@ -107,7 +116,7 @@ export default function BoxSpinner({ box }) {
                 <div className="flex items-center">
                   {isSpinning ? "SPINNING..." : "SPIN FOR"}
                   <span className="mx-2">⬢</span>
-                  {box.spinCost || "100"}
+                  {box?.spinCost || "100"}
                 </div>
               </Button>
             </div>
@@ -116,7 +125,12 @@ export default function BoxSpinner({ box }) {
       </div>
 
       {/* Prize Popup */}
-      <PrizePopup isOpen={showPrizePopup} onClose={closePrizePopup} prize={selectedPrize} spinCost={box.spinCost} />
+      <PrizePopup
+        isOpen={showPrizePopup}
+        onClose={closePrizePopup}
+        prize={selectedPrize}
+        spinCost={box?.spinCost}
+      />
     </>
-  )
+  );
 }

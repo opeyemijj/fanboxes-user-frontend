@@ -8,6 +8,10 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-}
 
-export default nextConfig
+  env: {
+    BASE_URL: process.env.BASE_URL,
+  },
+};
+
+export default nextConfig;

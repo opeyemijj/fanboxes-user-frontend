@@ -1,21 +1,25 @@
-"use client"
-import { useState } from "react"
-import Header from "@/components/_main/Header"
-import HeroCarousel from "@/components/_main/HeroCarousel"
-import LatestBoxes from "@/components/_main/LatestBoxes"
-import NewAmbassadors from "@/components/_main/NewAmbassadors"
-import Categories from "@/components/_main/Categories"
-import TrendingSidebar from "@/components/_main/TrendingSidebar"
-import Footer from "@/components/_main/Footer"
-import { useProgressiveLoading } from "@/hooks/useProgressiveLoading"
-import { useInitialDataFetch } from "@/hooks/useInitialDataFetch"
+"use client";
+import { useState } from "react";
+import Header from "@/components/_main/Header";
+import HeroCarousel from "@/components/_main/HeroCarousel";
+import LatestBoxes from "@/components/_main/LatestBoxes";
+import NewAmbassadors from "@/components/_main/NewAmbassadors";
+import Categories from "@/components/_main/Categories";
+import TrendingSidebar from "@/components/_main/TrendingSidebar";
+import Footer from "@/components/_main/Footer";
+import { useProgressiveLoading } from "@/hooks/useProgressiveLoading";
+import { useInitialDataFetch } from "@/hooks/useInitialDataFetch";
 
 export default function HomePage() {
-  const [selectedCategory, setSelectedCategory] = useState("all")
+  const [selectedCategory, setSelectedCategory] = useState("all");
 
-  const { isLoading } = useProgressiveLoading(["hero", "latestBoxes", "newAmbassadors", "trending"], 800)
+  const { isLoading } = useProgressiveLoading(
+    ["hero", "latestBoxes", "newAmbassadors", "trending"],
+    800
+  );
 
-  const { isLoading: dataLoading, hasError } = useInitialDataFetch()
+  const { isLoading: dataLoading, hasError } = useInitialDataFetch();
+  // console.log(hasError, "Check the error");
 
   return (
     <div className="bg-white text-black">
@@ -43,8 +47,11 @@ export default function HomePage() {
             <div className="bg-[#EFEFEF] rounded-lg p-4 mb-6">
               <NewAmbassadors loading={isLoading("newAmbassadors")} />
             </div>
-            <h2 className="text-3xl font-bold mb-4">Our Categories</h2>
-            <Categories selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} />
+            <h2 className="text-3xl font-bold mb-4"> Our Categories</h2>
+            <Categories
+              selectedCategory={selectedCategory}
+              onCategoryChange={setSelectedCategory}
+            />
           </div>
           <div className="w-full lg:w-1/3 xl:w-1/4">
             <TrendingSidebar loading={isLoading("trending")} />
@@ -53,5 +60,5 @@ export default function HomePage() {
       </main>
       <Footer />
     </div>
-  )
+  );
 }

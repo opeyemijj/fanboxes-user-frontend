@@ -1,5 +1,5 @@
-import { BoxCard } from "./box-card"
-import { latestBoxes } from "@/lib/data-v2"
+import { BoxCard } from "./box-card";
+import { latestBoxes } from "@/lib/data-v2";
 
 export default function LatestBoxes() {
   return (
@@ -11,5 +11,5 @@ export default function LatestBoxes() {
         ))}
       </div>
     </section>
-  )
+  );
 }
