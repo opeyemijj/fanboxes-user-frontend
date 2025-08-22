@@ -8,8 +8,8 @@ export default function AmbassadorProfile({ ambassador }) {
       <div className="md:flex items-start space-x-6">
         <div className="relative">
           <Image
-            src={ambassador.image || "/placeholder.svg"}
-            alt={ambassador.name}
+            src={ambassador?.logo?.url || "/placeholder.svg"}
+            alt={ambassador?.title}
             width={120}
             height={120}
             className="rounded-full border-4 border-white shadow-lg aspect-square object-cover"
@@ -17,7 +17,7 @@ export default function AmbassadorProfile({ ambassador }) {
           />
         </div>
         <div className="flex-1">
-          <h1 className="text-4xl font-bold mb-2">{ambassador.name}</h1>
+          <h1 className="text-4xl font-bold mb-2">{ambassador.title}</h1>
           <p className="text-gray-600 mb-4">
             {ambassador.description || "New box opening coming soon"}
           </p>
