@@ -1,16 +1,16 @@
-import Header from "@/components/_main/Header"
-import BoxSpinner from "@/components/_main/BoxSpinner"
-import BoxContents from "@/components/_main/BoxContents"
-import YouMightLike from "@/components/_main/YouMightLike"
-import Footer from "@/components/_main/Footer"
-import { boxesData } from "@/lib/boxes-data"
-import { notFound } from "next/navigation"
+import Header from "@/components/_main/Header";
+import BoxSpinner from "@/components/_main/BoxSpinner";
+import BoxContents from "@/components/_main/BoxContents";
+import YouMightLike from "@/components/_main/YouMightLike";
+import Footer from "@/components/_main/Footer";
+import { boxesData } from "@/lib/boxes-data";
+import { notFound } from "next/navigation";
 
 export default function BoxSpinPage({ params }) {
-  const box = boxesData.find((b) => b.slug === params.slug)
+  const box = boxesData.find((b) => b.slug === params.slug);
 
   if (!box) {
-    notFound()
+    notFound();
   }
 
   return (
@@ -23,5 +23,5 @@ export default function BoxSpinPage({ params }) {
       </main>
       <Footer />
     </div>
-  )
+  );
 }

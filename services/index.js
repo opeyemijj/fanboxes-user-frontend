@@ -1,4 +1,4 @@
-import http from './http';
+import http from "./http";
 
 export const register = async (payload) => {
   const { data } = await http.post(`/auth/register`, payload);
@@ -19,14 +19,14 @@ export const login = async (payload) => {
 };
 
 export const forgetPassword = async (payload) => {
-  const { data } = await http.post('/auth/forget-password', payload);
+  const { data } = await http.post("/auth/forget-password", payload);
   return data;
 };
 
 export const resetPassword = async ({ newPassword, token }) => {
-  const { data } = await http.post('/auth/reset-password', {
+  const { data } = await http.post("/auth/reset-password", {
     newPassword: newPassword,
-    token: token
+    token: token,
   });
   return data;
 };
@@ -41,7 +41,9 @@ export const getNotifications = async (page) => {
 };
 
 export const getBrandsByAdmin = async (page, search) => {
-  const { data } = await http.get(`/admin/brands?search=${search}&page=${page}`);
+  const { data } = await http.get(
+    `/admin/brands?search=${search}&page=${page}`
+  );
   return data;
 };
 export const getBrandByAdmin = async (id) => {
@@ -66,7 +68,9 @@ export const deleteBrandByAdmin = async (slug) => {
 };
 
 export const getCategoriesByAdmin = async (page, search) => {
-  const { data } = await http.get(`/admin/categories?search=${search}&page=${page}`);
+  const { data } = await http.get(
+    `/admin/categories?search=${search}&page=${page}`
+  );
   return data;
 };
 export const getCategoryByAdmin = async (slug) => {
@@ -87,7 +91,7 @@ export const updateCategoryByAdmin = async ({ currentSlug, ...payload }) => {
 };
 
 export const verifySpinByAdmin = async ({ ...payload }) => {
-  console.log(payload, 'check the spin varify payload in api');
+  console.log(payload, "check the spin varify payload in api");
   const { data } = await http.post(`/admin/spin-verify`, payload);
   return data;
 };
@@ -114,7 +118,10 @@ export const addSubCategoryByAdmin = async (payload) => {
   return data;
 };
 export const updateSubCategoryByAdmin = async ({ currentSlug, ...payload }) => {
-  const { data } = await http.put(`/admin/subcategories/${currentSlug}`, payload);
+  const { data } = await http.put(
+    `/admin/subcategories/${currentSlug}`,
+    payload
+  );
   return data;
 };
 
@@ -127,18 +134,31 @@ export const createProductByAdmin = async (payload) => {
   return response;
 };
 export const updateProductByAdmin = async ({ currentSlug, ...payload }) => {
-  const { data: response } = await http.put(`/admin/products/${currentSlug}`, payload);
+  const { data: response } = await http.put(
+    `/admin/products/${currentSlug}`,
+    payload
+  );
   return response;
 };
 
 export const updateItemBoxByAdmin = async ({ currentSlug, ...payload }) => {
-  const { data: response } = await http.put(`/admin/boxItem/${currentSlug}`, payload);
+  const { data: response } = await http.put(
+    `/admin/boxItem/${currentSlug}`,
+    payload
+  );
   return response;
 };
 
 export const updateBoxItemOddByAdmin = async ({ currentSlug, ...payload }) => {
-  console.log(currentSlug, payload, 'Check the backend api is calling for update item odd');
-  const { data: response } = await http.put(`/admin/boxItemOdd/${currentSlug}`, payload);
+  console.log(
+    currentSlug,
+    payload,
+    "Check the backend api is calling for update item odd"
+  );
+  const { data: response } = await http.put(
+    `/admin/boxItemOdd/${currentSlug}`,
+    payload
+  );
   return response;
 };
 
@@ -164,7 +184,9 @@ export const updateOrderStatus = async ({ id, ...payload }) => {
   return data;
 };
 export const getUserByAdminsByAdmin = async (page, search) => {
-  const { data: response } = await http.get(`/admin/users?search=${search}&page=${page}`);
+  const { data: response } = await http.get(
+    `/admin/users?search=${search}&page=${page}`
+  );
   return response;
 };
 export const getUserByAdmin = async (id) => {
@@ -177,7 +199,9 @@ export const updateUserRoleByAdmin = async (id) => {
 };
 
 export const getCouponCodesByAdmin = async (page, search) => {
-  const { data: response } = await http.get(`/admin/coupon-codes?search=${search}&page=${page}`);
+  const { data: response } = await http.get(
+    `/admin/coupon-codes?search=${search}&page=${page}`
+  );
   return response;
 };
 
@@ -191,7 +215,10 @@ export const addCouponCodeByAdmin = async (payload) => {
   return response;
 };
 export const updateCouponCodeByAdmin = async ({ currentId, ...others }) => {
-  const { data: response } = await http.put(`/admin/coupon-codes/${currentId}`, others);
+  const { data: response } = await http.put(
+    `/admin/coupon-codes/${currentId}`,
+    others
+  );
   return response;
 };
 export const deleteCouponCodeByAdmin = async (id) => {
@@ -220,15 +247,21 @@ export const deleteShop = async (slug) => {
   return response;
 };
 export const getLowStockProductsByAdmin = async (page) => {
-  const { data: response } = await http.get(`/admin/low-stock-products?page=${page}`);
+  const { data: response } = await http.get(
+    `/admin/low-stock-products?page=${page}`
+  );
   return response;
 };
 export const getShopsByAdmin = async (page, search) => {
-  const { data: response } = await http.get(`/admin/shops?search=${search}&page=${page}`);
+  const { data: response } = await http.get(
+    `/admin/shops?search=${search}&page=${page}`
+  );
   return response;
 };
 export const getShopIncomeByAdmin = async (slug, page) => {
-  const { data } = await http.get(`/admin/shops/${slug}/income?page=${page || 1}`);
+  const { data } = await http.get(
+    `/admin/shops/${slug}/income?page=${page || 1}`
+  );
 
   return data;
 };
@@ -253,7 +286,9 @@ export const getAllShopsByAdmin = async () => {
   return data;
 };
 export const getCurrenciesByAdmin = async (page, search) => {
-  const { data } = await http.get(`/admin/currencies?page=${page || 1}&search=${search || ''}`);
+  const { data } = await http.get(
+    `/admin/currencies?page=${page || 1}&search=${search || ""}`
+  );
   return data;
 };
 export const addCurrencyByAdmin = async (payload) => {
@@ -269,7 +304,9 @@ export const getCurrencyByAdmin = async (cid) => {
   return data;
 };
 export const getCompaignsByAdmin = async (page, search) => {
-  const { data } = await http.get(`/admin/compaigns?page=${page || 1}&search=${search || ''}`);
+  const { data } = await http.get(
+    `/admin/compaigns?page=${page || 1}&search=${search || ""}`
+  );
   return data;
 };
 export const addCompaignByAdmin = async (payload) => {
@@ -303,11 +340,15 @@ export const vendorDashboardAnalytics = async () => {
   return data;
 };
 export const getVendorLowStockProducts = async (page) => {
-  const { data: response } = await http.get(`/vendor/low-stock-products?page=${page}`);
+  const { data: response } = await http.get(
+    `/vendor/low-stock-products?page=${page}`
+  );
   return response;
 };
 export const getVendorProducts = async (page, search) => {
-  const { data: response } = await http.get(`/vendor/products?search=${search}&page=${page}`);
+  const { data: response } = await http.get(
+    `/vendor/products?search=${search}&page=${page}`
+  );
   return response;
 };
 export const deleteVendorProduct = async (slug) => {
@@ -319,12 +360,15 @@ export const createVendorProduct = async (payload) => {
   return response;
 };
 export const createVendorBoxItem = async (payload) => {
-  console.log(payload, 'OKK SEE');
+  console.log(payload, "OKK SEE");
   const { data: response } = await http.post(`/vendor/boxItem`, payload);
   return response;
 };
 export const updateVendorProduct = async ({ currentSlug, ...payload }) => {
-  const { data: response } = await http.put(`/vendor/products/${currentSlug}`, payload);
+  const { data: response } = await http.put(
+    `/vendor/products/${currentSlug}`,
+    payload
+  );
   return response;
 };
 export const getOrdersByVendor = async (payload) => {
@@ -348,8 +392,8 @@ export const getIncomeByVendor = async (slug, page) => {
   return data;
 };
 
-export const getProducts = async (query = '', cat, rate) => {
-  const { data } = await http.get(`/products${query || '?'}&rate=${rate}`);
+export const getProducts = async (query = "", cat, rate) => {
+  const { data } = await http.get(`/products${query || "?"}&rate=${rate}`);
   return data;
 };
 
@@ -363,12 +407,16 @@ export const getProductDetails = async (pid) => {
   return data;
 };
 
-export const getProductsByCategory = async (query = '', category, rate) => {
-  const { data } = await http.get(`/category/products/${category}${query || '?'}&rate=${rate}`);
+export const getProductsByCategory = async (query = "", category, rate) => {
+  const { data } = await http.get(
+    `/category/products/${category}${query || "?"}&rate=${rate}`
+  );
   return data;
 };
-export const getProductsByCompaign = async (query = '', slug, rate) => {
-  const { data } = await http.get(`/compaign/products/${slug}${query || '?'}&rate=${rate}`);
+export const getProductsByCompaign = async (query = "", slug, rate) => {
+  const { data } = await http.get(
+    `/compaign/products/${slug}${query || "?"}&rate=${rate}`
+  );
   return data;
 };
 
@@ -376,18 +424,26 @@ export const getProductSlugs = async () => {
   const { data } = await http.get(`/products-slugs`);
   return data;
 };
-export const getProductsBySubCategory = async (query = '', subcategory, rate) => {
-  const { data } = await http.get(`/subcategory/products/${subcategory}${query || '?'}&rate=${rate}`);
+export const getProductsBySubCategory = async (
+  query = "",
+  subcategory,
+  rate
+) => {
+  const { data } = await http.get(
+    `/subcategory/products/${subcategory}${query || "?"}&rate=${rate}`
+  );
   return data;
 };
 
-export const getProductsByShop = async (query = '', shop, rate) => {
-  const { data } = await http.get(`/shop/products/${shop}${query || '?'}&rate=${rate}`);
+export const getProductsByShop = async (query = "", shop, rate) => {
+  const { data } = await http.get(
+    `/shop/products/${shop}${query || "?"}&rate=${rate}`
+  );
   return data;
 };
 
 export const getAllProducts = async () => {
-  const { data } = await http.get(`/products/all`);
+  const { data } = await http.get(`/products`);
   return data;
 };
 export const getAllFilters = async () => {
@@ -405,7 +461,7 @@ export const getFiltersByShop = async (shop) => {
 };
 
 export const getNewArrivels = async () => {
-  const { data } = await http.get('/new-arrivals');
+  const { data } = await http.get("/new-arrivals");
   return data;
 };
 export const getRelatedProducts = async (pid) => {
@@ -506,7 +562,7 @@ export const getProfile = async () => {
 
 export const getCart = async (ids) => {
   const { data } = await http.post(`/cart`, {
-    products: ids
+    products: ids,
   });
   return data;
 };
@@ -557,14 +613,14 @@ export const applyCouponCode = async (code) => {
 export const paymentIntents = async (amount, currency) => {
   const { data } = await http.post(`/payment-intents`, {
     amount,
-    currency
+    currency,
   });
   return data;
 };
 
 export const addShopByUser = async (payload) => {
   const { data } = await http.post(`/shops`, {
-    ...payload
+    ...payload,
   });
 
   return data;
@@ -602,7 +658,7 @@ export const getCategorySlugs = async () => {
   return data;
 };
 export const getShopSlugs = async () => {
-  const { data } = await http.get('/shops-slugs');
+  const { data } = await http.get("/shops-slugs");
   return data;
 };
 export const getShopBySlug = async (shop) => {
@@ -629,7 +685,7 @@ export const getSubCategorySlugs = async () => {
 };
 
 export const getCompaignSlugs = async () => {
-  const { data } = await http.get('/compaigns-slugs');
+  const { data } = await http.get("/compaigns-slugs");
   return data;
 };
 export const getCompaignBySlug = async (slug) => {
