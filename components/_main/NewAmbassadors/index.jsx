@@ -26,7 +26,7 @@ export default function NewAmbassadors({ loading = false }) {
     return <NewAmbassadorsSkeleton />;
   }
 
-  const newAmbassadors = shops.slice(0, 6);
+  const newAmbassadors = shops;
 
   return (
     <section className="mt-2">

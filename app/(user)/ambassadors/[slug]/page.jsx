@@ -35,6 +35,7 @@ export default function AmbassadorProfilePage({ params }) {
 
   // Get ambassador's boxes
   const ambassadorBoxes = filterBoxesByCreator(products, ambassador);
+  // console.log(ambassadorBoxes, "check how many box are here");
 
   return (
     <div className="bg-white text-black">
@@ -70,7 +71,7 @@ export default function AmbassadorProfilePage({ params }) {
           </div>
         </div>
 
-        <YouMightLike />
+        {/* <YouMightLike /> */}
       </main>
       <Footer />
     </div>
