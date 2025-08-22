@@ -36,13 +36,14 @@ export default function MysteryBoxesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("most-popular");
 
+  // Box data
   const {
     products,
     loading: productsLoading,
     error,
   } = useSelector((state) => state.product);
 
-  // console.log(products, "OKKK NOW");
+  console.log(products, "OKKK");
 
   // Fallback data for demonstration
   const fallbackBoxes = [
