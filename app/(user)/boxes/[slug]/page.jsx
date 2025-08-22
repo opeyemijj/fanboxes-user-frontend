@@ -15,6 +15,25 @@ export default function BoxSpinPage({ params }) {
     error,
   } = useSelector((state) => state.product);
 
+  // Show loader while fetching
+  if (productsLoading) {
+    return (
+      <div className="bg-white text-black min-h-screen flex items-center justify-center">
+        <p>Loading box...</p>
+      </div>
+    );
+  }
+
+  // Handle fetch error
+  if (error) {
+    return (
+      <div className="bg-white text-black min-h-screen flex items-center justify-center">
+        <p className="text-red-600">Failed to load products: {error}</p>
+      </div>
+    );
+  }
+
+  // Once loaded, find the box by slug
   const box = products.find((b) => b.slug === params.slug);
 
   if (!box) {

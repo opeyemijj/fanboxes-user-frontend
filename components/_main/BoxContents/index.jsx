@@ -13,7 +13,7 @@ export default function BoxContents({ box, loading = false }) {
         <div className="px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold mb-8">What's in the box...</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-6">
-            {box?.items?.map((item) => (
+            {box?.prizeItems?.map((item) => (
               <div key={item._id} className="group">
                 <div className="bg-white rounded-lg overflow-hidden shadow-sm aspect-[4/3] relative flex">
                   <div className="relative bg-white p-4 flex-1 flex items-center justify-center">
@@ -23,7 +23,7 @@ export default function BoxContents({ box, loading = false }) {
                       </div>
                     )}
                     <Image
-                      src={item.images[0]?.url || "/placeholder.svg"}
+                      src={item?.image || "/placeholder.svg"}
                       alt={item.name}
                       width={200}
                       height={150}

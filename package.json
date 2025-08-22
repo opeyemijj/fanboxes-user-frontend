@@ -16,6 +16,7 @@
     "@mui/icons-material": "^6.1.6",
     "@mui/material": "latest",
     "@mui/material-pigment-css": "latest",
+    "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-select": "latest",
     "@radix-ui/react-slot": "latest",
     "@reduxjs/toolkit": "latest",

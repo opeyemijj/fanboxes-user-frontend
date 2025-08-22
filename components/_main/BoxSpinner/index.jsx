@@ -6,28 +6,18 @@ import { Button } from "@/components/Button";
 import Link from "next/link";
 import PrizePopup from "../PrizePopup";
 
+import FanboxGame from "./FanboxGame";
+// import boxConfig from "../data/box-config.json";
+
+function SpinGame({ boxConfig }) {
+  return <FanboxGame boxConfig={boxConfig} />;
+}
+
 export default function BoxSpinner({ box }) {
+  box.prizeItems = box.prizeItems || box.items || [];
   const [isSpinning, setIsSpinning] = useState(false);
   const [showPrizePopup, setShowPrizePopup] = useState(false);
   const [selectedPrize, setSelectedPrize] = useState(null);
-
-  const handleSpin = () => {
-    setIsSpinning(true);
-
-    // Simulate spinning animation
-    setTimeout(() => {
-      setIsSpinning(false);
-
-      // Select a random prize from the box contents or prize items
-      const availablePrizes = box.priceSale || box.prizeItems || [];
-      if (availablePrizes.length > 0) {
-        const randomPrize =
-          availablePrizes[Math.floor(Math.random() * availablePrizes.length)];
-        setSelectedPrize(randomPrize);
-        setShowPrizePopup(true);
-      }
-    }, 3000);
-  };
 
   const closePrizePopup = () => {
     setShowPrizePopup(false);
@@ -75,53 +65,56 @@ export default function BoxSpinner({ box }) {
         </div>
 
         {/* Spinning Area */}
-        <div className="relative w-full h-[400px] bg-black overflow-hidden flex items-center justify-center rounded-lg mb-8">
-          {/* Background Gradient */}
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-900/80 via-teal-600/60 to-purple-900/80" />
 
-          {/* Floating Prize Items */}
-          <div
-            className={`relative z-10 flex flex-wrap items-center justify-center gap-8 max-w-6xl mx-auto px-4 transition-transform duration-1000 ${
-              isSpinning ? "animate-spin" : ""
-            }`}
-          >
-            {box.prizeItems?.map((item, index) => (
-              <div
-                key={index}
-                className={`relative transition-all duration-1000 ${
-                  isSpinning ? "animate-bounce" : ""
-                }`}
-                style={{
-                  animationDelay: `${index * 0.2}s`,
-                }}
-              >
-                <Image
-                  src={item.image || "/placeholder.svg"}
-                  alt={item.name}
-                  width={item.size || 120}
-                  height={item.size || 120}
-                  className="object-contain drop-shadow-2xl"
-                />
-              </div>
-            ))}
+        {/* <div className="relative w-full h-[400px] bg-black overflow-hidden flex items-center justify-center rounded-lg mb-8">
+         
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-900/80 via-teal-600/60 to-purple-900/80" />
 
-            {/* Central Spin Button */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <Button
-                onClick={handleSpin}
-                disabled={isSpinning}
-                variant="cyan"
-                className="h-20 w-48 rounded-full font-bold text-lg shadow-lg shadow-cyan-500/50 disabled:opacity-50 transition-all duration-300"
-              >
-                <div className="flex items-center">
-                  {isSpinning ? "SPINNING..." : "SPIN FOR"}
-                  <span className="mx-2">⬢</span>
-                  {box.spinCost || "100"}
+     
+            <div
+              className={`relative z-10 flex flex-wrap items-center justify-center gap-8 max-w-6xl mx-auto px-4 transition-transform duration-1000 ${
+                isSpinning ? "animate-spin" : ""
+              }`}
+            >
+              {box.prizeItems?.map((item, index) => (
+                <div
+                  key={index}
+                  className={`relative transition-all duration-1000 ${
+                    isSpinning ? "animate-bounce" : ""
+                  }`}
+                  style={{
+                    animationDelay: `${index * 0.2}s`,
+                  }}
+                >
+                  <Image
+                    src={item.image || "/placeholder.svg"}
+                    alt={item.name}
+                    width={item.size || 120}
+                    height={item.size || 120}
+                    className="object-contain drop-shadow-2xl"
+                  />
                 </div>
-              </Button>
+              ))}
+
+           
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Button
+                  onClick={handleSpinClicked}
+                  disabled={isSpinning}
+                  variant="cyan"
+                  className="h-20 w-48 rounded-full font-bold text-lg shadow-lg shadow-cyan-500/50 disabled:opacity-50 transition-all duration-300"
+                >
+                  <div className="flex items-center">
+                    {isSpinning ? "SPINNING..." : "SPIN FOR"}
+                    <span className="mx-2">⬢</span>
+                    {box.spinCost || "100"}
+                  </div>
+                </Button>
+              </div>
             </div>
-          </div>
-        </div>
+          </div> */}
+
+        <SpinGame boxConfig={box} />
       </div>
 
       {/* Prize Popup */}
