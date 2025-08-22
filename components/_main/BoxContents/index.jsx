@@ -8,7 +8,7 @@ export default function BoxContents({ box, loading = false }) {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+    <div className="container mx-auto  mb-4">
       <section className="bg-[#EFEFEF] py-8 rounded-lg">
         <div className="px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold mb-8">What's in the box...</h2>
