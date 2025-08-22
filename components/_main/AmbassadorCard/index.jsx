@@ -48,7 +48,7 @@ export default function AmbassadorCard({ ambassador }) {
         </Button>
       </div>
       <p className="font-bold mt-3 text-sm">
-        {ambassador.name || "Unknown Ambassador"}
+        {ambassador.title || "Unknown Ambassador"}
       </p>
     </Link>
   );

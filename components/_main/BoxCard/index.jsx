@@ -29,9 +29,11 @@ export default function BoxCard({ box }) {
         </div>
       </Link>
       <div className="mt-2">
-        <span className="font-bold">{box.title}</span>
-        {box.creator && (
-          <span className="text-sm text-gray-500 ml-2">{box.creator}</span>
+        <span className="font-bold">{box.name}</span>
+        {box.shopDetails && (
+          <span className="text-sm text-gray-500 ml-2">
+            {box.shopDetails?.title}
+          </span>
         )}
       </div>
     </div>
