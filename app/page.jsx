@@ -18,8 +18,6 @@ export default function HomePage() {
     800
   );
 
-  console.log("how many times it is calling");
-
   const { isLoading: dataLoading, hasError } = useInitialDataFetch();
   // console.log(hasError, "Check the error");
 
