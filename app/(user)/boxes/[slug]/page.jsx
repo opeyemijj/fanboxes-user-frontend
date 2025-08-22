@@ -7,18 +7,32 @@ import Footer from "@/components/_main/Footer";
 import { boxesData } from "@/lib/boxes-data";
 import { notFound } from "next/navigation";
 import { useSelector } from "react-redux";
+import { getProductDetails } from "@/services";
+import { useEffect, useState } from "react";
+import LatestBoxesSkeleton from "@/components/ui/skeletons/LatestBoxesSkeleton";
 
 export default function BoxSpinPage({ params }) {
-  const {
-    products,
-    loading: productsLoading,
-    error,
-  } = useSelector((state) => state.product);
+  const [box, setBox] = useState(null);
+  const [apiLoading, setApiLoading] = useState(false);
 
-  const box = products.find((b) => b.slug === params.slug);
+  useEffect(() => {
+    async function callingProductApi() {
+      setApiLoading(true);
+      const apiData = await getProductDetails(params.slug);
+      if (apiData?.success) {
+        setBox(apiData?.data);
+        setApiLoading(false);
+      } else {
+        setBox(null);
+        setApiLoading(false);
+      }
+      console.log(apiData, "Getting products from api", params);
+    }
+    callingProductApi();
+  }, []);
 
-  if (!box) {
-    notFound();
+  if (apiLoading) {
+    <LatestBoxesSkeleton />;
   }
 
   return (
