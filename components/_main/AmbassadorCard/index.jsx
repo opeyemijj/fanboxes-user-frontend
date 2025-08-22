@@ -1,11 +1,11 @@
-import Image from "next/image"
-import Link from "next/link"
-import { Button } from "@/components/Button"
+import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/Button";
 
 export default function AmbassadorCard({ ambassador }) {
   if (!ambassador) {
-    console.log("[v0] Ambassador card received no data")
-    return null
+    console.log("[v0] Ambassador card received no data");
+    return null;
   }
 
   // Generate slug from name if missing
@@ -15,13 +15,13 @@ export default function AmbassadorCard({ ambassador }) {
       ?.toLowerCase()
       .replace(/\s+/g, "-")
       .replace(/[^a-z0-9-]/g, "") ||
-    `ambassador-${ambassador.id}`
+    `ambassador-${ambassador._id}`;
 
   return (
     <Link href={`/ambassadors/${slug}`} className="group block">
       <div className="relative rounded-lg overflow-hidden bg-gray-800 aspect-[3/2]">
         <Image
-          src={ambassador.image || "/placeholder.svg"}
+          src={ambassador?.logo?.url || "/placeholder.svg"}
           alt={ambassador.name || "Ambassador"}
           fill
           className="object-cover object-center"
@@ -47,7 +47,9 @@ export default function AmbassadorCard({ ambassador }) {
           </span>
         </Button>
       </div>
-      <p className="font-bold mt-3 text-sm">{ambassador.name || "Unknown Ambassador"}</p>
+      <p className="font-bold mt-3 text-sm">
+        {ambassador.name || "Unknown Ambassador"}
+      </p>
     </Link>
-  )
+  );
 }
