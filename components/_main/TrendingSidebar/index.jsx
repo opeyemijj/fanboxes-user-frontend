@@ -19,12 +19,19 @@ export default function TrendingSidebar({ loading = false }) {
     error,
   } = useSelector((state) => state.product);
 
+  const {
+    shops,
+    loading: shopsLoading,
+    error: shopError,
+  } = useSelector((state) => state.shops);
+
   if (productsLoading) {
     return <TrendingSidebarSkeleton />;
   }
 
   const trendingBoxes = products.slice(0, 3);
-  console.log(trendingBoxes, "Check the lates box");
+
+  const trendingAssadors = shops.slice(0, 3);
 
   return (
     <aside
@@ -73,7 +80,7 @@ export default function TrendingSidebar({ loading = false }) {
       )}
       {activeTab === "ambassadors" && (
         <div className="space-y-4">
-          {trendingAmbassadors.map((ambassador) => (
+          {trendingAssadors?.map((ambassador) => (
             <AmbassadorCard key={ambassador.id} ambassador={ambassador} />
           ))}
         </div>
