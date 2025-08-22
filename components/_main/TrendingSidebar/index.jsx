@@ -8,13 +8,23 @@ import TrendingBoxCard from "@/components/_main/TrendingBoxCard";
 import AmbassadorCard from "@/components/_main/AmbassadorCard";
 import TrendingSidebarSkeleton from "@/components/ui/skeletons/TrendingSidebarSkeleton";
 import { trendingBoxes, trendingAmbassadors } from "@/lib/data-v2";
+import { useSelector } from "react-redux";
 
 export default function TrendingSidebar({ loading = false }) {
   const [activeTab, setActiveTab] = useState("boxes");
 
-  if (loading) {
+  const {
+    products,
+    loading: productsLoading,
+    error,
+  } = useSelector((state) => state.product);
+
+  if (productsLoading) {
     return <TrendingSidebarSkeleton />;
   }
+
+  const trendingBoxes = products.slice(0, 3);
+  console.log(trendingBoxes, "Check the lates box");
 
   return (
     <aside
