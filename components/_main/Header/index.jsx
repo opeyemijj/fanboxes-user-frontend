@@ -18,15 +18,28 @@ import { useAuth } from "@/components/AuthProvider";
 import { useSelector } from "react-redux";
 
 export default function Header() {
-  const user = useSelector((state) => state.user);
+  const userData = useSelector((state) => state.user);
   const [showTopUpPopup, setShowTopUpPopup] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
+
   const pathname = usePathname();
   const { logout } = useAuth();
 
+  const token = userData?.user?.token || localStorage.getItem("token");
+  const isAuthenticated =
+    userData?.isAuthenticated || localStorage.getItem("isAuthenticated");
+
   useEffect(() => {
-    setIsLoggedIn(user?.isAuthenticated && user?.user?.token);
+    setUser(
+      userData?.user || { user: JSON.parse(localStorage.getItem("user")) }
+    );
+    setIsLoggedIn(isAuthenticated && token);
+  }, [token, isAuthenticated]);
+
+  useEffect(() => {
+    console.log(user, "<<<<dhddjdj");
   }, [user]);
 
   const handleLogout = () => {
@@ -86,7 +99,7 @@ export default function Header() {
             </div>
 
             <div className="flex items-center space-x-4">
-              {isLoggedIn ? (
+              {isLoggedIn && user ? (
                 <>
                   <Button
                     onClick={() => setShowTopUpPopup(true)}

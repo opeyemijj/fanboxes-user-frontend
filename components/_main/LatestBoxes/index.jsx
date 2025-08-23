@@ -27,7 +27,6 @@ export default function LatestBoxes({ loading = false }) {
   }
 
   const latestBoxes = products.slice(0, 6);
-  console.log(latestBoxes, "Check the lates box");
 
   return (
     <section>

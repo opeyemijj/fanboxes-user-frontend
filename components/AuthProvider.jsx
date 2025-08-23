@@ -40,6 +40,10 @@ export function AuthProvider({ children }) {
 
       const data = await res.json();
       dispatch(setLogin({ token: data.token, ...data.user }));
+      //using local storage for now, will use redux later when persist is set up
+      localStorage.setItem("isAuthenticated", "true");
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
 
       return { success: data?.success || false, message: data?.message || "" };
     } catch (error) {

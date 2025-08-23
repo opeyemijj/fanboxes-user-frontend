@@ -7,8 +7,14 @@ import SpinningWheel from "./SpiningWheel";
 import { Button } from "@/components/Button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "./GameCards";
+import { useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
 
 export default function FanboxGame({ boxConfig: initialBoxConfig }) {
+  const user = useSelector((state) => state.user);
+  const router = useRouter();
+
+  // Game States
   const [mounted, setMounted] = useState(false);
   const [gameState, setGameState] = useState("idle"); // idle, spinning, completed
   const [spinResult, setSpinResult] = useState(null);
@@ -40,50 +46,66 @@ export default function FanboxGame({ boxConfig: initialBoxConfig }) {
     setGameState("spinning");
 
     try {
+      //get user token from redux later. for now, get from local storage
+      const token = user?.user?.token || localStorage.getItem("token");
+      if (!token) {
+        router.push("/login");
+        alert("Please log in to spin the wheel.");
+        return;
+      }
+
       // Call the spin API with current box configuration
-      // const response = await fetch(process.env.NEXT_PUBLIC_API_URL + "/spin", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify({
-      //     clientSeed,
-      //     nonce,
-      //     boxId: currentBoxConfig.boxId,
-      //     items: currentBoxConfig.items, // Send current items to API
-      //   }),
-      // });
+      const response = await fetch(
+        process.env.NEXT_PUBLIC_API_URL + "/admin/spin",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            clientSeed,
+            nonce,
+            boxId: currentBoxConfig._id,
+            items: currentBoxConfig.items, // Send current items to API
+          }),
+        }
+      );
 
-      // const result = await response.json();
-      const simulateApiCallAndReturnWinningItem = async () => {
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            const randomItem =
-              currentBoxConfig.items[
-                Math.floor(Math.random() * currentBoxConfig.items.length)
-              ];
+      const result = await response.json();
+      // const simulateApiCallAndReturnWinningItem = async () => {
+      //   return new Promise((resolve) => {
+      //     setTimeout(() => {
+      //       const randomItem =
+      //         currentBoxConfig.items[
+      //           Math.floor(Math.random() * currentBoxConfig.items.length)
+      //         ];
 
-            resolve({
-              winningItem: randomItem,
-              serverSeedHash: "simulatedServerSeedHash123456",
-              verification: {
-                serverSeed: "simulatedServerSeed123456",
-                clientSeed,
-                hash: "simulatedHash123456",
-                normalized: Math.random(),
-                nonce,
-              },
-              success: true,
-            });
-          }, 2000);
-        });
-      };
+      //       resolve({
+      //         winningItem: randomItem,
+      //         serverSeedHash: "simulatedServerSeedHash123456",
+      //         verification: {
+      //           serverSeed: "simulatedServerSeed123456",
+      //           clientSeed,
+      //           hash: "simulatedHash123456",
+      //           normalized: Math.random(),
+      //           nonce,
+      //         },
+      //         success: true,
+      //       });
+      //     }, 2000);
+      //   });
+      // };
       // Simulate server seed and hash
-      const result = await simulateApiCallAndReturnWinningItem();
+      // const result = await simulateApiCallAndReturnWinningItem();
       console.log("📡 Received spin result from API:", result);
+      if (!result.success) {
+        setGameState("idle");
+        throw new Error(result.message || "Spin failed");
+      }
 
-      setSpinResult(result);
-      setServerSeedHash(result.serverSeedHash);
+      setSpinResult(result.data);
+      setServerSeedHash(result?.data.serverSeedHash);
       setNonce((prev) => prev + 1);
     } catch (error) {
       console.error("❌ Error during spin:", error);
@@ -115,7 +137,7 @@ export default function FanboxGame({ boxConfig: initialBoxConfig }) {
       // Validate each item has required fields
       for (let i = 0; i < newConfig.items.length; i++) {
         const item = newConfig.items[i];
-        if (!item.id || !item.name || !item.value || !item.odds) {
+        if (!item.id || !item.name || !item.value || !item.odd) {
           alert(
             `Invalid item at index ${i}: id, name, value, and odds are required.`
           );
@@ -125,7 +147,7 @@ export default function FanboxGame({ boxConfig: initialBoxConfig }) {
 
       // Validate odds sum to approximately 1
       const totalOdds = newConfig.items.reduce(
-        (sum, item) => sum + item.odds,
+        (sum, item) => sum + item.odd,
         0
       );
       if (Math.abs(totalOdds - 1) > 0.01) {
@@ -178,7 +200,7 @@ export default function FanboxGame({ boxConfig: initialBoxConfig }) {
           <p className="text-sm text-purple-300">
             Items: {currentBoxConfig.items.length} | Total Odds:{" "}
             {currentBoxConfig.items
-              .reduce((sum, item) => sum + item.odds, 0)
+              .reduce((sum, item) => sum + item.odd, 0)
               .toFixed(3)}
           </p>
         </div>
@@ -203,7 +225,9 @@ export default function FanboxGame({ boxConfig: initialBoxConfig }) {
               onSpin={handleSpin}
               isSpinning={gameState === "spinning"}
               winningItem={spinResult?.winningItem}
-              boxPrice={currentBoxConfig.boxPrice}
+              boxPrice={
+                currentBoxConfig?.boxPrice || currentBoxConfig?.priceSale
+              }
             />
           </div>
 

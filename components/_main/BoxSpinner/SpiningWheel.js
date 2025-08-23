@@ -4,13 +4,6 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/Button";
 import { Hexagon, Target } from "lucide-react";
-// import {
-//   Dialog,
-//   DialogContent,
-//   DialogHeader,
-//   DialogTitle,
-//   DialogDescription,
-// } from "@/components/ui/dialog";
 import {
   Dialog,
   DialogContent,
@@ -418,7 +411,7 @@ export default function SpinningWheel({
 
               return (
                 <div
-                  key={item.id}
+                  key={index}
                   className="absolute"
                   style={{
                     width: itemSize,
@@ -456,7 +449,7 @@ export default function SpinningWheel({
                     `}
                   >
                     <img
-                      src={item.image || "/placeholder.svg"}
+                      src={item.images[0]?.url || "/placeholder.svg"}
                       alt={item.name}
                       width={itemSize}
                       height={itemSize}
@@ -568,7 +561,7 @@ export default function SpinningWheel({
                   <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full blur-xl opacity-30 scale-110" />
                   <div className="relative bg-white rounded-2xl p-4 shadow-2xl">
                     <img
-                      src={winningItem.image || "/placeholder.svg"}
+                      src={winningItem.images[0]?.url || "/placeholder.svg"}
                       alt={winningItem.name}
                       width="200"
                       height="200"

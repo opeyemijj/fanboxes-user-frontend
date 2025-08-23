@@ -23,7 +23,7 @@ export default function BoxContents({ box, loading = false }) {
                       </div>
                     )}
                     <Image
-                      src={item?.image || "/placeholder.svg"}
+                      src={item?.images[0]?.url || "/placeholder.svg"}
                       alt={item.name}
                       width={200}
                       height={150}

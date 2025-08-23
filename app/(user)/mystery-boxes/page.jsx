@@ -1,34 +1,49 @@
-"use client"
-import { useState, useMemo } from "react"
-import Header from "@/components/_main/Header"
-import FilterSidebar from "@/components/_main/FilterSidebar"
-import BoxGrid from "@/components/_main/BoxGrid"
-import Categories from "@/components/_main/Categories"
-import Footer from "@/components/_main/Footer"
+"use client";
+import { useState, useMemo } from "react";
+import Header from "@/components/_main/Header";
+import FilterSidebar from "@/components/_main/FilterSidebar";
+import BoxGrid from "@/components/_main/BoxGrid";
+import Categories from "@/components/_main/Categories";
+import Footer from "@/components/_main/Footer";
+import { useSelector } from "react-redux";
 
 // Import enhanced data with fallback
-let enhancedMysteryBoxes, categories, filterBoxesByCategory, searchBoxes, sortBoxes
+let enhancedMysteryBoxes,
+  categories,
+  filterBoxesByCategory,
+  searchBoxes,
+  sortBoxes;
 
 try {
-  const enhancedData = require("@/lib/enhanced-data")
-  enhancedMysteryBoxes = enhancedData.enhancedMysteryBoxes || []
-  categories = enhancedData.categories || []
-  filterBoxesByCategory = enhancedData.filterBoxesByCategory || ((boxes) => boxes)
-  searchBoxes = enhancedData.searchBoxes || ((boxes) => boxes)
-  sortBoxes = enhancedData.sortBoxes || ((boxes) => boxes)
+  const enhancedData = require("@/lib/enhanced-data");
+  enhancedMysteryBoxes = enhancedData.enhancedMysteryBoxes || [];
+  categories = enhancedData.categories || [];
+  filterBoxesByCategory =
+    enhancedData.filterBoxesByCategory || ((boxes) => boxes);
+  searchBoxes = enhancedData.searchBoxes || ((boxes) => boxes);
+  sortBoxes = enhancedData.sortBoxes || ((boxes) => boxes);
 } catch (error) {
-  console.warn("Enhanced data not available, using fallback data")
-  enhancedMysteryBoxes = []
-  categories = []
-  filterBoxesByCategory = (boxes) => boxes
-  searchBoxes = (boxes) => boxes
-  sortBoxes = (boxes) => boxes
+  console.warn("Enhanced data not available, using fallback data");
+  enhancedMysteryBoxes = [];
+  categories = [];
+  filterBoxesByCategory = (boxes) => boxes;
+  searchBoxes = (boxes) => boxes;
+  sortBoxes = (boxes) => boxes;
 }
 
 export default function MysteryBoxesPage() {
-  const [selectedCategory, setSelectedCategory] = useState("all")
-  const [searchTerm, setSearchTerm] = useState("")
-  const [sortBy, setSortBy] = useState("most-popular")
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState("most-popular");
+
+  // Box data
+  const {
+    products,
+    loading: productsLoading,
+    error,
+  } = useSelector((state) => state.product);
+
+  console.log(products, "OKKK");
 
   // Fallback data for demonstration
   const fallbackBoxes = [
@@ -110,48 +125,55 @@ export default function MysteryBoxesPage() {
       totalValue: 400,
       rarity: "rare",
     },
-  ]
+  ];
 
-  const boxesToUse = enhancedMysteryBoxes.length > 0 ? enhancedMysteryBoxes : fallbackBoxes
+  const boxesToUse =
+    enhancedMysteryBoxes.length > 0 ? enhancedMysteryBoxes : fallbackBoxes;
 
   const filteredBoxes = useMemo(() => {
-    let filtered = boxesToUse
+    let filtered = boxesToUse;
 
     // Apply category filter
     if (selectedCategory !== "all") {
-      filtered = filtered.filter((box) => box.category === selectedCategory)
+      filtered = filtered.filter((box) => box.category === selectedCategory);
     }
 
     // Apply search filter
     if (searchTerm) {
-      const term = searchTerm.toLowerCase()
+      const term = searchTerm.toLowerCase();
       filtered = filtered.filter(
         (box) =>
           box.title.toLowerCase().includes(term) ||
           box.creator.toLowerCase().includes(term) ||
-          (box.description && box.description.toLowerCase().includes(term)),
-      )
+          (box.description && box.description.toLowerCase().includes(term))
+      );
     }
 
     // Apply sorting
     switch (sortBy) {
       case "newest":
-        filtered = [...filtered].sort((a, b) => b.id - a.id)
-        break
+        filtered = [...filtered].sort((a, b) => b.id - a.id);
+        break;
       case "price-low-high":
-        filtered = [...filtered].sort((a, b) => (a.price || 0) - (b.price || 0))
-        break
+        filtered = [...filtered].sort(
+          (a, b) => (a.price || 0) - (b.price || 0)
+        );
+        break;
       case "price-high-low":
-        filtered = [...filtered].sort((a, b) => (b.price || 0) - (a.price || 0))
-        break
+        filtered = [...filtered].sort(
+          (a, b) => (b.price || 0) - (a.price || 0)
+        );
+        break;
       case "most-popular":
       default:
-        filtered = [...filtered].sort((a, b) => (b.isTrending ? 1 : 0) - (a.isTrending ? 1 : 0))
-        break
+        filtered = [...filtered].sort(
+          (a, b) => (b.isTrending ? 1 : 0) - (a.isTrending ? 1 : 0)
+        );
+        break;
     }
 
-    return filtered
-  }, [boxesToUse, selectedCategory, searchTerm, sortBy])
+    return filtered;
+  }, [boxesToUse, selectedCategory, searchTerm, sortBy]);
 
   return (
     <div className="bg-white text-black">
@@ -162,7 +184,8 @@ export default function MysteryBoxesPage() {
             <div className="flex items-center justify-between mb-6">
               <h1 className="text-5xl font-bold">Mystery boxes</h1>
               <div className="text-sm text-gray-500">
-                {filteredBoxes.length} box{filteredBoxes.length !== 1 ? "es" : ""} found
+                {filteredBoxes.length} box
+                {filteredBoxes.length !== 1 ? "es" : ""} found
               </div>
             </div>
 
@@ -192,5 +215,5 @@ export default function MysteryBoxesPage() {
       </main>
       <Footer />
     </div>
-  )
+  );
 }
