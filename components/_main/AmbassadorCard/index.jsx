@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/Button";
 
-export default function AmbassadorCard({ ambassador }) {
+export default function AmbassadorCard({ ambassador, isNew }) {
   if (!ambassador) {
     console.log("[v0] Ambassador card received no data");
     return null;
@@ -29,7 +29,7 @@ export default function AmbassadorCard({ ambassador }) {
         <div className="absolute inset-0 " />
 
         {/* Badge */}
-        {ambassador.isNew && (
+        {isNew && (
           <div className="absolute top-3 left-3">
             <span
               className="text-xs font-bold px-2 py-1 rounded-full text-black"

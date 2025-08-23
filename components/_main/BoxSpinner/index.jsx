@@ -10,10 +10,11 @@ import FanboxGame from "./FanboxGame";
 // import boxConfig from "../data/box-config.json";
 
 function SpinGame({ boxConfig }) {
+  console.log('boxConfig', boxConfig)
   return <FanboxGame boxConfig={boxConfig} />;
 }
 
-export default function BoxSpinner({ box }) {
+export default function BoxSpinner({ box }) { 
   box.prizeItems = box?.items || [];
   const [isSpinning, setIsSpinning] = useState(false);
   const [showPrizePopup, setShowPrizePopup] = useState(false);

@@ -17,12 +17,12 @@ const banners = [
   },
   {
     id: 2,
-    image: "/images/home-banner-2.jpg",
-    title: "Unlock exclusive",
-    highlight: "mystery boxes",
-    description: "Premium items from top brands delivered to your door",
-    buttonText: "EXPLORE BOXES",
-    buttonLink: "/mystery-boxes",
+    image: "/images/home-banner2.jpg",
+    title: "Introducing",
+    highlight: "Lily Powers",
+    description: "",
+    buttonText: "View Profile",
+    buttonLink: "/ambassadors/lily-powers",
   },
   {
     id: 3,
@@ -80,10 +80,10 @@ export default function HeroCarousel({ loading = false }) {
               objectFit="cover"
               className="z-0"
             />
-            <div className="absolute inset-0 bg-black/60 z-10" />
+            <div className="absolute inset-0 bg-black/40 z-10" />
             <div className="relative z-20 text-white flex flex-col justify-center items-start p-8 md:p-12 h-full max-w-2xl">
               <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-tight mb-3">
-                {banner.title} <span style={{ color: "#11F2EB" }}>{banner.highlight}</span>
+                {banner.title} <p style={{ color: "#11F2EB" }}>{banner.highlight}</p>
               </h1>
               <p className="text-base md:text-lg leading-relaxed opacity-90 mb-6 max-w-lg">{banner.description}</p>
               <Link href={banner.buttonLink}>

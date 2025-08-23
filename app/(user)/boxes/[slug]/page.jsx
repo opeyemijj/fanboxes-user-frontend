@@ -14,7 +14,6 @@ import BoxSpinnerSkeleton from "@/components/_main/BoxSpinner/BoxSpinnerSkeleton
 export default function BoxSpinPage({ params }) {
   const [box, setBox] = useState(null);
   const [apiLoading, setApiLoading] = useState(false);
-
   useEffect(() => {
     async function callingProductApi() {
       setApiLoading(true);

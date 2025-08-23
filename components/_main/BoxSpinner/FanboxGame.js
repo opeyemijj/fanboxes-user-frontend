@@ -104,6 +104,7 @@ export default function FanboxGame({ boxConfig: initialBoxConfig }) {
         throw new Error(result.message || "Spin failed");
       }
 
+      console.log('result.data', result.data)
       setSpinResult(result.data);
       setServerSeedHash(result?.data.serverSeedHash);
       setNonce((prev) => prev + 1);
@@ -191,34 +192,12 @@ export default function FanboxGame({ boxConfig: initialBoxConfig }) {
       </div>
     );
   }
+  console.log('xxxxxxxxx', currentBoxConfig, spinResult)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-4">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center">
-          <p className="text-sm text-purple-300">
-            Items: {currentBoxConfig.items.length} | Total Odds:{" "}
-            {currentBoxConfig.items
-              .reduce((sum, item) => sum + item.odd, 0)
-              .toFixed(3)}
-          </p>
-        </div>
-
-        {/* Game Area */}
-        <div className={`w-full relative`}>
-          {/* Game Area - Full Width Always */}
+    <div
+  className=" bg-[url('/images/spin.jpg')] bg-cover bg-center rounded-3xl mb-5">
           <div className="w-full relative">
-            {/* Sidebar Toggle Button */}
-            {/* <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSidebarCollapsed(false)}
-              className="absolute top-4 left-4 z-40 text-white hover:bg-white/10 bg-black/20 backdrop-blur-sm rounded-full p-3"
-            >
-              <ChevronRight className="h-5 w-5" />
-            </Button> */}
-
             <SpinningWheel
               items={currentBoxConfig.items} // Use current dynamic config
               onSpinComplete={handleSpinComplete}
@@ -226,202 +205,12 @@ export default function FanboxGame({ boxConfig: initialBoxConfig }) {
               isSpinning={gameState === "spinning"}
               winningItem={spinResult?.winningItem}
               boxPrice={
-                currentBoxConfig?.boxPrice || currentBoxConfig?.priceSale
+                currentBoxConfig?.priceSale || currentBoxConfig?.boxPrice
               }
             />
           </div>
 
-          {/* Left Sidebar - Overlay */}
-          {/* <div
-            className={`fixed left-0 top-0 h-full z-50 transition-transform duration-300 ${
-              sidebarCollapsed ? "-translate-x-full" : "translate-x-0"
-            }`}
-          >
-            <div className="w-80 h-full bg-black/90 backdrop-blur-md border-r border-white/20 shadow-2xl">
-              <div className="p-4 h-full flex flex-col">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-white text-lg font-bold">
-                    Box Configuration
-                  </h2>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setSidebarCollapsed(true)}
-                    className="text-white hover:bg-white/10 p-2"
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </Button>
-                </div>
-
-                <div className="flex gap-2 mb-4">
-                  <Button
-                    variant={!isEditingBox ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setIsEditingBox(false)}
-                    className="flex-1"
-                  >
-                    View Items
-                  </Button>
-                  <Button
-                    variant={isEditingBox ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setIsEditingBox(true)}
-                    className="flex-1"
-                  >
-                    Edit JSON
-                  </Button>
-                </div>
-
-                <div className="flex-1 overflow-hidden">
-                  {!isEditingBox ? (
-                    <div className="space-y-3 overflow-y-auto h-full">
-                      {currentBoxConfig.items.map((item, index) => (
-                        <div
-                          key={item.id + index}
-                          className="bg-white/5 rounded-lg p-3 border border-white/10 flex items-center space-x-3"
-                        >
-                          <img
-                            src={item.image || "/placeholder.svg"}
-                            alt={item.name}
-                            className="w-12 h-12 object-cover rounded"
-                          />
-                          <div className="flex-1">
-                            <h3 className="text-white font-semibold text-sm">
-                              {item.name}
-                            </h3>
-                            <p className="text-green-400 font-bold">
-                              ${item.value}
-                            </p>
-                            <p className="text-purple-300 text-xs">
-                              {(item.odds * 100).toFixed(1)}% chance
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="h-full flex flex-col">
-                      <div className="mb-2 text-xs text-yellow-400 bg-yellow-400/10 p-2 rounded border border-yellow-400/20">
-                        💡 Tip: Make sure odds sum to 1.0 and all items have id,
-                        name, value, and odds fields.
-                      </div>
-                      <textarea
-                        value={editableBoxConfig}
-                        onChange={(e) => setEditableBoxConfig(e.target.value)}
-                        className="flex-1 bg-black/50 text-white font-mono text-xs p-3 rounded border border-white/20 resize-none"
-                        placeholder="Edit box configuration JSON..."
-                      />
-                      <div className="flex gap-2 mt-3">
-                        <Button
-                          onClick={handleBoxConfigUpdate}
-                          className="flex-1 bg-green-600 hover:bg-green-700"
-                          size="sm"
-                        >
-                          Apply Changes
-                        </Button>
-                        <Button
-                          onClick={resetBoxConfig}
-                          variant="outline"
-                          size="sm"
-                        >
-                          Reset
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div> */}
-        </div>
-
-        {/* Provably Fair Info */}
-        {/* <div className="mt-8 max-w-4xl mx-auto">
-          <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-            <CardHeader>
-              <CardTitle className="text-white">
-                🔒 Provably Fair System
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-white space-y-3">
-              <div
-                className={`grid gap-4 ${
-                  sidebarCollapsed ? "md:grid-cols-4" : "md:grid-cols-3"
-                }`}
-              >
-                <div>
-                  <strong className="text-purple-300">Client Seed:</strong>
-                  <div className="font-mono text-sm bg-white/5 p-2 rounded mt-1 break-all">
-                    {clientSeed}
-                  </div>
-                </div>
-                <div>
-                  <strong className="text-purple-300">Nonce:</strong>
-                  <div className="font-mono text-sm bg-white/5 p-2 rounded mt-1">
-                    {nonce}
-                  </div>
-                </div>
-                {serverSeedHash && (
-                  <div>
-                    <strong className="text-purple-300">
-                      Server Seed Hash:
-                    </strong>
-                    <div className="font-mono text-xs bg-white/5 p-2 rounded mt-1 break-all">
-                      {serverSeedHash}
-                    </div>
-                  </div>
-                )}
-                {sidebarCollapsed && spinResult && (
-                  <div>
-                    <strong className="text-purple-300">Last Winner:</strong>
-                    <div className="text-sm bg-white/5 p-2 rounded mt-1">
-                      {spinResult.winningItem?.name}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {spinResult && (
-                <div className="mt-4 p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
-                  <h4 className="font-bold text-green-400 mb-2">
-                    Latest Spin Verification:
-                  </h4>
-                  <div
-                    className={`grid gap-4 text-sm ${
-                      sidebarCollapsed ? "md:grid-cols-3" : "md:grid-cols-2"
-                    }`}
-                  >
-                    <div>
-                      <strong>Server Seed:</strong>
-                      <div className="font-mono text-xs bg-white/5 p-2 rounded mt-1 break-all">
-                        {spinResult.verification.serverSeed}
-                      </div>
-                    </div>
-                    <div>
-                      <strong>Result Hash:</strong>
-                      <div className="font-mono text-xs bg-white/5 p-2 rounded mt-1 break-all">
-                        {spinResult.verification.hash}
-                      </div>
-                    </div>
-                    {sidebarCollapsed && (
-                      <div>
-                        <strong>Normalized Value:</strong>
-                        <div className="font-mono text-xs bg-white/5 p-2 rounded mt-1">
-                          {spinResult.verification.normalized?.toFixed(6)}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  <p className="text-xs text-gray-300 mt-2">
-                    You can verify this result independently using our
-                    verification tool.
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div> */}
-      </div>
+        
     </div>
   );
 }

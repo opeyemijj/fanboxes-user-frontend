@@ -254,7 +254,7 @@ export default function SpinningWheel({
       });
 
       winnerIndexRef.current = items.findIndex(
-        (item) => item.id === winningItem.id
+        (item) => item._id === winningItem._id
       );
 
       if (winnerIndexRef.current === -1) {
@@ -275,6 +275,8 @@ export default function SpinningWheel({
         rotation,
         winnerIndexRef.current
       );
+            console.log('sdddddddd',targetRotation, rotation, winnerIndexRef.current)
+
 
       // Set up animation parameters
       startRotationRef.current = rotation;
@@ -352,11 +354,11 @@ export default function SpinningWheel({
 
   return (
     <>
-      <div className="relative w-full h-[75vh] min-h-[550px] bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 overflow-hidden flex flex-col items-center justify-center rounded-2xl">
+      <div className="relative w-full h-[50vh] min-h-[400px] overflow-hidden flex flex-col items-center justify-center rounded-2xl">
         {/* Background effects */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.1)_0%,transparent_70%)]" />
 
-        {/* Speed Indicator */}
+        {/* Speed Indicator
         {isSpinning && (
           <div className="absolute top-4 right-4 z-30 bg-black/50 backdrop-blur-sm rounded-lg p-3">
             <div className="text-white text-sm font-mono">
@@ -371,7 +373,7 @@ export default function SpinningWheel({
               </div>
             </div>
           </div>
-        )}
+        )} */}
 
         {/* FIXED WINNING SPOT INDICATOR - Absolute Center Front */}
         <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-40 pointer-events-none">
@@ -388,12 +390,12 @@ export default function SpinningWheel({
             className="relative"
           >
             {/* Main pointer */}
-            <div className="w-15 h-15 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-full flex items-center justify-center shadow-2xl shadow-cyan-400/50 border-4 border-white">
+            {/* <div className="w-15 h-15 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-full flex items-center justify-center shadow-2xl shadow-cyan-400/50 border-4 border-white">
               <Target className="w-10 h-10 text-black" />
-            </div>
+            </div> */}
 
             {/* Pointer arrow */}
-            <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[15px] border-r-[15px] border-b-[20px] border-l-transparent border-r-transparent border-b-cyan-400" />
+            { isSpinning && <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[15px] border-r-[15px] border-b-[20px] border-l-transparent border-r-transparent border-b-[#11F2EB]" /> }
           </motion.div>
         </div>
 
@@ -440,9 +442,9 @@ export default function SpinningWheel({
                       }
                       ${
                         style.isWinningItemAtWinningSpot
-                          ? "border-4 border-yellow-400 shadow-yellow-400/70 bg-gradient-to-br from-yellow-100/30 to-orange-100/30"
+                          ? "border-4 border-[#11F2EB] shadow-[#11F2EB]/70 bg-gradient-to-br from-[#11F2EB]/30 to-orange-100/30"
                           : style.isAtWinningSpot && !isSpinning
-                          ? "border-2 border-yellow-300/50"
+                          ? "border-2 border-[#11F2EB]/50"
                           : "border border-white/20"
                       }
                       transition-all duration-500
@@ -465,7 +467,7 @@ export default function SpinningWheel({
                         <motion.div
                           initial={{ scale: 0, opacity: 0 }}
                           animate={{ scale: 1, opacity: 1 }}
-                          className="absolute -top-3 -right-3 w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center text-black font-bold text-xl shadow-lg z-10"
+                          className="absolute -top-3 -right-3 w-12 h-12 bg-[#11F2EB] rounded-full flex items-center justify-center text-black font-bold text-xl shadow-lg z-10"
                         >
                           🏆
                         </motion.div>
@@ -479,7 +481,7 @@ export default function SpinningWheel({
                             repeat: Number.POSITIVE_INFINITY,
                             ease: "easeInOut",
                           }}
-                          className="absolute inset-0 bg-gradient-to-br from-yellow-400/40 to-orange-400/40 rounded-2xl"
+                          className="absolute inset-0 bg-gradient-to-br from-[#11F2EB]-400/40 to-[#11F2EB]-400/40 rounded-2xl"
                         />
                       </>
                     )}
@@ -495,7 +497,7 @@ export default function SpinningWheel({
           <Button
             size="lg"
             className="h-14 rounded-full 
-    bg-gradient-to-r from-[#11F2EB] via-cyan-500 to-blue-600 
+    bg-gradient-to-r from-[#11F2EB] via-cyan-500 to-cyan-600 
     hover:from-cyan-400 hover:via-[#11F2EB] hover:to-blue-700
     text-white font-bold text-lg 
 

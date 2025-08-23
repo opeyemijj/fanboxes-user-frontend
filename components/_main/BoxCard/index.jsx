@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/Button";
 
-export default function BoxCard({ box }) {
+export default function BoxCard({ box, isNew }) {
   const boxSlug =
     box.slug ||
     `${box.title?.toLowerCase().replace(/\s+/g, "-")}-${box.id}` ||
@@ -18,7 +18,7 @@ export default function BoxCard({ box }) {
             fill
             className="object-cover"
           />
-          {box.isNew && (
+          {isNew && (
             <div className="absolute top-3 left-3 bg-black text-white text-xs font-bold px-2 py-1 rounded-full">
               NEW
             </div>
