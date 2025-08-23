@@ -352,7 +352,7 @@ export default function SpinningWheel({
 
   return (
     <>
-      <div className="relative w-full h-[85vh] min-h-[600px] bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 overflow-hidden flex flex-col items-center justify-center rounded-2xl">
+      <div className="relative w-full h-[75vh] min-h-[550px] bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 overflow-hidden flex flex-col items-center justify-center rounded-2xl">
         {/* Background effects */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.1)_0%,transparent_70%)]" />
 

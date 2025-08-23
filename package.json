@@ -35,6 +35,7 @@
     "next": "14.2.16",
     "next-nprogress-bar": "latest",
     "next-themes": "latest",
+    "nextjs-toploader": "^3.8.16",
     "numeral": "latest",
     "prop-types": "latest",
     "react": "^18",

@@ -71,7 +71,7 @@ export default function Header() {
                 <span className="font-bold text-2xl">fanboxes</span>
               </Link>
               <nav className="hidden md:flex items-center space-x-4">
-                <Link href="/mystery-boxes">
+                <Link href="/mystery-boxes" prefetch={false}>
                   <Button
                     variant="ghost"
                     className={`text-sm font-semibold transition-colors ${
