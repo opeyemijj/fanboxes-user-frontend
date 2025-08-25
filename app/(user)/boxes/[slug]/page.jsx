@@ -49,7 +49,7 @@ export default function BoxSpinPage({ params }) {
         <main className="pt-20">
           <BoxSpinner box={box} />
           <BoxContents box={box} />
-          {/* <YouMightLike /> */}
+          <YouMightLike />
         </main>
       )}
       <Footer />
