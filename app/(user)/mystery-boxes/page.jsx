@@ -208,7 +208,8 @@ export default function MysteryBoxesPage() {
             </div>
 
             <div className="bg-[#EFEFEF] rounded-lg p-6">
-              <BoxGrid boxes={filteredBoxes} />
+              {/* <BoxGrid boxes={filteredBoxes} /> */}
+              <BoxGrid boxes={products} />
             </div>
           </div>
         </div>

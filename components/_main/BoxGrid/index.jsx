@@ -1,6 +1,7 @@
 import BoxCard from "@/components/_main/BoxCard";
 
 export default function BoxGrid({ boxes = [] }) {
+  console.log(boxes, "check the coming boxes");
   if (!boxes || boxes.length === 0) {
     return (
       <section>

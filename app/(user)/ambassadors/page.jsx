@@ -94,7 +94,8 @@ export default function AmbassadorsPage() {
               className="p-5 rounded-lg mb-4"
               style={{ backgroundColor: "#EFEFEF" }}
             >
-              <AmbassadorGrid ambassadors={filteredAmbassadors} />
+              {/* <AmbassadorGrid ambassadors={filteredAmbassadors} /> */}
+              <AmbassadorGrid ambassadors={shops} />
             </div>
           </div>
         </div>
