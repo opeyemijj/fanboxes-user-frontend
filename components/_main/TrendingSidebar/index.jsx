@@ -21,7 +21,7 @@ export default function TrendingSidebar({ loading = false }) {
   // Filter Boxes
   const filteredBoxes = useMemo(() => {
     if (!products) return [];
-    if (!searchQuery.trim()) return products.slice(0, 3);
+    if (!searchQuery.trim()) return products.slice(0, 5);
 
     const query = searchQuery.toLowerCase();
     return products.filter((product) => {
@@ -40,7 +40,7 @@ export default function TrendingSidebar({ loading = false }) {
   // Filter Ambassadors
   const filteredAmbassadors = useMemo(() => {
     if (!shops) return [];
-    if (!searchQuery.trim()) return shops.slice(0, 3);
+    if (!searchQuery.trim()) return shops.slice(0, 5);
 
     const query = searchQuery.toLowerCase();
     return shops.filter((shop) => {
