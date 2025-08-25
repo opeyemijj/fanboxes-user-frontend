@@ -84,3 +84,15 @@
 .backdrop-blur-sm {
   backdrop-filter: blur(4px);
 }
+
+.custom-sonner-toast[data-type="error"] {
+  color: #dc2626 !important;
+}
+
+.custom-sonner-toast[data-type="success"] {
+  color: #166534 !important;
+}
+
+.custom-sonner-toast[data-type="loading"] {
+  color: #d97706 !important;
+}
