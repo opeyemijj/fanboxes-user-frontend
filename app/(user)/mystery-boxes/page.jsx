@@ -178,18 +178,20 @@ export default function MysteryBoxesPage() {
   return (
     <div className="bg-white text-black">
       <Header />
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24">
-        <div className="flex flex-col lg:flex-row gap-8 mt-8">
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24">
+        <div className="flex flex-col lg:flex-row gap-4 sm:gap-8 mt-4 sm:mt-8">
           <div className="w-full lg:w-3/3 xl:w-4/4">
-            <div className="flex items-center justify-between mb-6">
-              <h1 className="text-5xl font-bold">Mystery boxes</h1>
-              <div className="text-sm text-gray-500">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 gap-2 sm:gap-0">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold">
+                Mystery boxes
+              </h1>
+              <div className="text-xs sm:text-sm text-gray-500">
                 {filteredBoxes.length} box
                 {filteredBoxes.length !== 1 ? "es" : ""} found
               </div>
             </div>
 
-            <div className="mb-6 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+            <div className="mb-4 sm:mb-6 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
               <div className="flex-1">
                 <Categories
                   categories={categories}
@@ -207,8 +209,8 @@ export default function MysteryBoxesPage() {
               </div>
             </div>
 
-            <div className="bg-[#EFEFEF] rounded-lg p-6">
-              <BoxGrid boxes={filteredBoxes} />
+            <div className="bg-[#EFEFEF] rounded-lg p-4 sm:p-6">
+              <BoxGrid boxes={products} />
             </div>
           </div>
         </div>

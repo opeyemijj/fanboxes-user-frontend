@@ -21,7 +21,6 @@ const slice = createSlice({
       console.log("Login action payload:", action.payload);
       state.user = action.payload;
       state.isAuthenticated = true;
-      console.log("set user data::", state.user);
     },
     setLogout(state) {
       state.user = null;

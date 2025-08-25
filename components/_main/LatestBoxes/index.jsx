@@ -4,6 +4,7 @@ import BoxCard from "@/components/_main/BoxCard";
 import LatestBoxesSkeleton from "@/components/ui/skeletons/LatestBoxesSkeleton";
 import ErrorDisplay from "@/components/ui/ErrorDisplay";
 import { fetchProducts } from "@/redux/slices/product";
+import { setProducts } from "@/redux/slices/product";
 
 export default function LatestBoxes({ loading = false }) {
   const dispatch = useDispatch();

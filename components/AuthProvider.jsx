@@ -24,6 +24,7 @@ export function AuthProvider({ children }) {
 
   async function login(email, password) {
     try {
+      console.log("login called ffrom auth prov...");
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
         method: "POST",
         headers: {
@@ -39,12 +40,8 @@ export function AuthProvider({ children }) {
       }
 
       const data = await res.json();
+      console.log("dispatching...");
       dispatch(setLogin({ token: data.token, ...data.user }));
-      //using local storage for now, will use redux later when persist is set up
-      localStorage.setItem("isAuthenticated", "true");
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-
       return { success: data?.success || false, message: data?.message || "" };
     } catch (error) {
       return { success: false, error: error.message };
@@ -52,8 +49,10 @@ export function AuthProvider({ children }) {
   }
 
   const logout = () => {
-    // localStorage.removeItem("isAuthenticated");
-    // setIsAuthenticated(false);
+    localStorage.removeItem("isAuthenticated");
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    setIsAuthenticated(false);
     dispatch(setLogout()); // Clear user data in Redux
   };
 

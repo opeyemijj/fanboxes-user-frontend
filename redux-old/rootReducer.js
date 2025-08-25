@@ -10,7 +10,6 @@ import SettingsReducer from "./slices/settings"
 import CategoriesReducer from "./slices/categories"
 import BrandsReducer from "./slices/brands"
 import ShopsReducer from "./slices/shops"
-import AmbassadorsReducer from "./slices/ambassadors"
 
 const reducer = combineReducers({
   product: productReducer,
@@ -21,7 +20,6 @@ const reducer = combineReducers({
   categories: CategoriesReducer,
   brands: BrandsReducer,
   shops: ShopsReducer,
-  ambassadors: AmbassadorsReducer,
 })
 
 export { reducer }
