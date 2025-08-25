@@ -32,7 +32,11 @@ export default function LoginPage() {
     setEmail("");
     setPassword("");
     setIsLoading(false);
-    router.push("/");
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const destination = urlParams.get("dest");
+
+    router.push(destination || "/");
   };
 
   const handleGoogleLogin = () => {

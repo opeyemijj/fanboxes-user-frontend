@@ -1,12 +1,23 @@
-"use client"
+"use client";
 
-import { Input } from "@/components/Input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/Select"
-import { Search } from "lucide-react"
+import { Input } from "@/components/Input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/Select";
+import { Search } from "lucide-react";
 
-export default function AmbassadorFilterSidebar({ searchTerm, onSearchChange, sortBy, onSortChange }) {
+export default function AmbassadorFilterSidebar({
+  searchTerm,
+  onSearchChange,
+  sortBy,
+  onSortChange,
+}) {
   return (
-    <aside className="my-8 top-24 space-y-6">
+    <aside className="my-0 top-24 space-y-6">
       <div>
         <div className="relative">
           <Input
@@ -19,7 +30,9 @@ export default function AmbassadorFilterSidebar({ searchTerm, onSearchChange, so
         </div>
       </div>
       <div>
-        <label className="text-sm font-semibold text-gray-500 mb-2 block">SORT BY</label>
+        <label className="text-sm font-semibold text-gray-500 mb-2 block">
+          SORT BY
+        </label>
         <Select value={sortBy} onValueChange={onSortChange}>
           <SelectTrigger className="w-full bg-gray-50 text-sm">
             <SelectValue placeholder="Sort by" />
@@ -58,5 +71,5 @@ export default function AmbassadorFilterSidebar({ searchTerm, onSearchChange, so
         </div>
       </div> */}
     </aside>
-  )
+  );
 }

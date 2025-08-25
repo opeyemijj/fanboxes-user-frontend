@@ -8,12 +8,13 @@ import SpinningWheel from "./SpiningWheel";
 // import { ChevronLeft, ChevronRight } from "lucide-react";
 // import { Card, CardContent, CardHeader, CardTitle } from "./GameCards";
 import { useSelector } from "react-redux";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { toastSuccess, toastError, toastLoading } from "@/lib/toast";
 
 export default function FanboxGame({ boxConfig: initialBoxConfig }) {
   const user = useSelector((state) => state.user);
   const router = useRouter();
+  const pathname = usePathname();
 
   // Game States
   const [mounted, setMounted] = useState(false);
@@ -50,9 +51,8 @@ export default function FanboxGame({ boxConfig: initialBoxConfig }) {
       //get user token from redux later. for now, get from local storage
       const token = user?.user?.token || localStorage.getItem("token");
       if (!token) {
-        router.push("/login");
-
         toastError("Please log in to spin the wheel.");
+        router.push(`/login?dest=${pathname}`);
         return;
       }
 
@@ -101,9 +101,9 @@ export default function FanboxGame({ boxConfig: initialBoxConfig }) {
       // Simulate server seed and hash
       // const result = await simulateApiCallAndReturnWinningItem();
       console.log("📡 Received spin result from API:", result);
-      if (!result.success) {
+      if (!result?.success) {
         setGameState("idle");
-        throw new Error(result.message || "Spin failed");
+        toastError(result?.message);
       }
 
       console.log("result.data", result.data);

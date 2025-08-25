@@ -191,11 +191,20 @@ export default function MysteryBoxesPage() {
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24">
         <div className="flex flex-col lg:flex-row gap-8 mt-8">
           <div className="w-full lg:w-3/3 xl:w-4/4">
-            <div className="flex items-center justify-between mb-6">
+            {/* <div className="flex items-center justify-between mb-6">
               <h1 className="text-5xl font-bold">Mystery boxes</h1>
               <div className="text-sm text-gray-500">
                 {filteredBoxes.length} box
                 {filteredBoxes.length !== 1 ? "es" : ""} found
+              </div>
+            </div> */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+              <h1 className="text-2xl sm:text-3xl lg:text-5xl font-bold">
+                Mystery boxes
+              </h1>
+              <div className="text-sm text-gray-500">
+                {filteredBoxes.length} box
+                {filteredBoxes.length !== 1 ? "s" : ""} found
               </div>
             </div>
 

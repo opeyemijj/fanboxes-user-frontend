@@ -10,12 +10,13 @@ import FanboxGame from "./FanboxGame";
 // import boxConfig from "../data/box-config.json";
 
 function SpinGame({ boxConfig }) {
-  console.log('boxConfig', boxConfig)
+  console.log("boxConfig", boxConfig);
   return <FanboxGame boxConfig={boxConfig} />;
 }
 
-export default function BoxSpinner({ box }) { 
+export default function BoxSpinner({ box }) {
   box.prizeItems = box?.items || [];
+  console.log({ box });
   const [isSpinning, setIsSpinning] = useState(false);
   const [showPrizePopup, setShowPrizePopup] = useState(false);
   const [selectedPrize, setSelectedPrize] = useState(null);
@@ -27,13 +28,13 @@ export default function BoxSpinner({ box }) {
 
   return (
     <>
-      <div className="container mx-auto ">
+      <div className="container mx-auto px-5">
         {/* Ambassador Info */}
-        <div className="flex items-center justify-between px-4 sm:px-6 lg:px-8 py-8 mb-8">
-          <div className="flex items-center space-x-4">
-            <div className="w-16 h-16 bg-[#11F2EB] rounded-full flex items-center justify-center overflow-hidden">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-6 px-3 sm:px-4 lg:px-8 py-6 sm:py-8 mb-6 sm:mb-8">
+          <div className="flex items-center space-x-3 sm:space-x-4">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-[#11F2EB] rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
               <Image
-                src={box?.images[0]?.url || "/placeholder.svg"}
+                src={box?.shopDetails?.logo?.url || "/placeholder.svg"}
                 alt={box?.name}
                 width={64}
                 height={64}
@@ -41,79 +42,35 @@ export default function BoxSpinner({ box }) {
               />
             </div>
             <div>
-              <h1 className="text-3xl font-bold">{box?.shopDetails?.title}</h1>
-              <p className="text-gray-500">{box?.name}</p>
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold leading-tight">
+                {box?.shopDetails?.title}
+              </h1>
+              <p className="text-gray-500 text-sm sm:text-base mt-1">
+                {box?.name}
+              </p>
             </div>
           </div>
-          <div className="flex items-center space-x-3">
+          <div className="flex flex-wrap gap-2 sm:gap-3 w-full sm:w-auto justify-start sm:justify-end">
             <Button
               variant="outline"
-              className="bg-gray-100 border-gray-200 rounded-full"
+              className="bg-gray-100 border-gray-200 rounded-full text-xs sm:text-sm px-3 py-1.5 sm:px-4 sm:py-2"
             >
-              <span className="mr-2">🔔</span>
+              <span className="mr-1 sm:mr-2 text-xs">🔔</span>
               GET UPDATES
             </Button>
-            <Link href={`/ambassadors/${box?.ambassadorSlug}`}>
+            <Link href={`/ambassadors/${box?.shopDetails?.slug}`}>
               <Button
                 variant="outline"
-                className="bg-gray-100 border-gray-200 rounded-full"
+                className="bg-gray-100 border-gray-200 rounded-full text-xs sm:text-sm px-3 py-1.5 sm:px-4 sm:py-2"
               >
                 VIEW PROFILE
-                <span className="ml-2">→</span>
+                <span className="ml-1 sm:ml-2 text-xs">→</span>
               </Button>
             </Link>
           </div>
         </div>
 
         {/* Spinning Area */}
-
-        {/* <div className="relative w-full h-[400px] bg-black overflow-hidden flex items-center justify-center rounded-lg mb-8">
-         
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-900/80 via-teal-600/60 to-purple-900/80" />
-
-     
-            <div
-              className={`relative z-10 flex flex-wrap items-center justify-center gap-8 max-w-6xl mx-auto px-4 transition-transform duration-1000 ${
-                isSpinning ? "animate-spin" : ""
-              }`}
-            >
-              {box.prizeItems?.map((item, index) => (
-                <div
-                  key={index}
-                  className={`relative transition-all duration-1000 ${
-                    isSpinning ? "animate-bounce" : ""
-                  }`}
-                  style={{
-                    animationDelay: `${index * 0.2}s`,
-                  }}
-                >
-                  <Image
-                    src={item.image || "/placeholder.svg"}
-                    alt={item.name}
-                    width={item.size || 120}
-                    height={item.size || 120}
-                    className="object-contain drop-shadow-2xl"
-                  />
-                </div>
-              ))}
-
-           
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Button
-                  onClick={handleSpinClicked}
-                  disabled={isSpinning}
-                  variant="cyan"
-                  className="h-20 w-48 rounded-full font-bold text-lg shadow-lg shadow-cyan-500/50 disabled:opacity-50 transition-all duration-300"
-                >
-                  <div className="flex items-center">
-                    {isSpinning ? "SPINNING..." : "SPIN FOR"}
-                    <span className="mx-2">⬢</span>
-                    {box.spinCost || "100"}
-                  </div>
-                </Button>
-              </div>
-            </div>
-          </div> */}
 
         <SpinGame boxConfig={box} />
       </div>

@@ -275,8 +275,12 @@ export default function SpinningWheel({
         rotation,
         winnerIndexRef.current
       );
-            console.log('sdddddddd',targetRotation, rotation, winnerIndexRef.current)
-
+      console.log(
+        "sdddddddd",
+        targetRotation,
+        rotation,
+        winnerIndexRef.current
+      );
 
       // Set up animation parameters
       startRotationRef.current = rotation;
@@ -395,7 +399,9 @@ export default function SpinningWheel({
             </div> */}
 
             {/* Pointer arrow */}
-            { isSpinning && <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[15px] border-r-[15px] border-b-[20px] border-l-transparent border-r-transparent border-b-[#11F2EB]" /> }
+            {isSpinning && (
+              <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[15px] border-r-[15px] border-b-[20px] border-l-transparent border-r-transparent border-b-[#11F2EB]" />
+            )}
           </motion.div>
         </div>
 
@@ -504,7 +510,7 @@ export default function SpinningWheel({
     transition-all hover:scale-105 active:scale-95 
     disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={handleSpin}
-            disabled={isSpinning}
+            disabled={isSpinning || items?.length < 1}
           >
             {isSpinning ? (
               <motion.span
