@@ -23,9 +23,13 @@ export default function BoxGrid({ boxes = [] }) {
     <section>
       <h2 className="text-2xl font-bold mb-6">All boxes</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {boxes.map((box) => (
-          <BoxCard key={box.id} box={box} />
-        ))}
+        {boxes.map((box) => {
+          return (
+            <div key={box._id}>
+              <BoxCard box={box} />
+            </div>
+          );
+        })}
       </div>
     </section>
   );

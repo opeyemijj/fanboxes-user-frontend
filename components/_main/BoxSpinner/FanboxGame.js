@@ -4,11 +4,12 @@ import { useState, useEffect } from "react";
 import SpinningWheel from "./SpiningWheel";
 // import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 // import { Button } from "@/components/ui/button";
-import { Button } from "@/components/Button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "./GameCards";
+// import { Button } from "@/components/Button";
+// import { ChevronLeft, ChevronRight } from "lucide-react";
+// import { Card, CardContent, CardHeader, CardTitle } from "./GameCards";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
+import { toastSuccess, toastError, toastLoading } from "@/lib/toast";
 
 export default function FanboxGame({ boxConfig: initialBoxConfig }) {
   const user = useSelector((state) => state.user);
@@ -50,7 +51,8 @@ export default function FanboxGame({ boxConfig: initialBoxConfig }) {
       const token = user?.user?.token || localStorage.getItem("token");
       if (!token) {
         router.push("/login");
-        alert("Please log in to spin the wheel.");
+
+        toastError("Please log in to spin the wheel.");
         return;
       }
 
@@ -104,7 +106,7 @@ export default function FanboxGame({ boxConfig: initialBoxConfig }) {
         throw new Error(result.message || "Spin failed");
       }
 
-      console.log('result.data', result.data)
+      console.log("result.data", result.data);
       setSpinResult(result.data);
       setServerSeedHash(result?.data.serverSeedHash);
       setNonce((prev) => prev + 1);
@@ -192,25 +194,20 @@ export default function FanboxGame({ boxConfig: initialBoxConfig }) {
       </div>
     );
   }
-  console.log('xxxxxxxxx', currentBoxConfig, spinResult)
+  console.log("xxxxxxxxx", currentBoxConfig, spinResult);
 
   return (
-    <div
-  className=" bg-[url('/images/spin.jpg')] bg-cover bg-center rounded-3xl mb-5">
-          <div className="w-full relative">
-            <SpinningWheel
-              items={currentBoxConfig.items} // Use current dynamic config
-              onSpinComplete={handleSpinComplete}
-              onSpin={handleSpin}
-              isSpinning={gameState === "spinning"}
-              winningItem={spinResult?.winningItem}
-              boxPrice={
-                currentBoxConfig?.priceSale || currentBoxConfig?.boxPrice
-              }
-            />
-          </div>
-
-        
+    <div className=" bg-[url('/images/spin.jpg')] bg-cover bg-center rounded-3xl mb-5">
+      <div className="w-full relative">
+        <SpinningWheel
+          items={currentBoxConfig.items} // Use current dynamic config
+          onSpinComplete={handleSpinComplete}
+          onSpin={handleSpin}
+          isSpinning={gameState === "spinning"}
+          winningItem={spinResult?.winningItem}
+          boxPrice={currentBoxConfig?.priceSale || currentBoxConfig?.boxPrice}
+        />
+      </div>
     </div>
   );
 }

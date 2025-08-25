@@ -3,6 +3,7 @@ import { AuthProvider } from "@/components/AuthProvider";
 import { LoadingProvider } from "@/components/LoadingProvider";
 import ReduxProvider from "@/components/ReduxProvider";
 import NextTopLoader from "nextjs-toploader";
+import { ToastProvider } from "@/components/ToastProvider";
 
 export const metadata = {
   title: "Fanboxes - Mystery Boxes",
@@ -31,7 +32,9 @@ export default function RootLayout({ children }) {
         />
         <ReduxProvider>
           <AuthProvider>
-            <LoadingProvider>{children}</LoadingProvider>
+            <LoadingProvider>
+              {children} <ToastProvider />
+            </LoadingProvider>
           </AuthProvider>
         </ReduxProvider>
       </body>

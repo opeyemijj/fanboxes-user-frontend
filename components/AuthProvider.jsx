@@ -17,10 +17,35 @@ export function AuthProvider({ children }) {
     setIsLoading(false);
   }, []);
 
-  // const login = () => {
-  //   localStorage.setItem("isAuthenticated", "true")
-  //   setIsAuthenticated(true)
-  // }
+  async function signup(payload) {
+    try {
+      console.log("signup called ffrom auth prov...");
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      // Handle response
+      if (!res.ok) {
+        const errorData = await res.json();
+        return errorData;
+      }
+
+      const data = await res.json();
+      console.log("dispatching...");
+      console.log("dataToDispatch", data);
+      dispatch(setLogin({ token: data.token, ...data.user }));
+      return { success: data?.success || false, message: data?.message || "" };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
 
   async function login(email, password) {
     try {
@@ -61,6 +86,7 @@ export function AuthProvider({ children }) {
     isLoading,
     login,
     logout,
+    signup,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

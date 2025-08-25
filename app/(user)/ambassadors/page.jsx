@@ -1,19 +1,84 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Header from "@/components/_main/Header";
 import AmbassadorCategories from "@/components/_main/AmbassadorCategories";
 import AmbassadorGrid from "@/components/_main/AmbassadorGrid";
 import AmbassadorFilterSidebar from "@/components/_main/AmbassadorFilterSidebar";
 import Footer from "@/components/_main/Footer";
-import {
-  enhancedAmbassadors,
-  categories,
-  filterAmbassadorsByCategory,
-  searchAmbassadors,
-} from "@/lib/enhanced-data";
 import { useSelector } from "react-redux";
 
+// Fallback data for ambassadors
+const fallbackAmbassadors = [
+  {
+    id: 1,
+    name: "Alex Johnson",
+    category: "fitness",
+    followers: "150K",
+    engagement: "8.2%",
+    image: "/placeholder.svg?height=200&width=200",
+    isFeatured: true,
+  },
+  {
+    id: 2,
+    name: "Sarah Miller",
+    category: "beauty",
+    followers: "450K",
+    engagement: "12.5%",
+    image: "/placeholder.svg?height=200&width=200",
+    isFeatured: false,
+  },
+  {
+    id: 3,
+    name: "Mike Chen",
+    category: "tech",
+    followers: "1.2M",
+    engagement: "5.8%",
+    image: "/placeholder.svg?height=200&width=200",
+    isFeatured: true,
+  },
+  {
+    id: 4,
+    name: "Emily Davis",
+    category: "lifestyle",
+    followers: "890K",
+    engagement: "9.1%",
+    image: "/placeholder.svg?height=200&width=200",
+    isFeatured: false,
+  },
+  {
+    id: 5,
+    name: "David Wilson",
+    category: "gaming",
+    followers: "2.3M",
+    engagement: "7.4%",
+    image: "/placeholder.svg?height=200&width=200",
+    isFeatured: true,
+  },
+  {
+    id: 6,
+    name: "Jessica Brown",
+    category: "fashion",
+    followers: "1.5M",
+    engagement: "10.2%",
+    image: "/placeholder.svg?height=200&width=200",
+    isFeatured: false,
+  },
+];
+
+// Fallback categories
+const fallbackCategories = [
+  { id: "all", name: "All Ambassadors" },
+  { id: "fitness", name: "Fitness" },
+  { id: "beauty", name: "Beauty" },
+  { id: "tech", name: "Tech" },
+  { id: "lifestyle", name: "Lifestyle" },
+  { id: "gaming", name: "Gaming" },
+  { id: "fashion", name: "Fashion" },
+];
+
 export default function AmbassadorsPage() {
+  const [enhancedData, setEnhancedData] = useState(null);
+  const [isDataLoading, setIsDataLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("most-popular");
@@ -25,8 +90,43 @@ export default function AmbassadorsPage() {
     error: shopError,
   } = useSelector((state) => state.shops);
 
+  useEffect(() => {
+    try {
+      const enhancedData = require("@/lib/enhanced-data");
+      setEnhancedData(enhancedData);
+    } catch (error) {
+      console.warn("Enhanced data not available");
+      setEnhancedData(null);
+    } finally {
+      setIsDataLoading(false);
+    }
+  }, []);
+
+  // Get enhanced data with fallbacks
+  const enhancedAmbassadors = enhancedData?.enhancedAmbassadors || [];
+  const categories = enhancedData?.categories || fallbackCategories;
+  const filterAmbassadorsByCategory =
+    enhancedData?.filterAmbassadorsByCategory ||
+    ((ambassadors, category) => {
+      if (category === "all") return ambassadors;
+      return ambassadors.filter((amb) => amb.category === category);
+    });
+  const searchAmbassadors =
+    enhancedData?.searchAmbassadors ||
+    ((ambassadors, term) => {
+      if (!term) return ambassadors;
+      return ambassadors.filter(
+        (amb) =>
+          amb.name.toLowerCase().includes(term.toLowerCase()) ||
+          amb.category.toLowerCase().includes(term.toLowerCase())
+      );
+    });
+
+  const ambassadorsToUse =
+    enhancedAmbassadors.length > 0 ? enhancedAmbassadors : fallbackAmbassadors;
+
   const filteredAmbassadors = useMemo(() => {
-    let filtered = enhancedAmbassadors;
+    let filtered = ambassadorsToUse;
 
     // Apply category filter
     filtered = filterAmbassadorsByCategory(filtered, selectedCategory);
@@ -45,19 +145,50 @@ export default function AmbassadorsPage() {
       case "most-popular":
       default:
         filtered = [...filtered].sort((a, b) => {
-          const aFollowers =
-            Number.parseFloat(a.followers.replace(/[KM]/g, "")) *
-            (a.followers.includes("M") ? 1000000 : 1000);
-          const bFollowers =
-            Number.parseFloat(b.followers.replace(/[KM]/g, "")) *
-            (b.followers.includes("M") ? 1000000 : 1000);
+          const aFollowers = parseFollowers(a.followers);
+          const bFollowers = parseFollowers(b.followers);
           return bFollowers - aFollowers;
         });
         break;
     }
 
     return filtered;
-  }, [selectedCategory, searchTerm, sortBy]);
+  }, [
+    ambassadorsToUse,
+    selectedCategory,
+    searchTerm,
+    sortBy,
+    filterAmbassadorsByCategory,
+    searchAmbassadors,
+  ]);
+
+  // Helper function to parse follower strings like "150K", "1.2M"
+  function parseFollowers(followerString) {
+    if (!followerString) return 0;
+
+    const num = parseFloat(followerString.replace(/[KM]/g, ""));
+    if (followerString.includes("M")) return num * 1000000;
+    if (followerString.includes("K")) return num * 1000;
+    return num;
+  }
+
+  // Show loading state during SSR and initial client render
+  if (typeof window === "undefined" || isDataLoading || shopsLoading) {
+    return (
+      <div className="bg-white text-black">
+        <Header />
+        <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24">
+          <div className="flex items-center justify-center h-64">
+            <div className="flex flex-col items-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#11F2EB]"></div>
+              <p className="mt-4 text-lg">Loading ambassadors...</p>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white text-black">
@@ -94,8 +225,10 @@ export default function AmbassadorsPage() {
               className="p-5 rounded-lg mb-4"
               style={{ backgroundColor: "#EFEFEF" }}
             >
-              {/* <AmbassadorGrid ambassadors={filteredAmbassadors} /> */}
-              <AmbassadorGrid ambassadors={shops} />
+              {/* Use either enhanced data or shops from Redux - choose one */}
+              <AmbassadorGrid
+                ambassadors={shops.length > 0 ? shops : filteredAmbassadors}
+              />
             </div>
           </div>
         </div>

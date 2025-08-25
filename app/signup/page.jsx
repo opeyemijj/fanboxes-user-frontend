@@ -1,12 +1,12 @@
-"use client"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
-import { Button } from "@/components/Button"
-import { Eye, EyeOff } from "lucide-react"
-import { useAuth } from "@/components/AuthProvider"
-import Header from "@/components/_main/Header"
-import Footer from "@/components/_main/Footer"
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Button } from "@/components/Button";
+import { Eye, EyeOff, X } from "lucide-react";
+import { useAuth } from "@/components/AuthProvider";
+import Header from "@/components/_main/Header";
+import Footer from "@/components/_main/Footer";
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -14,40 +14,62 @@ export default function SignupPage() {
     lastName: "",
     email: "",
     password: "",
-  })
-  const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
-  const { login } = useAuth()
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const router = useRouter();
+  const { login, signup } = useAuth();
 
   const handleInputChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
-    })
-  }
+    });
+  };
 
+  // const handleSignup = async (e) => {
+  //   e.preventDefault()
+  //   setIsLoading(true)
+
+  //   // Simulate signup process
+  //   setTimeout(() => {
+  //     login()
+  //     setIsLoading(false)
+  //     router.push("/")
+  //   }, 1000)
+  // }
   const handleSignup = async (e) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
 
-    // Simulate signup process
-    setTimeout(() => {
-      login()
-      setIsLoading(false)
-      router.push("/")
-    }, 1000)
-  }
+    const { success, message } = await signup(formData);
+    if (!success) {
+      setError(message || "signup failed");
+      setIsLoading(false);
+      return;
+    }
+
+    setFormData({
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+    });
+    setIsLoading(false);
+    router.push("/");
+  };
 
   const handleGoogleSignup = () => {
-    setIsLoading(true)
+    setIsLoading(true);
     // Simulate Google signup
     setTimeout(() => {
-      login()
-      setIsLoading(false)
-      router.push("/")
-    }, 1000)
-  }
+      login();
+      setIsLoading(false);
+      router.push("/");
+    }, 1000);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex flex-col">
@@ -58,8 +80,12 @@ export default function SignupPage() {
           {/* Signup Card */}
           <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
             <div className="text-center mb-8">
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">Create your account</h1>
-              <p className="text-gray-600">Join fanboxes and start your mystery box journey</p>
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                Create your account
+              </h1>
+              <p className="text-gray-600">
+                Join fanboxes and start your mystery box journey
+              </p>
             </div>
 
             {/* Google Signup Button */}
@@ -95,15 +121,33 @@ export default function SignupPage() {
                 <div className="w-full border-t border-gray-200"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white text-gray-500">or continue with email</span>
+                <span className="px-4 bg-white text-gray-500">
+                  or continue with email
+                </span>
               </div>
             </div>
 
             {/* Signup Form */}
             <form onSubmit={handleSignup} className="space-y-6">
+              {/* Error message display */}
+              {error && (
+                <div className="relative p-3 rounded-lg bg-red-100 border border-red-300 text-red-700 text-sm flex items-start">
+                  <span className="flex-1">{error}</span>
+                  <button
+                    type="button"
+                    onClick={() => setError("")}
+                    className="ml-2 text-red-500 hover:text-red-700 transition-colors"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              )}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="firstName"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     First name
                   </label>
                   <input
@@ -118,7 +162,10 @@ export default function SignupPage() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="lastName"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Last name
                   </label>
                   <input
@@ -135,7 +182,10 @@ export default function SignupPage() {
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
                   Email address
                 </label>
                 <input
@@ -151,7 +201,10 @@ export default function SignupPage() {
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
                   Password
                 </label>
                 <div className="relative">
@@ -170,7 +223,11 @@ export default function SignupPage() {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
                   >
-                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
                   </button>
                 </div>
               </div>
@@ -182,13 +239,22 @@ export default function SignupPage() {
                   required
                   className="h-4 w-4 text-[#11F2EB] focus:ring-[#11F2EB] border-gray-300 rounded"
                 />
-                <label htmlFor="terms" className="ml-2 block text-sm text-gray-700">
+                <label
+                  htmlFor="terms"
+                  className="ml-2 block text-sm text-gray-700"
+                >
                   I agree to the{" "}
-                  <Link href="/terms" className="text-[#11F2EB] hover:text-[#0DD4C7] transition-colors">
+                  <Link
+                    href="/terms"
+                    className="text-[#11F2EB] hover:text-[#0DD4C7] transition-colors"
+                  >
                     Terms of Service
                   </Link>{" "}
                   and{" "}
-                  <Link href="/privacy" className="text-[#11F2EB] hover:text-[#0DD4C7] transition-colors">
+                  <Link
+                    href="/privacy"
+                    className="text-[#11F2EB] hover:text-[#0DD4C7] transition-colors"
+                  >
                     Privacy Policy
                   </Link>
                 </label>
@@ -207,7 +273,10 @@ export default function SignupPage() {
             <div className="text-center mt-6">
               <p className="text-gray-600">
                 Already have an account?{" "}
-                <Link href="/login" className="text-[#11F2EB] hover:text-[#0DD4C7] font-medium transition-colors">
+                <Link
+                  href="/login"
+                  className="text-[#11F2EB] hover:text-[#0DD4C7] font-medium transition-colors"
+                >
                   Sign in
                 </Link>
               </p>
@@ -218,5 +287,5 @@ export default function SignupPage() {
 
       <Footer />
     </div>
-  )
+  );
 }
