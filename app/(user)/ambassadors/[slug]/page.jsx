@@ -71,7 +71,7 @@ export default function AmbassadorProfilePage({ params }) {
           </div>
         </div>
 
-        {/* <YouMightLike /> */}
+        <YouMightLike />
       </main>
       <Footer />
     </div>
