@@ -10,11 +10,11 @@ import FanboxGame from "./FanboxGame";
 // import boxConfig from "../data/box-config.json";
 
 function SpinGame({ boxConfig }) {
-  console.log('boxConfig', boxConfig)
+  console.log("boxConfig", boxConfig);
   return <FanboxGame boxConfig={boxConfig} />;
 }
 
-export default function BoxSpinner({ box }) { 
+export default function BoxSpinner({ box }) {
   box.prizeItems = box?.items || [];
   const [isSpinning, setIsSpinning] = useState(false);
   const [showPrizePopup, setShowPrizePopup] = useState(false);
@@ -45,7 +45,7 @@ export default function BoxSpinner({ box }) {
               <p className="text-gray-500">{box?.name}</p>
             </div>
           </div>
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 hidden sm:block ">
             <Button
               variant="outline"
               className="bg-gray-100 border-gray-200 rounded-full"
