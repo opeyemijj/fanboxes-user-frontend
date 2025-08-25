@@ -1,3 +1,4 @@
+"use client";
 import BoxCard from "@/components/_main/BoxCard";
 import { recommendedBoxes } from "@/lib/data";
 import { useSelector } from "react-redux";
