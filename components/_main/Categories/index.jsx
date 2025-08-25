@@ -53,25 +53,25 @@ export default function Categories({
 
   return (
     <section className="my-2">
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-1 sm:gap-2">
         {categoriesToUse?.map((category) => (
           <Button
             key={category._id}
             onClick={() => onCategoryChange(category._id)}
-            className={`rounded-full transition-all duration-200 ${
-              selectedCategory === category._id ? "text-black" : "text-white"
+            className={`rounded-full transition-all duration-200 text-xs sm:text-sm px-2 py-1 ${
+              selectedCategory === category._id
+                ? "text-black bg-[#11F2EB] border-[#11F2EB]"
+                : "text-white bg-[#98989F] border-[#98989F]"
             }`}
-            variant={selectedCategory === category._id ? "default" : "outline"}
             style={{
-              backgroundColor:
-                selectedCategory === category._id ? "#11F2EB" : "#98989F",
+              borderRadius: "9999px",
             }}
           >
             {category.name}
             {selectedCategory === category._id ? (
-              <span className="ml-2 text-sm">×</span>
+              <span className="ml-1 text-[10px] sm:text-xs">×</span>
             ) : (
-              <span className="ml-2 text-sm">→</span>
+              <span className="ml-1 text-[10px] sm:text-xs">→</span>
             )}
           </Button>
         ))}

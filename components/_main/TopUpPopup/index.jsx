@@ -1,31 +1,34 @@
-"use client"
-import { useState } from "react"
-import { Button } from "@/components/Button"
-import { X, ArrowRight, Bitcoin } from "lucide-react"
+"use client";
+import { useState } from "react";
+import { Button } from "@/components/Button";
+import { X, ArrowRight, Bitcoin } from "lucide-react";
 
 export default function TopUpPopup({ isOpen, onClose }) {
-  const [selectedAmount, setSelectedAmount] = useState(null)
-  const [customAmount, setCustomAmount] = useState("")
-  const [selectedMethod, setSelectedMethod] = useState("card")
+  const [selectedAmount, setSelectedAmount] = useState(null);
+  const [customAmount, setCustomAmount] = useState("");
+  const [selectedMethod, setSelectedMethod] = useState("card");
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
-  const presetAmounts = [50, 100, 250, 500, 1000]
+  const presetAmounts = [50, 100, 250, 500, 1000];
 
   const handleAmountSelect = (amount) => {
-    setSelectedAmount(amount)
-    setCustomAmount("")
-  }
+    setSelectedAmount(amount);
+    setCustomAmount("");
+  };
 
   const handleCustomAmountChange = (e) => {
-    setCustomAmount(e.target.value)
-    setSelectedAmount(null)
-  }
+    setCustomAmount(e.target.value);
+    setSelectedAmount(null);
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        onClick={onClose}
+      />
 
       {/* Modal */}
       <div className="relative bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
@@ -38,19 +41,23 @@ export default function TopUpPopup({ isOpen, onClose }) {
         </button>
 
         {/* View Profile Link */}
-        <div className="absolute top-6 right-16">
+        {/* <div className="absolute top-6 right-16">
           <button className="text-sm font-medium text-gray-600 hover:text-gray-800 flex items-center space-x-1">
             <span>VIEW PROFILE</span>
             <ArrowRight className="h-3 w-3" />
           </button>
-        </div>
+        </div> */}
 
         {/* Title */}
-        <h2 className="text-2xl font-bold text-black mb-8">Top up your account</h2>
+        <h2 className="text-2xl font-bold text-black mb-8">
+          Top up your account
+        </h2>
 
         {/* Credit/Debit Card Section */}
         <div className="mb-8">
-          <h3 className="text-lg font-semibold text-black mb-4">Credit / Debit card</h3>
+          <h3 className="text-lg font-semibold text-black mb-4">
+            Credit / Debit card
+          </h3>
 
           {/* Payment Method Icons */}
           <div className="flex items-center space-x-2 mb-6">
@@ -71,7 +78,9 @@ export default function TopUpPopup({ isOpen, onClose }) {
 
           {/* Amount Selection */}
           <div className="mb-4">
-            <p className="text-sm text-gray-600 mb-3">Select how much you want to deposit</p>
+            <p className="text-sm text-gray-600 mb-3">
+              Select how much you want to deposit
+            </p>
             <div className="flex flex-wrap gap-2 mb-4">
               {presetAmounts.map((amount) => (
                 <button
@@ -110,7 +119,9 @@ export default function TopUpPopup({ isOpen, onClose }) {
             </h3>
             <ArrowRight className="h-4 w-4 text-gray-400" />
           </div>
-          <p className="text-sm text-gray-500">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+          <p className="text-sm text-gray-500">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+          </p>
         </div>
 
         {/* Select Method Button */}
@@ -122,11 +133,14 @@ export default function TopUpPopup({ isOpen, onClose }) {
         </Button>
 
         {/* Deposit Button */}
-        <Button variant="cyan" className="w-full py-3 rounded-lg font-bold flex items-center justify-center space-x-2">
+        <Button
+          variant="cyan"
+          className="w-full py-3 rounded-lg font-bold flex items-center justify-center space-x-2"
+        >
           <span>DEPOSIT</span>
           <ArrowRight className="h-4 w-4" />
         </Button>
       </div>
     </div>
-  )
+  );
 }
