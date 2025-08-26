@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Provably Fair Algorithm — Technical Write-up</title>
+    <style>
+      :root {
+        --bg: #0b1020;
+        --card: #0f1530;
+        --muted: #9aa3bf;
+        --accent: #60a5fa;
+        --accent-2: #6ee7b7;
+        --text: #e6eef8;
+        --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, "Courier New",
+          monospace;
+        --radius: 14px;
+      }
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        background: linear-gradient(180deg, #060814 0%, var(--bg) 40%);
+        color: var(--text);
+        -webkit-font-smoothing: antialiased;
+      }
+      .wrap {
+        max-width: 980px;
+        margin: 36px auto;
+        padding: 28px;
+      }
+      header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .logo {
+        width: 52px;
+        height: 52px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--accent-2), var(--accent));
+        box-shadow: 0 8px 30px rgba(96, 165, 250, 0.08);
+      }
+      h1 {
+        margin: 0;
+        font-size: 22px;
+      }
+      p.lead {
+        color: var(--muted);
+        margin-top: 8px;
+      }
+      .card {
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.02),
+          rgba(255, 255, 255, 0.01)
+        );
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        padding: 20px;
+        border-radius: var(--radius);
+        margin-top: 20px;
+      }
+      h2 {
+        margin: 0 0 8px;
+        font-size: 18px;
+      }
+      h3 {
+        margin-top: 18px;
+        margin-bottom: 8px;
+        font-size: 15px;
+        color: #dce9ff;
+      }
+      .muted {
+        color: var(--muted);
+        font-size: 14px;
+      }
+      pre {
+        background: #071028;
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        padding: 14px;
+        border-radius: 10px;
+        overflow: auto;
+        font-family: var(--mono);
+        font-size: 13px;
+        color: #dbeafe;
+      }
+      code {
+        font-family: var(--mono);
+        background: rgba(255, 255, 255, 0.02);
+        padding: 2px 6px;
+        border-radius: 6px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 12px;
+      }
+      th,
+      td {
+        padding: 10px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        text-align: left;
+        font-size: 14px;
+      }
+      thead th {
+        color: var(--muted);
+        text-transform: uppercase;
+        font-size: 12px;
+      }
+      .cols {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      @media (max-width: 780px) {
+        .cols {
+          grid-template-columns: 1fr;
+        }
+        .wrap {
+          padding: 16px;
+        }
+      }
+      .small {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .btn {
+        display: inline-block;
+        padding: 8px 10px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        background: transparent;
+        color: var(--text);
+        cursor: pointer;
+        font-family: var(--mono);
+        font-size: 13px;
+      }
+      footer {
+        margin-top: 22px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Provably Fair — Technical Write-up</h1>
+          <p class="lead">
+            Concise & detailed explanation of the implementation, verification
+            and security properties for the provably fair spin algorithm
+            (Node.js / crypto).
+          </p>
+        </div>
+      </header>
+
+      <section class="card" id="summary">
+        <h2>Summary (brief)</h2>
+        <p class="muted">
+          The algorithm combines a server-generated secret seed (pre-committed
+          via SHA-256 hash), a client-provided seed, and a nonce. Those inputs
+          are concatenated and hashed using SHA-256. A portion of the hash is
+          converted to a numeric value, normalized to a 0–1 float, and mapped to
+          item probability ranges (cumulative odds) to select a winner. This
+          result is verifiable by recomputing the hash from the revealed seeds
+          and nonce.
+        </p>
+      </section>
+
+      <section class="card" id="detailed">
+        <h2>Detailed explanation</h2>
+
+        <h3>Key components</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Component</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Server seed</strong></td>
+              <td>
+                A 32-byte random hex string generated by the server. Only its
+                SHA-256 hash is published before spins to commit the server to
+                that seed (pre-commitment).
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Client seed</strong></td>
+              <td>
+                A 16-byte hex string supplied by the client (or generated
+                client-side). It ensures users contribute entropy and prevents
+                server-only control of outcomes.
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Nonce</strong></td>
+              <td>
+                An incrementing integer (0,1,2...) unique per spin for given
+                seeds — ensures reproducible unique inputs across multiple
+                spins.
+              </td>
+            </tr>
+            <tr>
+              <td><strong>SHA-256 hash</strong></td>
+              <td>
+                Hash of the concatenated string
+                <code>`${serverSeed}-${clientSeed}-${nonce}`</code>. This hash
+                is the deterministic source of randomness.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Randomness extraction & normalization</h3>
+        <p class="small">Implementation detail:</p>
+        <pre><code>// combine and hash (Node.js crypto)
+const combined = `${serverSeed}-${clientSeed}-${nonce}`;
+const hash = crypto.createHash('sha256').update(combined).digest('hex');</code></pre>
+
+        <p class="small">To extract a numeric random value:</p>
+        <pre><code>// take first 8 hex chars -> parse -> normalize to [0,1)
+const hexSubstring = hash.substring(0, 8);
+const decimal = Number.parseInt(hexSubstring, 16);
+const normalized = decimal / 0xffffffff; // 0xffffffff = 4294967295</code></pre>
+
+        <p class="muted">
+          Why first 8 hex chars? They represent 32 bits of entropy (0..2³²-1).
+          Converting to a float in [0,1) is fast, stable and sufficiently random
+          for mapping to odds in most use-cases. If higher precision is needed,
+          more hex chars can be consumed.
+        </p>
+
+        <h3>Mapping normalized value to item</h3>
+        <p class="small">
+          Given an array of items where each item has an <code>odds</code> (a
+          number such that sum of odds == 1.0), build cumulative ranges and
+          select the item whose range contains the normalized value.
+        </p>
+        <pre><code>// build ranges
+let cumulative = 0;
+const ranges = items.map(it => {
+  const start = cumulative;
+  cumulative += it.odds;
+  return { item: it, start, end: cumulative };
+});
+
+// find winner
+const winner = ranges.find(r => normalized >= r.start && normalized &lt; r.end).item;</code></pre>
+
+        <h3>Why this is provably fair</h3>
+        <ul class="small">
+          <li>
+            <strong>Pre-commitment:</strong> server publishes
+            <code>hash(serverSeed)</code> before spins. This prevents the server
+            from changing serverSeed after seeing clientSeed/nonces.
+          </li>
+          <li>
+            <strong>Client influence:</strong> clientSeed guarantees players
+            contribute entropy so server cannot fully control outcomes.
+          </li>
+          <li>
+            <strong>Deterministic & verifiable:</strong> anyone can recompute
+            the hash and normalized value from revealed seeds and nonce and
+            confirm the recorded outcome.
+          </li>
+        </ul>
+
+        <h3>Verification</h3>
+        <p class="small">
+          Recompute the SHA-256 hash of
+          <code>{serverSeed}-{clientSeed}-{nonce}</code> and confirm:
+        </p>
+        <ol class="small">
+          <li>
+            The recomputed hash equals the stored hash (or the serverSeed's
+            pre-published hash verifies via <code>sha256(serverSeed)</code>).
+          </li>
+          <li>
+            Normalized value computed from the hash falls into the winning
+            item's cumulative odds range.
+          </li>
+        </ol>
+
+        <pre><code>static verifyResult(serverSeed, clientSeed, nonce, expectedHash) {
+  const combined = `${serverSeed}-${clientSeed}-${nonce}`;
+  const hash = crypto.createHash('sha256').update(combined).digest('hex');
+  return hash === expectedHash;
+}</code></pre>
+
+        <h3>Security considerations & best practices</h3>
+        <ul class="small">
+          <li>
+            Always publish <code>sha256(serverSeed)</code> before spins and
+            reveal <code>serverSeed</code> only after spins to allow
+            verification.
+          </li>
+          <li>
+            Protect the unrevealed serverSeed with strong access controls until
+            it is time to reveal.
+          </li>
+          <li>
+            Ensure item odds sum to 1 (or normalize them) to avoid
+            gaps/overhangs in ranges.
+          </li>
+          <li>
+            Log and persist nonce per serverSeed so it never repeats for the
+            same (serverSeed, clientSeed) pair.
+          </li>
+          <li>
+            Consider using more than 32 bits for high-precision distributions by
+            reading more hex from the hash if needed.
+          </li>
+          <li>
+            Rate-limit verification and reveal endpoints to avoid leaking
+            serverSeed prematurely through timing or side-channels.
+          </li>
+        </ul>
+      </section>
+
+      <section class="card" id="code">
+        <h2>Reference — Implementation (Node.js)</h2>
+        <p class="small">
+          This is the exact implementation used (copied & cleaned from the
+          supplied class):
+        </p>
+        <pre><code>import crypto from "crypto"
+
+export class ProvablyFair {
+  static generateServerSeed() {
+    return crypto.randomBytes(32).toString("hex")
+  }
+
+  static generateClientSeed() {
+    return crypto.randomBytes(16).toString("hex")
+  }
+
+  static hashServerSeed(serverSeed) {
+    return crypto.createHash("sha256").update(serverSeed).digest("hex")
+  }
+
+  static generateSpinResult(serverSeed, clientSeed, nonce, items) {
+    // Combine seeds and nonce
+    const combined = `${serverSeed}-${clientSeed}-${nonce}`
+
+    // Generate hash
+    const hash = crypto.createHash("sha256").update(combined).digest("hex")
+
+    // Convert first 8 characters to decimal
+    const hexSubstring = hash.substring(0, 8)
+    const decimal = Number.parseInt(hexSubstring, 16)
+
+    // Normalize to 0-1
+    const normalized = decimal / 0xffffffff
+
+    // Calculate cumulative odds and find winning item
+    let cumulativeOdds = 0
+    const oddsMap = items.map((item) => {
+      const range = {
+        item: item.name,
+        start: cumulativeOdds,
+        end: cumulativeOdds + item.odds,
+      }
+      cumulativeOdds += item.odds
+      return range
+    })
+
+    const winningItem = items.find((item, index) => {
+      const range = oddsMap[index]
+      return normalized >= range.start && normalized < range.end
+    })
+
+    return {
+      winningItem,
+      hash,
+      normalized,
+      verification: { serverSeed, clientSeed, nonce, hash, normalized },
+    }
+  }
+
+  static verifyResult(serverSeed, clientSeed, nonce, expectedHash) {
+    const combined = `${serverSeed}-${clientSeed}-${nonce}`
+    const hash = crypto.createHash("sha256").update(combined).digest("hex")
+    return hash === expectedHash
+  }
+}</code></pre>
+      </section>
+
+      <footer>
+        <div class="small">
+          If you want, I can: <strong>generate a printable PDF/Word</strong>, or
+          <strong>embed diagrams</strong> (flowchart) illustrating: pre-commit →
+          spin → reveal → verify. Tell me which format you prefer.
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>
