@@ -342,10 +342,10 @@ function VerifySpinContent() {
                                   : odds.item}
                               </td>
                               <td className="px-2 py-2 text-right font-mono text-gray-600 text-xs">
-                                {formatPercentage(odds.start)}
+                                {odds.start?.toFixed(6)}
                               </td>
                               <td className="px-2 py-2 text-right font-mono text-gray-600 text-xs">
-                                {formatPercentage(odds.end)}
+                                {odds.end?.toFixed(6)}
                               </td>
                             </tr>
                           ))}
@@ -459,11 +459,11 @@ function VerifySpinContent() {
                             {spinResult.winningItem.name}
                           </h4>
                           <div className="flex flex-row sm:flex-row items-start gap-2">
-                            <span className="bg-[#11F2EB]/10 text-[#11F2EB] px-2 py-1 rounded-full text-xs font-medium">
+                            <span className="bg-[#11F2EB]/10 text-[#11F2EB] px-2 py-1 rounded-full text-md font-medium">
                               ${spinResult.winningItem.value}
                             </span>
-                            <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-xs font-medium">
-                              {(spinResult.winningItem.odd * 100).toFixed(2)}%
+                            <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-md font-medium">
+                              {spinResult.winningItem.odd}
                             </span>
                           </div>
                         </div>
