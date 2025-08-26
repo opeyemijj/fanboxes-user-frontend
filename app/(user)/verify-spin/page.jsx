@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Header from "@/components/_main/Header";
 import Footer from "@/components/_main/Footer";
@@ -17,7 +17,20 @@ import {
   ExternalLink,
 } from "lucide-react";
 
-export default function VerifySpinPage() {
+// Loading component for Suspense fallback
+function VerifySpinLoading() {
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <main className="flex-grow flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#11F2EB]"></div>
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
+function VerifySpinContent() {
   const searchParams = useSearchParams();
   const [showServerSeed, setShowServerSeed] = useState(false);
   const [copiedField, setCopiedField] = useState(null);
@@ -75,18 +88,15 @@ export default function VerifySpinPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col">
-        <Header />
         <main className="flex-grow flex items-center justify-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#11F2EB]"></div>
         </main>
-        <Footer />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
       <main className="flex-grow container mx-auto px-4 py-4 max-w-4xl">
         <div className="bg-white rounded-lg shadow-lg p-6 mt-14">
           <div className="text-center mb-8">
@@ -422,6 +432,20 @@ export default function VerifySpinPage() {
             </ul>
           </div>
         </div>
+      </main>
+    </div>
+  );
+}
+
+// Main page component with Suspense boundary
+export default function VerifySpinPage() {
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <main className="flex-grow">
+        <Suspense fallback={<VerifySpinLoading />}>
+          <VerifySpinContent />
+        </Suspense>
       </main>
       <Footer />
     </div>
