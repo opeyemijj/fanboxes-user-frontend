@@ -4,7 +4,8 @@ import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Header from "@/components/_main/Header";
 import Footer from "@/components/_main/Footer";
-import { getProductDetails } from "@/services";
+import { toastError } from "@/lib/toast";
+import { getProductDetails, getSpinWinningItem } from "@/services";
 import {
   Shield,
   Key,
@@ -14,7 +15,6 @@ import {
   EyeOff,
   Copy,
   Check,
-  ExternalLink,
 } from "lucide-react";
 
 // Loading component for Suspense fallback
@@ -37,6 +37,7 @@ function VerifySpinContent() {
   const [boxData, setBoxData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [spinResult, setSpinResult] = useState(null);
 
   // Extract data from query parameters
   const clientSeed = searchParams.get("clientSeed");
@@ -50,6 +51,7 @@ function VerifySpinContent() {
 
   useEffect(() => {
     if (boxSlug) {
+      fetchSpinResult();
       fetchBoxData();
     } else {
       setLoading(false);
@@ -62,10 +64,42 @@ function VerifySpinContent() {
       const apiData = await getProductDetails(boxSlug);
 
       if (!apiData.success) {
-        throw new Error("Failed to fetch box data");
+        toastError("Failed to fetch spin result data");
+        setLoading(false);
+        return;
       }
 
+      console.log("box data:", apiData.data);
       setBoxData(apiData.data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchSpinResult = async () => {
+    try {
+      setLoading(true);
+      const apiData = await getSpinWinningItem({
+        clientSeed,
+        serverSeed,
+        nonce,
+      });
+
+      if (!apiData.success) {
+        toastError("Failed to fetch spin result data");
+        setLoading(false);
+        return;
+      }
+
+      console.log("Spin result:", apiData.data);
+      setSpinResult(apiData.data);
+
+      // Also fetch box details for additional information
+      if (apiData.data.boxDetails) {
+        setBoxData(apiData.data.boxDetails);
+      }
     } catch (err) {
       setError(err.message);
     } finally {
@@ -85,6 +119,10 @@ function VerifySpinContent() {
     return date.toLocaleString();
   };
 
+  const formatPercentage = (decimal) => {
+    return (decimal * 100).toFixed(6) + "%";
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -97,7 +135,7 @@ function VerifySpinContent() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <main className="flex-grow container mx-auto px-4 py-4 max-w-4xl">
+      <main className="flex-grow container mx-auto px-4 py-4 max-w-7xl">
         <div className="bg-white rounded-lg shadow-lg p-6 mt-14">
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-[#11F2EB] rounded-full mb-4">
@@ -117,9 +155,10 @@ function VerifySpinContent() {
             </div>
           )}
 
-          {/* Verification Results */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div className="bg-gray-50 rounded-lg p-4">
+          {/* Main Content Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-8">
+            {/* Left Column - Verification Data */}
+            <div className="lg:col-span-2 bg-gray-50 rounded-lg p-4">
               <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
                 <Shield className="w-5 h-5 mr-2 text-[#11F2EB]" />
                 Verification Data
@@ -263,130 +302,227 @@ function VerifySpinContent() {
                   </div>
                 </div>
               </div>
+
+              {/* Odds Mapping Table */}
+              {spinResult?.oddsMap && (
+                <div className="mt-6">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                    Odds Distribution
+                  </h3>
+                  <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm table-fixed">
+                        <colgroup>
+                          <col className="w-1/2" />
+                          <col className="w-1/4" />
+                          <col className="w-1/4" />
+                        </colgroup>
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-2 py-2 text-left font-medium text-gray-700">
+                              Item
+                            </th>
+                            <th className="px-2 py-2 text-right font-medium text-gray-700">
+                              Start
+                            </th>
+                            <th className="px-2 py-2 text-right font-medium text-gray-700">
+                              End
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                          {spinResult.oddsMap.map((odds, index) => (
+                            <tr key={index} className="hover:bg-gray-50">
+                              <td
+                                className="px-2 py-2 text-gray-900 truncate text-xs"
+                                title={odds.item}
+                              >
+                                {odds.item.length > 25
+                                  ? odds.item.substring(0, 25) + "..."
+                                  : odds.item}
+                              </td>
+                              <td className="px-2 py-2 text-right font-mono text-gray-600 text-xs">
+                                {formatPercentage(odds.start)}
+                              </td>
+                              <td className="px-2 py-2 text-right font-mono text-gray-600 text-xs">
+                                {formatPercentage(odds.end)}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* Box Information */}
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                <Key className="w-5 h-5 mr-2 text-[#11F2EB]" />
+            {/* Right Column - Box Information */}
+            <div className="lg:col-span-3 bg-gray-50 rounded-lg p-6">
+              <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                <Key className="w-6 h-6 mr-2 text-[#11F2EB]" />
                 Box Information
               </h2>
 
-              {boxData ? (
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium text-gray-600">
-                      Box Name
-                    </label>
-                    <div className="bg-white border border-gray-200 rounded px-3 py-2 text-sm">
-                      {boxData.name}
+              {spinResult ? (
+                <div className="space-y-6">
+                  {/* Box Header with Image and Details */}
+                  <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <div className="flex flex-col md:flex-row items-center md:items-start gap-4">
+                      {/* Box Image */}
+                      {spinResult.boxDetails?.images?.[0] && (
+                        <img
+                          src={spinResult.boxDetails.images[0].url}
+                          alt={spinResult.boxDetails.name}
+                          className="w-24 h-24 object-contain rounded-lg"
+                        />
+                      )}
+
+                      {/* Box Details */}
+                      <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div>
+                          <h4 className="text-sm font-medium text-gray-500 mb-1">
+                            Box Name
+                          </h4>
+                          <p className="text-sm font-semibold text-gray-800">
+                            {spinResult.boxDetails?.name || "N/A"}
+                          </p>
+                        </div>
+
+                        <div>
+                          <h4 className="text-sm font-medium text-gray-500 mb-1">
+                            Total Items
+                          </h4>
+                          <p className="text-sm font-semibold text-gray-800">
+                            {spinResult.boxDetails?.items?.length || 0} items
+                          </p>
+                        </div>
+
+                        <div>
+                          <h4 className="text-sm font-medium text-gray-500 mb-1">
+                            Category
+                          </h4>
+                          <p className="text-sm font-semibold text-gray-800">
+                            {boxData?.categoryDetails?.name || "N/A"}
+                          </p>
+                        </div>
+
+                        <div>
+                          <h4 className="text-sm font-medium text-gray-500 mb-1">
+                            Price
+                          </h4>
+                          <p className="text-sm font-semibold text-gray-800">
+                            ${boxData?.priceSale || "N/A"}
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  {boxData.images && boxData.images.length > 0 && (
-                    <div>
-                      <label className="text-sm font-medium text-gray-600">
-                        Box Image
-                      </label>
-                      <div className="mt-1">
-                        <img
-                          src={boxData.images[0].url}
-                          alt={boxData.name}
-                          className="w-full h-32 object-contain bg-white border border-gray-200 rounded"
-                        />
+                  {/* Influencer Section */}
+                  {spinResult.shopDetails && (
+                    <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                      <div className="flex items-center">
+                        {spinResult.shopDetails.logo && (
+                          <img
+                            src={spinResult.shopDetails.logo.url}
+                            alt={spinResult.shopDetails.title}
+                            className="w-12 h-12 rounded-full object-cover border-2 border-[#11F2EB]"
+                          />
+                        )}
+                        <div className="ml-4">
+                          <h3 className="text-md font-semibold text-gray-800">
+                            {spinResult.shopDetails.title}
+                          </h3>
+                          <p className="text-sm text-gray-600">Influencer</p>
+                        </div>
                       </div>
                     </div>
                   )}
 
-                  {boxData.vendor && (
-                    <div>
-                      <label className="text-sm font-medium text-gray-600">
-                        Vendor ID
-                      </label>
-                      <div className="bg-white border border-gray-200 rounded px-3 py-2 text-sm font-mono">
-                        {boxData.vendor}
+                  {/* Winning Item */}
+                  {spinResult.winningItem && (
+                    <div className="bg-gradient-to-r from-[#11F2EB]/10 to-cyan-100/10 rounded-xl p-4 border border-[#11F2EB]/20">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 flex items-start">
+                        🏆 Winning Item
+                      </h3>
+                      <div className="flex flex-col sm:flex-row items-start sm:items-start gap-3">
+                        {spinResult.winningItem.images?.[0] && (
+                          <img
+                            src={spinResult.winningItem.images[0].url}
+                            alt={spinResult.winningItem.name}
+                            className="w-16 h-16 sm:w-20 sm:h-20 object-contain bg-white rounded-lg p-2 border border-[#11F2EB]"
+                          />
+                        )}
+                        <div className="flex-grow text-start sm:text-left">
+                          <h4 className="text-sm sm:text-lg font-bold text-gray-800 mb-2">
+                            {spinResult.winningItem.name}
+                          </h4>
+                          <div className="flex flex-row sm:flex-row items-start gap-2">
+                            <span className="bg-[#11F2EB]/10 text-[#11F2EB] px-2 py-1 rounded-full text-xs font-medium">
+                              ${spinResult.winningItem.value}
+                            </span>
+                            <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-xs font-medium">
+                              {(spinResult.winningItem.odd * 100).toFixed(2)}%
+                            </span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )}
 
-                  {boxData.items && (
-                    <div>
-                      <label className="text-sm font-medium text-gray-600">
-                        Total Items
-                      </label>
-                      <div className="bg-white border border-gray-200 rounded px-3 py-2 text-sm">
-                        {boxData.items.length} items
-                      </div>
-                    </div>
-                  )}
-
-                  {boxData.prizeItems && boxData.prizeItems.length > 0 && (
-                    <div>
-                      <label className="text-sm font-medium text-gray-600">
-                        Sample Prize Items
-                      </label>
-                      <div className="space-y-2 mt-1">
-                        {boxData.prizeItems.slice(0, 3).map((item, index) => (
-                          <div
-                            key={index}
-                            className="bg-white border border-gray-200 rounded p-2"
-                          >
-                            <div className="flex items-center">
-                              {item.images && item.images.length > 0 && (
-                                <img
-                                  src={item.images[0].url}
-                                  alt={item.name}
-                                  className="w-8 h-8 object-contain mr-2"
-                                />
-                              )}
-                              <div className="flex-grow">
-                                <div className="text-sm font-medium truncate">
-                                  {item.name}
-                                </div>
-                                <div className="text-xs text-gray-600">
-                                  ${item.value}
+                  {/* Sample Items */}
+                  {spinResult.boxDetails?.items &&
+                    spinResult.boxDetails.items.length > 0 && (
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                          Box Items ({spinResult.boxDetails.items.length})
+                        </h3>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                          {spinResult.boxDetails.items
+                            .slice(0, 8)
+                            .map((item, index) => (
+                              <div
+                                key={index}
+                                className="bg-white rounded-lg p-3 shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+                              >
+                                <div className="flex flex-col h-full">
+                                  {item.images?.[0] && (
+                                    <img
+                                      src={item.images[0].url}
+                                      alt={item.name}
+                                      className="w-full h-20 object-contain mb-2 rounded"
+                                    />
+                                  )}
+                                  <div className="flex-grow">
+                                    <h4 className="text-xs font-medium text-gray-800 line-clamp-2 mb-1">
+                                      {item.name}
+                                    </h4>
+                                    <div className="flex justify-between items-center">
+                                      <span className="text-[#11F2EB] font-bold text-xs">
+                                        ${item.value}
+                                      </span>
+                                    </div>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          </div>
-                        ))}
-                        {boxData.prizeItems.length > 3 && (
-                          <div className="text-xs text-gray-500 text-center">
-                            +{boxData.prizeItems.length - 3} more items
+                            ))}
+                        </div>
+                        {spinResult.boxDetails.items.length > 8 && (
+                          <div className="text-center mt-3">
+                            <p className="text-sm text-gray-500">
+                              +{spinResult.boxDetails.items.length - 8} more
+                              items
+                            </p>
                           </div>
                         )}
                       </div>
-                    </div>
-                  )}
-
-                  {boxData.shopDetails && (
-                    <div>
-                      <label className="text-sm font-medium text-gray-600">
-                        Shop
-                      </label>
-                      <div className="bg-white border border-gray-200 rounded px-3 py-2 text-sm">
-                        {boxData.shopDetails.title}
-                      </div>
-                    </div>
-                  )}
-
-                  {boxData.categoryDetails && (
-                    <div>
-                      <label className="text-sm font-medium text-gray-600">
-                        Category
-                      </label>
-                      <div className="bg-white border border-gray-200 rounded px-3 py-2 text-sm">
-                        {boxData.categoryDetails.name}
-                      </div>
-                    </div>
-                  )}
+                    )}
                 </div>
               ) : (
-                <div className="text-center py-8 text-gray-500">
-                  <p>No box information available</p>
-                  <p className="text-sm mt-2">
-                    Box slug was not provided in the URL
-                  </p>
+                <div className="text-center py-12 text-gray-500">
+                  <Key className="w-12 h-12 mx-auto text-gray-300 mb-4" />
+                  <p>No spin result information available</p>
                 </div>
               )}
             </div>

@@ -1,43 +1,51 @@
-import axios from "axios"
+import axios from "axios";
+import { store } from "@/redux/store";
 
 function getToken() {
-  const cname = "token"
+  const cname = "token";
   if (typeof window !== "undefined") {
-    const name = cname + "="
-    const decodedCookie = decodeURIComponent(document.cookie)
-    const ca = decodedCookie.split(";")
+    const name = cname + "=";
+    const decodedCookie = decodeURIComponent(document.cookie);
+    const ca = decodedCookie.split(";");
     for (let i = 0; i < ca.length; i++) {
-      let c = ca[i]
+      let c = ca[i];
       while (c.charAt(0) == " ") {
-        c = c.substring(1)
+        c = c.substring(1);
       }
       if (c.indexOf(name) == 0) {
-        return c.substring(name.length, c.length)
+        return c.substring(name.length, c.length);
       }
     }
-    return ""
+    return "";
   }
-  return ""
+  return "";
 }
 
-const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.BASE_URL
-console.log(baseURL)
+// ✅ new function to get token from redux
+function getTokenFromRedux() {
+  const state = store.getState();
+  return state.user?.user?.token || "";
+}
+
+const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.BASE_URL;
+console.log(baseURL);
 const http = axios.create({
   baseURL: baseURL + `/api`,
-  timeout: 30000
-})
+  timeout: 30000,
+});
 
 http.interceptors.request.use(
   (config) => {
-    const token = getToken()
+    const token = getTokenFromRedux() || getTokenFromCookies();
+
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+      config.headers.Authorization = `Bearer ${token}`;
     }
-    return config
+    return config;
   },
   (error) => {
-    return Promise.reject(error)
-  },
-)
+    return Promise.reject(error);
+  }
+);
 
-export default http
+export default http;

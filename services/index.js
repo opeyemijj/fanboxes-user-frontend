@@ -407,6 +407,11 @@ export const getProductDetails = async (pid) => {
   return data;
 };
 
+export const getSpinWinningItem = async (payload) => {
+  const { data } = await http.post(`/admin/spin-verify`, payload);
+  return data;
+};
+
 export const getProductsByCategory = async (query = "", category, rate) => {
   const { data } = await http.get(
     `/category/products/${category}${query || "?"}&rate=${rate}`
