@@ -42,10 +42,9 @@ export default function FanboxGame({ boxConfig: initialBoxConfig }) {
     console.log("🎮 Game initialized with client seed:", initialClientSeed);
   }, []);
 
-  const handleSpin = async () => {
+  const handleSpin = async (resultsOnly = true, reusableResult) => {
     console.log("🚀 Starting spin process...");
     console.log("📦 Using current box config:", currentBoxConfig);
-    setGameState("spinning");
 
     try {
       //get user token from redux later. for now, get from local storage
@@ -56,25 +55,40 @@ export default function FanboxGame({ boxConfig: initialBoxConfig }) {
         return;
       }
 
-      // Call the spin API with current box configuration
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_API_URL + "/admin/spin",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            clientSeed,
-            nonce,
-            boxId: currentBoxConfig._id,
-            items: currentBoxConfig.items, // Send current items to API
-          }),
-        }
-      );
+      setGameState("waiting");
 
-      const result = await response.json();
+      if (resultsOnly) {
+        // Call the spin API with current box configuration
+        const response = await fetch(
+          process.env.NEXT_PUBLIC_API_URL + "/admin/spin",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              clientSeed,
+              nonce,
+              boxId: currentBoxConfig._id,
+              items: currentBoxConfig.items, // Send current items to API
+            }),
+          }
+        );
+
+        const result = await response.json();
+        console.log("📡 Received spin result from API:", result);
+        if (!result?.success) {
+          setGameState("idle");
+          toastError(result?.message);
+        }
+
+        console.log("result.data", result.data);
+        setGameState("idle");
+        return result?.data;
+      }
+
+      setGameState("spinning");
       // const simulateApiCallAndReturnWinningItem = async () => {
       //   return new Promise((resolve) => {
       //     setTimeout(() => {
@@ -100,15 +114,9 @@ export default function FanboxGame({ boxConfig: initialBoxConfig }) {
       // };
       // Simulate server seed and hash
       // const result = await simulateApiCallAndReturnWinningItem();
-      console.log("📡 Received spin result from API:", result);
-      if (!result?.success) {
-        setGameState("idle");
-        toastError(result?.message);
-      }
 
-      console.log("result.data", result.data);
-      setSpinResult(result.data);
-      setServerSeedHash(result?.data.serverSeedHash);
+      setSpinResult(reusableResult);
+      setServerSeedHash(reusableResult?.serverSeedHash);
       setNonce((prev) => prev + 1);
     } catch (error) {
       console.error("❌ Error during spin:", error);
@@ -206,6 +214,8 @@ export default function FanboxGame({ boxConfig: initialBoxConfig }) {
           isSpinning={gameState === "spinning"}
           winningItem={spinResult?.winningItem}
           boxPrice={currentBoxConfig?.priceSale || currentBoxConfig?.boxPrice}
+          spinResult={spinResult}
+          isWaitingForResult={gameState === "waiting"}
         />
       </div>
     </div>
