@@ -5,7 +5,8 @@ import { useSearchParams } from "next/navigation";
 import Header from "@/components/_main/Header";
 import Footer from "@/components/_main/Footer";
 import { toastError } from "@/lib/toast";
-import { getProductDetails, getSpinWinningItem } from "@/services";
+import { getProductDetails } from "@/services/boxes";
+import { getSpinWinningItem } from "@/services/boxes/spin-game/index";
 import {
   Shield,
   Key,

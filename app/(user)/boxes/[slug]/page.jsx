@@ -4,10 +4,7 @@ import BoxSpinner from "@/components/_main/BoxSpinner";
 import BoxContents from "@/components/_main/BoxContents";
 import YouMightLike from "@/components/_main/YouMightLike";
 import Footer from "@/components/_main/Footer";
-import { boxesData } from "@/lib/boxes-data";
-import { notFound } from "next/navigation";
-import { useSelector } from "react-redux";
-import { getProductDetails } from "@/services";
+import { getProductDetails } from "@/services/boxes";
 import { useEffect, useState } from "react";
 import BoxSpinnerSkeleton from "@/components/_main/BoxSpinner/BoxSpinnerSkeleton";
 

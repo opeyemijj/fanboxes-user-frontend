@@ -10,7 +10,8 @@ import SpinningWheel from "./SpiningWheel";
 import { useSelector } from "react-redux";
 import { useRouter, usePathname } from "next/navigation";
 import { toastSuccess, toastError, toastLoading } from "@/lib/toast";
-import { useDisableScrollInGameState } from "@/hooks/useDisableScrollInGameState";
+import { useDisableScrollInGameState } from "@/hooks/spin-game/useDisableScrollInGameState";
+import { initializeSpin } from "../../../services/boxes/spin-game/index";
 
 export default function FanboxGame({ boxConfig: initialBoxConfig }) {
   const user = useSelector((state) => state.user);
@@ -66,24 +67,30 @@ export default function FanboxGame({ boxConfig: initialBoxConfig }) {
 
       if (resultsOnly) {
         // Call the spin API with current box configuration
-        const response = await fetch(
-          process.env.NEXT_PUBLIC_API_URL + "/user/spin",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              clientSeed,
-              nonce,
-              boxId: currentBoxConfig._id,
-              items: currentBoxConfig.items, // Send current items to API
-            }),
-          }
-        );
+        // const response = await fetch(
+        //   process.env.NEXT_PUBLIC_API_URL + "/user/spin",
+        //   {
+        //     method: "POST",
+        //     headers: {
+        //       "Content-Type": "application/json",
+        //       authorization: `Bearer ${token}`,
+        //     },
+        //     body: JSON.stringify({
+        //       clientSeed,
+        //       nonce,
+        //       boxId: currentBoxConfig._id,
+        //       items: currentBoxConfig.items, // Send current items to API
+        //     }),
+        //   }
+        // );
 
-        const result = await response.json();
+        // const result = await response.json();
+        const result = await initializeSpin({
+          clientSeed,
+          nonce,
+          boxId: currentBoxConfig._id,
+          items: currentBoxConfig.items, // Send current items to API
+        });
         console.log("📡 Received spin result from API:", result);
         if (!result?.success) {
           setGameState("idle");

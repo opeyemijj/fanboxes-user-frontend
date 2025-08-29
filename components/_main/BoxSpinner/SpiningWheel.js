@@ -298,6 +298,7 @@ export default function SpinningWheel({
   };
 
   const handleCancelSpin = () => {
+    if (isWaitingForResult) return;
     // Close the modal
     setShowSeedModal(false);
 
@@ -926,6 +927,7 @@ export default function SpinningWheel({
                       className="h-10 sm:h-12 text-sm sm:text-lg border-2 border-gray-300 
                         hover:border-gray-400 hover:text-black hover:bg-gray-50 w-full sm:w-1/3"
                       onClick={handleCancelSpin}
+                      disabled={isWaitingForResult}
                     >
                       Cancel
                     </Button>
@@ -933,6 +935,7 @@ export default function SpinningWheel({
                       className="h-10 sm:h-12 text-sm sm:text-lg bg-gradient-to-r from-[#11F2EB] via-cyan-500 to-cyan-600 
                         hover:from-cyan-400 hover:via-[#11F2EB] hover:to-blue-700 w-full sm:w-2/3"
                       onClick={handleContinueToSpin}
+                      disabled={isWaitingForResult}
                     >
                       Continue to Spin
                     </Button>
