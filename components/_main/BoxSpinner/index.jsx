@@ -10,7 +10,7 @@ import FanboxGame from "./FanboxGame";
 // import boxConfig from "../data/box-config.json";
 
 function SpinGame({ boxConfig }) {
-  console.log("boxConfig", boxConfig);
+  // console.log("boxConfig", boxConfig);
   return <FanboxGame boxConfig={boxConfig} />;
 }
 

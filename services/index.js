@@ -408,7 +408,7 @@ export const getProductDetails = async (pid) => {
 };
 
 export const getSpinWinningItem = async (payload) => {
-  const { data } = await http.post(`/admin/spin-verify`, payload);
+  const { data } = await http.post(`/user/spin-verify`, payload);
   return data;
 };
 

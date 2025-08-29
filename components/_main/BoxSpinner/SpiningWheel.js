@@ -14,6 +14,8 @@ import {
   EyeOff,
   Copy,
   Loader,
+  X,
+  RefreshCw,
 } from "lucide-react";
 import {
   Dialog,
@@ -31,10 +33,15 @@ export default function SpinningWheel({
   onSpin,
   boxPrice,
   isWaitingForResult,
+  createSpinApiError,
+  setCreateSpinApiError,
+  generateAndSetClientSeed,
+  clientSeed,
 }) {
   const [showModal, setShowModal] = useState(false);
   const [showSeedModal, setShowSeedModal] = useState(false);
   const [showServerSeed, setShowServerSeed] = useState(false);
+  const [showClientSeedModal, setShowClientSeedModal] = useState(false);
   const [copiedField, setCopiedField] = useState(null);
   const [spinResultData, setSpinResultData] = useState(null);
   const [rotation, setRotation] = useState(0);
@@ -48,9 +55,10 @@ export default function SpinningWheel({
   const startTimeRef = useRef(0);
   const startRotationRef = useRef(0);
   const targetRotationRef = useRef(0);
+  const [spinRecordId, setSpinRecordId] = useState(null);
 
   // Extract seed data from spinResultData
-  const clientSeed = spinResultData?.clientSeed || "";
+  // const clientSeed = spinResultData?.clientSeed || "";
   const serverSeed = spinResultData?.serverSeed || "";
   const serverSeedHash = spinResultData?.serverSeedHash || "";
   const nonce = spinResultData?.nonce || 0;
@@ -258,13 +266,52 @@ export default function SpinningWheel({
 
     // Call onSpin with true to get the spin result data
     const result = await onSpin(true);
+    if (result && result._id) {
+      setSpinRecordId(result._id);
+    }
     setSpinResultData(result);
   };
 
   const handleContinueToSpin = () => {
     // Close seed modal and start the actual spin with the result data
     setShowSeedModal(false);
+    setCreateSpinApiError(null); // Clear any previous errors
     onSpin(false, spinResultData);
+  };
+
+  // Function to delete spin record (to be implemented)
+  const deleteSpinRecord = async (spinId) => {
+    console.log("Deleting spin record with ID:", spinId);
+    // TODO: Implement API call to delete spin record
+    // Example:
+    // try {
+    //   const response = await fetch(`/api/spins/${spinId}`, {
+    //     method: 'DELETE',
+    //   });
+    //   if (!response.ok) {
+    //     throw new Error('Failed to delete spin record');
+    //   }
+    //   console.log('Spin record deleted successfully');
+    // } catch (error) {
+    //   console.error('Error deleting spin record:', error);
+    // }
+  };
+
+  const handleCancelSpin = () => {
+    // Close the modal
+    setShowSeedModal(false);
+
+    // If we have a spin record ID, delete the spin record
+    if (spinRecordId) {
+      deleteSpinRecord(spinRecordId);
+    }
+
+    // Clear any error messages
+    setCreateSpinApiError(null);
+  };
+
+  const handleRegenerateClientSeed = () => {
+    generateAndSetClientSeed();
   };
 
   const copyToClipboard = (text, fieldName) => {
@@ -400,6 +447,22 @@ export default function SpinningWheel({
       <div className="relative w-full h-[50vh] min-h-[400px] overflow-hidden flex flex-col items-center justify-center rounded-2xl">
         {/* Background effects */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.1)_0%,transparent_70%)]" />
+
+        {/* Client Seed Regenerate Button - Top Right */}
+        <div className="absolute top-4 right-4 z-50">
+          <div className="relative group">
+            <button
+              onClick={() => setShowClientSeedModal(true)}
+              className="p-2 bg-white/80 hover:bg-white rounded-full shadow-lg transition-all duration-200 hover:scale-110"
+              title="View and regenerate client seed"
+            >
+              <RefreshCw className="w-5 h-5 text-cyan-600" />
+            </button>
+            <div className="absolute top-full right-0 mt-2 w-40 p-2 bg-black/80 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+              View and regenerate client seed
+            </div>
+          </div>
+        </div>
 
         {/* FIXED WINNING SPOT INDICATOR - Absolute Center Front */}
         <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-40 pointer-events-none">
@@ -563,35 +626,131 @@ export default function SpinningWheel({
         </div>
       </div>
 
+      {/* Client Seed Modal */}
+      <AnimatePresence>
+        {showClientSeedModal && (
+          <Dialog
+            open={showClientSeedModal}
+            onOpenChange={setShowClientSeedModal}
+          >
+            <DialogContent className="sm:max-w-[500px] max-w-[95vw] bg-gradient-to-br from-purple-50 to-blue-50 z-[9999] fixed">
+              <DialogHeader>
+                <DialogTitle className="text-xl sm:text-2xl text-center bg-gradient-to-r from-[#11F2EB] via-cyan-500 to-cyan-600 bg-clip-text text-transparent">
+                  <Key className="inline-block w-5 h-5 sm:w-6 sm:h-6 mr-2" />
+                  Client Seed
+                </DialogTitle>
+                <DialogDescription className="text-center text-gray-600 text-sm sm:text-base">
+                  Your current client seed for cryptographic verification
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="py-4 space-y-4">
+                <div className="bg-white p-3 sm:p-4 rounded-lg border border-gray-200">
+                  <div className="flex items-center mb-2">
+                    <Key className="w-4 h-4 mr-2 text-blue-500" />
+                    <span className="font-semibold text-sm sm:text-base">
+                      Current Client Seed
+                    </span>
+                    <button
+                      onClick={() =>
+                        copyToClipboard(clientSeed, "clientSeedModal")
+                      }
+                      className="ml-2 p-1 text-gray-400 hover:text-gray-600"
+                    >
+                      <Copy className="w-4 h-4" />
+                    </button>
+                    {copiedField === "clientSeedModal" && (
+                      <span className="ml-2 text-xs text-green-500">
+                        Copied!
+                      </span>
+                    )}
+                  </div>
+                  <div className="bg-gray-100 p-2 sm:p-3 rounded font-mono text-xs sm:text-sm break-all max-h-32 overflow-y-auto">
+                    {clientSeed}
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2">
+                    This seed is used along with the server seed to determine
+                    spin outcomes. Changing it will affect future spin results.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mt-4">
+                <Button
+                  variant="outline"
+                  className="h-10 sm:h-12 text-sm sm:text-lg border-2 border-gray-300 
+                    hover:border-gray-400 hover:text-black hover:bg-gray-50 w-full sm:w-1/3"
+                  onClick={() => setShowClientSeedModal(false)}
+                >
+                  Close
+                </Button>
+                <Button
+                  className="h-10 sm:h-12 text-sm sm:text-lg bg-gradient-to-r from-[#11F2EB] via-cyan-500 to-cyan-600 
+                    hover:from-cyan-400 hover:via-[#11F2EB] hover:to-blue-700 w-full sm:w-2/3"
+                  onClick={handleRegenerateClientSeed}
+                >
+                  <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
+                  Regenerate Seed
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
+      </AnimatePresence>
+
       {/* Seed Verification Modal */}
       <AnimatePresence>
         {showSeedModal && (
           <Dialog open={showSeedModal} onOpenChange={() => {}}>
-            <DialogContent className="sm:max-w-[600px] bg-gradient-to-br from-purple-50 to-blue-50 z-[9999] fixed">
+            <DialogContent className="sm:max-w-[600px] max-w-[95vw] max-h-[90vh] bg-gradient-to-br from-purple-50 to-blue-50 z-[9999] fixed">
               <DialogHeader>
-                <DialogTitle className="text-2xl text-center bg-gradient-to-r from-[#11F2EB] via-cyan-500 to-cyan-600 bg-clip-text text-transparent">
-                  <Shield className="inline-block w-6 h-6 mr-2" />
-                  Fairness Verification
+                <DialogTitle className="text-xl sm:text-2xl text-center bg-gradient-to-r from-[#11F2EB] via-cyan-500 to-cyan-600 bg-clip-text text-transparent">
+                  <Shield className="inline-block w-5 h-5 sm:w-6 sm:h-6 mr-2" />
+                  {createSpinApiError ? "Error" : "Fairness Verification"}
                 </DialogTitle>
-                <DialogDescription className="text-center text-gray-600">
-                  You can verify the integrity of this spin using the
-                  cryptographic seeds below
+                <DialogDescription className="text-center text-gray-600 text-sm sm:text-base">
+                  {createSpinApiError
+                    ? "An error occurred while trying to process your spin"
+                    : "You can verify the integrity of this spin using the cryptographic seeds below"}
                 </DialogDescription>
               </DialogHeader>
 
               {isWaitingForResult ? (
                 <div className="py-8 flex flex-col items-center justify-center">
-                  <Loader className="h-12 w-12 animate-spin text-cyan-500 mb-4" />
-                  <p className="text-gray-600">Loading spin data...</p>
+                  <Loader className="h-10 w-10 sm:h-12 sm:w-12 animate-spin text-cyan-500 mb-4" />
+                  <p className="text-gray-600 text-sm sm:text-base">
+                    Loading spin data...
+                  </p>
+                </div>
+              ) : createSpinApiError ? (
+                // Display error message instead of seed data
+                <div className="py-4 space-y-4 max-h-64 sm:max-h-96 overflow-y-auto">
+                  <div className="bg-red-50 p-3 sm:p-4 rounded-lg border border-red-200">
+                    <div className="flex items-center mb-2">
+                      <X className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-red-500" />
+                      <span className="font-semibold text-red-700 text-sm sm:text-base">
+                        Error
+                      </span>
+                    </div>
+                    <div className="text-red-600 p-2 rounded text-sm sm:text-base">
+                      {createSpinApiError}
+                    </div>
+                    <p className="text-xs text-red-500 mt-1">
+                      Please try again or contact support if the problem
+                      persists.
+                    </p>
+                  </div>
                 </div>
               ) : (
                 <>
-                  <div className="py-4 space-y-4 max-h-96 overflow-y-auto">
+                  <div className="py-4 space-y-4 max-h-64 sm:max-h-96 overflow-y-auto px-1">
                     {/* Client Seed */}
-                    <div className="bg-white p-4 rounded-lg border border-gray-200">
+                    <div className="bg-white p-3 sm:p-4 rounded-lg border border-gray-200">
                       <div className="flex items-center mb-2">
                         <Key className="w-4 h-4 mr-2 text-blue-500" />
-                        <span className="font-semibold">Client Seed</span>
+                        <span className="font-semibold text-sm sm:text-base">
+                          Client Seed
+                        </span>
                         <button
                           onClick={() =>
                             copyToClipboard(clientSeed, "clientSeed")
@@ -606,16 +765,18 @@ export default function SpinningWheel({
                           </span>
                         )}
                       </div>
-                      <div className="bg-gray-100 p-2 rounded font-mono text-sm break-all">
+                      <div className="bg-gray-100 p-2 rounded font-mono text-xs sm:text-sm break-all">
                         {clientSeed}
                       </div>
                     </div>
 
                     {/* Server Seed Hash */}
-                    <div className="bg-white p-4 rounded-lg border border-gray-200">
+                    <div className="bg-white p-3 sm:p-4 rounded-lg border border-gray-200">
                       <div className="flex items-center mb-2">
                         <Hash className="w-4 h-4 mr-2 text-purple-500" />
-                        <span className="font-semibold">Server Seed Hash</span>
+                        <span className="font-semibold text-sm sm:text-base">
+                          Server Seed Hash
+                        </span>
                         <button
                           onClick={() =>
                             copyToClipboard(serverSeedHash, "serverSeedHash")
@@ -630,7 +791,7 @@ export default function SpinningWheel({
                           </span>
                         )}
                       </div>
-                      <div className="bg-gray-100 p-2 rounded font-mono text-sm break-all">
+                      <div className="bg-gray-100 p-2 rounded font-mono text-xs sm:text-sm break-all">
                         {serverSeedHash}
                       </div>
                       <p className="text-xs text-gray-500 mt-1">
@@ -640,10 +801,12 @@ export default function SpinningWheel({
                     </div>
 
                     {/* Server Seed */}
-                    <div className="bg-white p-4 rounded-lg border border-gray-200">
+                    <div className="bg-white p-3 sm:p-4 rounded-lg border border-gray-200">
                       <div className="flex items-center mb-2">
                         <Shield className="w-4 h-4 mr-2 text-green-500" />
-                        <span className="font-semibold">Server Seed</span>
+                        <span className="font-semibold text-sm sm:text-base">
+                          Server Seed
+                        </span>
                         <button
                           onClick={() => setShowServerSeed(!showServerSeed)}
                           className="ml-2 p-1 text-gray-400 hover:text-gray-600"
@@ -668,7 +831,7 @@ export default function SpinningWheel({
                           </span>
                         )}
                       </div>
-                      <div className="bg-gray-100 p-2 rounded font-mono text-sm break-all">
+                      <div className="bg-gray-100 p-2 rounded font-mono text-xs sm:text-sm break-all">
                         {showServerSeed
                           ? serverSeed
                           : "••••••••••••••••••••••••••••••••"}
@@ -679,10 +842,12 @@ export default function SpinningWheel({
                     </div>
 
                     {/* Nonce */}
-                    <div className="bg-white p-4 rounded-lg border border-gray-200">
+                    <div className="bg-white p-3 sm:p-4 rounded-lg border border-gray-200">
                       <div className="flex items-center mb-2">
                         <Hash className="w-4 h-4 mr-2 text-orange-500" />
-                        <span className="font-semibold">Nonce</span>
+                        <span className="font-semibold text-sm sm:text-base">
+                          Nonce
+                        </span>
                         <button
                           onClick={() =>
                             copyToClipboard(nonce.toString(), "nonce")
@@ -697,16 +862,18 @@ export default function SpinningWheel({
                           </span>
                         )}
                       </div>
-                      <div className="bg-gray-100 p-2 rounded font-mono text-sm">
+                      <div className="bg-gray-100 p-2 rounded font-mono text-xs sm:text-sm">
                         {nonce}
                       </div>
                     </div>
 
                     {/* Hash */}
-                    <div className="bg-white p-4 rounded-lg border border-gray-200">
+                    <div className="bg-white p-3 sm:p-4 rounded-lg border border-gray-200">
                       <div className="flex items-center mb-2">
                         <Hash className="w-4 h-4 mr-2 text-red-500" />
-                        <span className="font-semibold">Result Hash</span>
+                        <span className="font-semibold text-sm sm:text-base">
+                          Result Hash
+                        </span>
                         <button
                           onClick={() => copyToClipboard(hash, "hash")}
                           className="ml-2 p-1 text-gray-400 hover:text-gray-600"
@@ -719,7 +886,7 @@ export default function SpinningWheel({
                           </span>
                         )}
                       </div>
-                      <div className="bg-gray-100 p-2 rounded font-mono text-sm break-all">
+                      <div className="bg-gray-100 p-2 rounded font-mono text-xs sm:text-sm break-all">
                         {hash}
                       </div>
                       <p className="text-xs text-gray-500 mt-1">
@@ -728,28 +895,50 @@ export default function SpinningWheel({
                     </div>
 
                     {/* Created At */}
-                    <div className="bg-white p-4 rounded-lg border border-gray-200">
+                    <div className="bg-white p-3 sm:p-4 rounded-lg border border-gray-200">
                       <div className="flex items-center mb-2">
                         <Clock className="w-4 h-4 mr-2 text-indigo-500" />
-                        <span className="font-semibold">Time Created</span>
+                        <span className="font-semibold text-sm sm:text-base">
+                          Time Created
+                        </span>
                       </div>
-                      <div className="bg-gray-100 p-2 rounded font-mono text-sm">
+                      <div className="bg-gray-100 p-2 rounded font-mono text-xs sm:text-sm">
                         {formatDate(createdAt)}
                       </div>
                     </div>
                   </div>
+                </>
+              )}
 
-                  <div className="flex justify-center mt-4">
+              <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mt-4">
+                {createSpinApiError ? (
+                  <Button
+                    className="h-10 sm:h-12 text-sm sm:text-lg bg-gradient-to-r from-red-500 to-red-600 
+                      hover:from-red-400 hover:to-red-700 w-full"
+                    onClick={handleCancelSpin}
+                  >
+                    Close
+                  </Button>
+                ) : (
+                  <>
                     <Button
-                      className="h-12 text-lg bg-gradient-to-r from-[#11F2EB] via-cyan-500 to-cyan-600 
-                        hover:from-cyan-400 hover:via-[#11F2EB] hover:to-blue-700 w-full"
+                      variant="outline"
+                      className="h-10 sm:h-12 text-sm sm:text-lg border-2 border-gray-300 
+                        hover:border-gray-400 hover:text-black hover:bg-gray-50 w-full sm:w-1/3"
+                      onClick={handleCancelSpin}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      className="h-10 sm:h-12 text-sm sm:text-lg bg-gradient-to-r from-[#11F2EB] via-cyan-500 to-cyan-600 
+                        hover:from-cyan-400 hover:via-[#11F2EB] hover:to-blue-700 w-full sm:w-2/3"
                       onClick={handleContinueToSpin}
                     >
                       Continue to Spin
                     </Button>
-                  </div>
-                </>
-              )}
+                  </>
+                )}
+              </div>
             </DialogContent>
           </Dialog>
         )}
@@ -759,16 +948,16 @@ export default function SpinningWheel({
       <AnimatePresence>
         {showModal && winningItem && !isSpinning && (
           <Dialog open={showModal} onOpenChange={handleModalClose}>
-            <DialogContent className="sm:max-w-[425px] bg-gradient-to-br from-cyan-50 to-blue-50 z-[9999] fixed">
+            <DialogContent className="sm:max-w-[425px] max-w-[95vw] bg-gradient-to-br from-cyan-50 to-blue-50 z-[9999] fixed">
               <DialogHeader>
-                <DialogTitle className="text-3xl text-center bg-gradient-to-r from-[#11F2EB] via-cyan-500 to-cyan-600 bg-clip-text text-transparent">
+                <DialogTitle className="text-2xl sm:text-3xl text-center bg-gradient-to-r from-[#11F2EB] via-cyan-500 to-cyan-600 bg-clip-text text-transparent">
                   🎉 Congratulations! 🎉
                 </DialogTitle>
-                <DialogDescription className="text-center text-lg text-gray-600">
+                <DialogDescription className="text-center text-gray-600 text-base sm:text-lg">
                   You've won an amazing prize!
                 </DialogDescription>
               </DialogHeader>
-              <div className="py-6 flex flex-col items-center">
+              <div className="py-4 sm:py-6 flex flex-col items-center">
                 <motion.div
                   initial={{ scale: 0.5, opacity: 0, rotateY: -180 }}
                   animate={{ scale: 1, opacity: 1, rotateY: 0 }}
@@ -778,16 +967,16 @@ export default function SpinningWheel({
                     stiffness: 200,
                     damping: 20,
                   }}
-                  className="relative"
+                  className="relative w-full max-w-xs"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-700 rounded-full blur-xl opacity-30 scale-110" />
-                  <div className="relative bg-white rounded-2xl p-4 shadow-2xl">
+                  <div className="relative bg-white rounded-2xl p-3 sm:p-4 shadow-2xl flex justify-center items-center">
                     <img
                       src={winningItem.images[0]?.url || "/placeholder.svg"}
                       alt={winningItem.name}
-                      width="200"
-                      height="200"
-                      className="object-contain"
+                      width={200}
+                      height={200}
+                      className="object-contain h-40 sm:h-48 w-auto"
                     />
                   </div>
                 </motion.div>
@@ -795,16 +984,16 @@ export default function SpinningWheel({
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3, duration: 0.4 }}
-                  className="text-center mt-6"
+                  className="text-center mt-4 sm:mt-6"
                 >
-                  <h3 className="text-2xl font-bold text-gray-800 mb-2">
+                  <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">
                     {winningItem.name}
                   </h3>
-                  <p className="text-gray-600 text-lg">
+                  <p className="text-gray-600 text-base sm:text-lg">
                     Value: ${winningItem.value}
                   </p>
 
-                  <p className="text-sm text-gray-500 mt-2">
+                  <p className="text-xs sm:text-sm text-gray-500 mt-2">
                     {spinResultData && (
                       <button
                         onClick={() => {
@@ -822,12 +1011,12 @@ export default function SpinningWheel({
 
                           window.open(`/verify-spin?${queryParams}`, "_blank");
                         }}
-                        className="inline-flex items-center text-cyan-600 hover:text-[#11F2EB] underline transition-colors duration-200"
+                        className="inline-flex items-center text-cyan-600 hover:text-[#11F2EB] underline transition-colors duration-200 text-xs sm:text-sm"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          width="16"
-                          height="16"
+                          width="14"
+                          height="14"
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="currentColor"
@@ -847,24 +1036,26 @@ export default function SpinningWheel({
                 </motion.div>
               </div>
               <motion.div
-                className="grid grid-cols-2 gap-4"
+                className="grid grid-cols-2 gap-3 sm:gap-4"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, duration: 0.4 }}
               >
                 <Button
                   variant="outline"
-                  className="w-full h-12 text-lg border-2 border-[#11F2EB] hover:border-cyan-500 hover:bg-blue-50 bg-transparent hover:text-black"
+                  className="w-full h-10 sm:h-12 text-xs sm:text-lg border-2 border-[#11F2EB] hover:border-cyan-500 hover:bg-blue-50 bg-transparent hover:text-black"
                   onClick={handleModalClose}
                 >
-                  💰 Sell for Credits
+                  <span className="hidden sm:inline">💰 Sell for Credits</span>
+                  <span className="sm:hidden">💰 Sell</span>
                 </Button>
                 <Button
-                  className="w-full h-12 text-lg bg-gradient-to-r from-[#11F2EB] via-cyan-500 to-cyan-600 
+                  className="w-full h-10 sm:h-12 text-xs sm:text-lg bg-gradient-to-r from-[#11F2EB] via-cyan-500 to-cyan-600 
     hover:from-cyan-400 hover:via-[#11F2EB] hover:to-blue-700"
                   onClick={handleModalClose}
                 >
-                  📦 Ship to Me
+                  <span className="hidden sm:inline">📦 Ship to Me</span>
+                  <span className="sm:hidden">📦 Ship</span>
                 </Button>
               </motion.div>
             </DialogContent>
