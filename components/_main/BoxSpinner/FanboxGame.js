@@ -10,6 +10,7 @@ import SpinningWheel from "./SpiningWheel";
 import { useSelector } from "react-redux";
 import { useRouter, usePathname } from "next/navigation";
 import { toastSuccess, toastError, toastLoading } from "@/lib/toast";
+import { useDisableScrollInGameState } from "@/hooks/useDisableScrollInGameState";
 
 export default function FanboxGame({ boxConfig: initialBoxConfig }) {
   const user = useSelector((state) => state.user);
@@ -23,9 +24,12 @@ export default function FanboxGame({ boxConfig: initialBoxConfig }) {
   const [serverSeedHash, setServerSeedHash] = useState("");
   const [clientSeed, setClientSeed] = useState("");
   const [nonce, setNonce] = useState(1);
+  const [createSpinApiError, setCreateSpinApiError] = useState("");
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [isEditingBox, setIsEditingBox] = useState(false);
+
+  useDisableScrollInGameState(gameState === "spinning");
 
   // Make box config dynamic and editable
   const [currentBoxConfig, setCurrentBoxConfig] = useState(initialBoxConfig);
@@ -37,18 +41,21 @@ export default function FanboxGame({ boxConfig: initialBoxConfig }) {
   useEffect(() => {
     setMounted(true);
     // Generate initial client seed
-    const initialClientSeed = Math.random().toString(36).substring(2, 15);
-    setClientSeed(initialClientSeed);
-    console.log("🎮 Game initialized with client seed:", initialClientSeed);
+    generateAndSetClientSeed();
   }, []);
+
+  function generateAndSetClientSeed() {
+    const initialClientSeed = Math.random().toString(36).substring(2, 15);
+    console.log("🎮 Game initialized with client seed:", initialClientSeed);
+    setClientSeed(initialClientSeed);
+  }
 
   const handleSpin = async (resultsOnly = true, reusableResult) => {
     console.log("🚀 Starting spin process...");
     console.log("📦 Using current box config:", currentBoxConfig);
 
     try {
-      //get user token from redux later. for now, get from local storage
-      const token = user?.user?.token || localStorage.getItem("token");
+      const token = user?.user?.token;
       if (!token) {
         toastError("Please log in to spin the wheel.");
         router.push(`/login?dest=${pathname}`);
@@ -60,7 +67,7 @@ export default function FanboxGame({ boxConfig: initialBoxConfig }) {
       if (resultsOnly) {
         // Call the spin API with current box configuration
         const response = await fetch(
-          process.env.NEXT_PUBLIC_API_URL + "/admin/spin",
+          process.env.NEXT_PUBLIC_API_URL + "/user/spin",
           {
             method: "POST",
             headers: {
@@ -80,6 +87,7 @@ export default function FanboxGame({ boxConfig: initialBoxConfig }) {
         console.log("📡 Received spin result from API:", result);
         if (!result?.success) {
           setGameState("idle");
+          setCreateSpinApiError(result?.message);
           toastError(result?.message);
         }
 
@@ -89,31 +97,6 @@ export default function FanboxGame({ boxConfig: initialBoxConfig }) {
       }
 
       setGameState("spinning");
-      // const simulateApiCallAndReturnWinningItem = async () => {
-      //   return new Promise((resolve) => {
-      //     setTimeout(() => {
-      //       const randomItem =
-      //         currentBoxConfig.items[
-      //           Math.floor(Math.random() * currentBoxConfig.items.length)
-      //         ];
-
-      //       resolve({
-      //         winningItem: randomItem,
-      //         serverSeedHash: "simulatedServerSeedHash123456",
-      //         verification: {
-      //           serverSeed: "simulatedServerSeed123456",
-      //           clientSeed,
-      //           hash: "simulatedHash123456",
-      //           normalized: Math.random(),
-      //           nonce,
-      //         },
-      //         success: true,
-      //       });
-      //     }, 2000);
-      //   });
-      // };
-      // Simulate server seed and hash
-      // const result = await simulateApiCallAndReturnWinningItem();
 
       setSpinResult(reusableResult);
       setServerSeedHash(reusableResult?.serverSeedHash);
@@ -216,6 +199,10 @@ export default function FanboxGame({ boxConfig: initialBoxConfig }) {
           boxPrice={currentBoxConfig?.priceSale || currentBoxConfig?.boxPrice}
           spinResult={spinResult}
           isWaitingForResult={gameState === "waiting"}
+          createSpinApiError={createSpinApiError}
+          setCreateSpinApiError={setCreateSpinApiError}
+          generateAndSetClientSeed={generateAndSetClientSeed}
+          clientSeed={clientSeed}
         />
       </div>
     </div>

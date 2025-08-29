@@ -36,7 +36,7 @@ const http = axios.create({
 
 http.interceptors.request.use(
   (config) => {
-    const token = getTokenFromRedux() || getTokenFromCookies();
+    const token = getTokenFromRedux() || getToken();
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
