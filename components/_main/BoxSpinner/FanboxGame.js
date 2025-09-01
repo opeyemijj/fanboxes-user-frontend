@@ -111,6 +111,16 @@ export default function FanboxGame({ boxConfig: initialBoxConfig }) {
     } catch (error) {
       console.error("❌ Error during spin:", error);
       setGameState("idle");
+      setCreateSpinApiError(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Internal server error"
+      );
+      toastError(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Internal server error"
+      );
     }
   };
 

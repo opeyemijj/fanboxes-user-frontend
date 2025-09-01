@@ -703,7 +703,13 @@ export default function SpinningWheel({
       <AnimatePresence>
         {showSeedModal && (
           <Dialog open={showSeedModal} onOpenChange={() => {}}>
-            <DialogContent className="sm:max-w-[600px] max-w-[95vw] max-h-[90vh] bg-gradient-to-br from-purple-50 to-blue-50 z-[9999] fixed">
+            <DialogContent
+              className="sm:max-w-[600px] max-w-[95vw] max-h-[90vh] bg-gradient-to-br from-purple-50 to-blue-50 z-[9999] fixed"
+              onInteractOutside={(e) => e.preventDefault()}
+              onEscapeKeyDown={(e) => e.preventDefault()}
+              useCustomClose={true}
+              onCustomClose={handleCancelSpin}
+            >
               <DialogHeader>
                 <DialogTitle className="text-xl sm:text-2xl text-center bg-gradient-to-r from-[#11F2EB] via-cyan-500 to-cyan-600 bg-clip-text text-transparent">
                   <Shield className="inline-block w-5 h-5 sm:w-6 sm:h-6 mr-2" />
