@@ -1,36 +1,5 @@
 import http from "./http";
 
-export const register = async (payload) => {
-  const { data } = await http.post(`/auth/register`, payload);
-  return data;
-};
-export const verifyOTP = async (payload) => {
-  const { data } = await http.post(`/auth/verify-otp`, payload);
-  return data;
-};
-export const resendOTP = async (payload) => {
-  const { data } = await http.post(`/auth/resend-otp`, payload);
-  return data;
-};
-
-export const login = async (payload) => {
-  const { data } = await http.post(`/auth/login`, payload);
-  return data;
-};
-
-export const forgetPassword = async (payload) => {
-  const { data } = await http.post("/auth/forget-password", payload);
-  return data;
-};
-
-export const resetPassword = async ({ newPassword, token }) => {
-  const { data } = await http.post("/auth/reset-password", {
-    newPassword: newPassword,
-    token: token,
-  });
-  return data;
-};
-
 export const adminDashboardAnalytics = async () => {
   const { data } = await http.get(`/admin/dashboard-analytics`);
   return data;
@@ -326,162 +295,6 @@ export const deleteCompaignByAdmin = async (slug) => {
   return data;
 };
 
-export const getVendorProductBySlug = async (slug) => {
-  const { data } = await http.get(`/vendor/products/${slug}`);
-  return data;
-};
-
-export const getVendorShop = async () => {
-  const { data } = await http.get(`/vendor/shop`);
-  return data;
-};
-export const vendorDashboardAnalytics = async () => {
-  const { data } = await http.get(`/vendor/dashboard-analytics`);
-  return data;
-};
-export const getVendorLowStockProducts = async (page) => {
-  const { data: response } = await http.get(
-    `/vendor/low-stock-products?page=${page}`
-  );
-  return response;
-};
-export const getVendorProducts = async (page, search) => {
-  const { data: response } = await http.get(
-    `/vendor/products?search=${search}&page=${page}`
-  );
-  return response;
-};
-export const deleteVendorProduct = async (slug) => {
-  const { data: response } = await http.delete(`/vendor/products/${slug}`);
-  return response;
-};
-export const createVendorProduct = async (payload) => {
-  const { data: response } = await http.post(`/vendor/products`, payload);
-  return response;
-};
-export const createVendorBoxItem = async (payload) => {
-  console.log(payload, "OKK SEE");
-  const { data: response } = await http.post(`/vendor/boxItem`, payload);
-  return response;
-};
-export const updateVendorProduct = async ({ currentSlug, ...payload }) => {
-  const { data: response } = await http.put(
-    `/vendor/products/${currentSlug}`,
-    payload
-  );
-  return response;
-};
-export const getOrdersByVendor = async (payload) => {
-  const { data } = await http.get(`/vendor/orders?${payload}`);
-  return data;
-};
-export const addShopByVendor = async (payload) => {
-  const { data } = await http.post(`/vendor/shops`, payload);
-  return data;
-};
-export const updateShopByVendor = async ({ currentSlug, ...payload }) => {
-  const { data } = await http.put(`/vendor/shops/${currentSlug}`, payload);
-  return data;
-};
-export const getShopDetailsByVendor = async () => {
-  const { data } = await http.get(`/vendor/shop/stats`);
-  return data;
-};
-export const getIncomeByVendor = async (slug, page) => {
-  const { data } = await http.get(`/vendor/shops/income?page=${page || 1}`);
-  return data;
-};
-
-export const getProducts = async (query = "", cat, rate) => {
-  const { data } = await http.get(`/products${query || "?"}&rate=${rate}`);
-  return data;
-};
-
-export const getSpinsByAdmin = async () => {
-  const { data } = await http.get(`admin/spins`);
-  return data;
-};
-
-export const getProductDetails = async (pid) => {
-  const { data } = await http.get(`/products/${pid}`);
-  return data;
-};
-
-export const getSpinWinningItem = async (payload) => {
-  const { data } = await http.post(`/user/spin-verify`, payload);
-  return data;
-};
-
-export const getProductsByCategory = async (query = "", category, rate) => {
-  const { data } = await http.get(
-    `/category/products/${category}${query || "?"}&rate=${rate}`
-  );
-  return data;
-};
-export const getProductsByCompaign = async (query = "", slug, rate) => {
-  const { data } = await http.get(
-    `/compaign/products/${slug}${query || "?"}&rate=${rate}`
-  );
-  return data;
-};
-
-export const getProductSlugs = async () => {
-  const { data } = await http.get(`/products-slugs`);
-  return data;
-};
-export const getProductsBySubCategory = async (
-  query = "",
-  subcategory,
-  rate
-) => {
-  const { data } = await http.get(
-    `/subcategory/products/${subcategory}${query || "?"}&rate=${rate}`
-  );
-  return data;
-};
-
-export const getProductsByShop = async (query = "", shop, rate) => {
-  const { data } = await http.get(
-    `/shop/products/${shop}${query || "?"}&rate=${rate}`
-  );
-  return data;
-};
-
-export const getAllProducts = async () => {
-  const { data } = await http.get(`/products`);
-  return data;
-};
-export const getAllFilters = async () => {
-  const { data } = await http.get(`/products/filters`);
-  return data;
-};
-
-export const getNewProducts = async () => {
-  const { data } = await http.get(`/products/new`);
-  return data;
-};
-export const getFiltersByShop = async (shop) => {
-  const { data } = await http.get(`/filters/${shop}`);
-  return data;
-};
-
-export const getNewArrivels = async () => {
-  const { data } = await http.get("/new-arrivals");
-  return data;
-};
-export const getRelatedProducts = async (pid) => {
-  const { data } = await http.get(`/related-products/${pid}`);
-  return data;
-};
-export const getProductBySlug = async (slug) => {
-  const { data } = await http.get(`/products/${slug}`);
-  return data;
-};
-
-export const getProductReviews = async (pid) => {
-  const { data } = await http.get(`/reviews/${pid}`);
-  return data;
-};
 export const addReview = async (payload) => {
   const { data } = await http.post(`/reviews`, payload);
   return data;
@@ -492,31 +305,6 @@ export const getUserInvoice = async (page) => {
   return response;
 };
 
-export const updateProfile = async ({ ...payload }) => {
-  const { data } = await http.put(`/users/profile`, payload);
-  return data;
-};
-export const changePassword = async ({ ...payload }) => {
-  const { data } = await http.put(`/users/change-password`, payload);
-  return data;
-};
-
-export const getAddress = async (payload) => {
-  const { data } = await http.get(`/users/addresses?id=${payload}`);
-  return data;
-};
-export const updateAddress = async ({ _id, ...payload }) => {
-  const { data } = await http.put(`/users/addresses/${_id}`, payload);
-  return data;
-};
-export const createAddress = async ({ ...payload }) => {
-  const { data } = await http.post(`/users/addresses/`, payload);
-  return data;
-};
-export const deleteAddress = async ({ _id }) => {
-  const { data } = await http.delete(`/users/addresses/${_id}`);
-  return data;
-};
 export const search = async (payload) => {
   const { data } = await http.post(`/search`, payload);
   return data;
@@ -557,18 +345,6 @@ export const updateWishlist = async (pid) => {
 };
 export const getCompareProducts = async (products) => {
   const { data } = await http.post(`/compare/products`, { products });
-  return data;
-};
-
-export const getProfile = async () => {
-  const { data } = await http.get(`/users/profile`);
-  return data;
-};
-
-export const getCart = async (ids) => {
-  const { data } = await http.post(`/cart`, {
-    products: ids,
-  });
   return data;
 };
 

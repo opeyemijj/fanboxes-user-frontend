@@ -27,7 +27,7 @@ export default function LatestBoxes({ loading = false }) {
     return <LatestBoxesSkeleton />;
   }
 
-  const latestBoxes = products.slice(0, 6);
+  const latestBoxes = products.slice(0, 9);
 
   return (
     <section>

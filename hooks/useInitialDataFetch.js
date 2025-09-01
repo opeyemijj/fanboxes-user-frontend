@@ -25,10 +25,10 @@ export const useInitialDataFetch = () => {
       try {
         console.log("[v0] Fetching initial data...");
 
-        const testResults = await testApiEndpoints();
-        if (testResults) {
-          console.log("[v0] API test successful, proceeding with data fetch");
-        }
+        // const testResults = await testApiEndpoints();
+        // if (testResults) {
+        //   console.log("[v0] API test successful, proceeding with data fetch");
+        // }
 
         await Promise.all([
           dispatch(fetchProducts()),
@@ -49,7 +49,7 @@ export const useInitialDataFetch = () => {
     products,
     shops,
     categories,
-    isLoading: products.loading || shops.loading || categories.loading,
-    hasError: products.error || shops.error || categories.error,
+    isLoading: products?.loading || shops?.loading || categories?.loading,
+    hasError: products?.error || shops?.error || categories?.error,
   };
 };

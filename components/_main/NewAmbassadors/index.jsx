@@ -31,9 +31,20 @@ export default function NewAmbassadors({ loading = false }) {
   return (
     <section className="mt-2">
       <h2 className="text-3xl font-bold mb-6">New ambassadors</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div
+        className="
+          flex gap-6 overflow-x-auto pb-4
+          snap-x snap-mandatory scroll-smooth
+          [&::-webkit-scrollbar]:hidden
+        "
+      >
         {newAmbassadors.map((ambassador) => (
-          <AmbassadorCard key={ambassador._id} ambassador={ambassador} isNew={true} />
+          <div
+            key={ambassador._id}
+            className="snap-center shrink-0 w-72 sm:w-80"
+          >
+            <AmbassadorCard ambassador={ambassador} isNew={true} />
+          </div>
         ))}
       </div>
     </section>
