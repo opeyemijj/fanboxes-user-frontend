@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 
 export default function YouMightLike() {
   const {
-    products,
+    products = [],
     loading: productsLoading,
     error,
   } = useSelector((state) => state.product);

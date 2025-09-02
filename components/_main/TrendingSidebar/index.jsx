@@ -13,10 +13,12 @@ export default function TrendingSidebar({ loading = false }) {
   const [activeTab, setActiveTab] = useState("boxes");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { products, loading: productsLoading } = useSelector(
+  const { products = [], loading: productsLoading } = useSelector(
     (state) => state.product
   );
-  const { shops, loading: shopsLoading } = useSelector((state) => state.shops);
+  const { shops = [], loading: shopsLoading } = useSelector(
+    (state) => state.shops
+  );
 
   // Filter Boxes
   const filteredBoxes = useMemo(() => {

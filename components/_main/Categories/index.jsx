@@ -9,7 +9,7 @@ export default function Categories({
   onCategoryChange = () => {},
 }) {
   const {
-    categories: categoriesData,
+    categories: categoriesData = [],
     loading: categoriesLoading,
     error,
   } = useSelector((state) => state.categories);
