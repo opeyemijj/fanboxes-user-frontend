@@ -1,16 +1,16 @@
 /* Instruments */
-import { combineReducers } from "redux"
+import { combineReducers } from "redux";
 
 // slices
-import productReducer from "./slices/product"
-import UserReducer from "./slices/user"
-import WishlistReducer from "./slices/wishlist"
-import CompareReducer from "./slices/compare"
-import SettingsReducer from "./slices/settings"
-import CategoriesReducer from "./slices/categories"
-import BrandsReducer from "./slices/brands"
-import ShopsReducer from "./slices/shops"
-import AmbassadorsReducer from "./slices/ambassadors"
+import productReducer from "./slices/product";
+import UserReducer from "./slices/user";
+import WishlistReducer from "./slices/wishlist";
+import CompareReducer from "./slices/compare";
+import SettingsReducer from "./slices/settings";
+import CategoriesReducer from "./slices/categories";
+import BrandsReducer from "./slices/brands";
+import ShopsReducer from "./slices/shops";
+import AmbassadorsReducer from "./slices/ambassadors";
 
 const reducer = combineReducers({
   product: productReducer,
@@ -22,6 +22,6 @@ const reducer = combineReducers({
   brands: BrandsReducer,
   shops: ShopsReducer,
   ambassadors: AmbassadorsReducer,
-})
+});
 
-export { reducer }
+export { reducer };
