@@ -8,9 +8,9 @@ import { fetchShops } from "@/redux/slices/shops";
 export default function NewAmbassadors({ loading = false }) {
   const dispatch = useDispatch();
   const {
-    shops,
+    shops = [],
     loading: shopsLoading,
-    error,
+    error = null,
   } = useSelector((state) => state.shops);
 
   if (error) {

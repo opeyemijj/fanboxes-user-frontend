@@ -33,10 +33,17 @@ export default function LatestBoxes({ loading = false, products = [], error }) {
     <section>
       <h2 className="text-3xl font-bold mb-6">Latest boxes</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {latestBoxes?.length &&
+        {latestBoxes?.length ? (
           latestBoxes.map((box) => (
             <BoxCard key={box._id} box={box} isNew={true} />
-          ))}
+          ))
+        ) : (
+          <>
+            <h6 className="text-1xl text-gray-500 mb-2">
+              There are no boxes available for now
+            </h6>
+          </>
+        )}
       </div>
     </section>
   );
