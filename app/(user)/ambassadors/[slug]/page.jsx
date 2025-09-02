@@ -12,6 +12,8 @@ import {
 } from "@/lib/enhanced-data";
 import { notFound } from "next/navigation";
 import { useSelector } from "react-redux";
+import { useEffect } from "react";
+import { incrementVisitCount } from "@/services/influencer/index";
 
 export default function AmbassadorProfilePage({ params }) {
   const {
@@ -28,6 +30,17 @@ export default function AmbassadorProfilePage({ params }) {
   console.log(shops, "Check the shop");
 
   const ambassador = shops?.find((amb) => amb?.slug === params?.slug);
+
+  // Call the API when the component mounts and ambassador is available
+  useEffect(() => {
+    if (ambassador && params?.slug) {
+      try {
+        incrementVisitCount(params.slug);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  }, [ambassador, params?.slug]);
 
   if (!ambassador) {
     notFound();
