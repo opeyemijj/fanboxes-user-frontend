@@ -5,13 +5,13 @@ import NewAmbassadorsSkeleton from "@/components/ui/skeletons/NewAmbassadorsSkel
 import ErrorDisplay from "@/components/ui/ErrorDisplay";
 import { fetchShops } from "@/redux/slices/shops";
 
-export default function NewAmbassadors({ loading = false }) {
+export default function NewAmbassadors({ loading = false, shops = [], error }) {
   const dispatch = useDispatch();
-  const {
-    shops = [],
-    loading: shopsLoading,
-    error = null,
-  } = useSelector((state) => state.shops);
+  // const {
+  //   shops = [],
+  //   loading: shopsLoading,
+  //   error = null,
+  // } = useSelector((state) => state.shops);
 
   if (error) {
     return (
@@ -22,11 +22,12 @@ export default function NewAmbassadors({ loading = false }) {
     );
   }
 
-  if (loading || shopsLoading) {
+  if (loading) {
     return <NewAmbassadorsSkeleton />;
   }
 
-  const newAmbassadors = shops;
+  // Ensure shops is always an array
+  const newAmbassadors = Array.isArray(shops) ? shops : [];
 
   return (
     <section className="mt-2">
@@ -38,14 +39,18 @@ export default function NewAmbassadors({ loading = false }) {
           [&::-webkit-scrollbar]:hidden
         "
       >
-        {newAmbassadors.map((ambassador) => (
-          <div
-            key={ambassador._id}
-            className="snap-center shrink-0 w-72 sm:w-80"
-          >
-            <AmbassadorCard ambassador={ambassador} isNew={true} />
-          </div>
-        ))}
+        {newAmbassadors.length > 0 ? (
+          newAmbassadors.map((ambassador) => (
+            <div
+              key={ambassador._id}
+              className="snap-center shrink-0 w-72 sm:w-80"
+            >
+              <AmbassadorCard ambassador={ambassador} isNew={true} />
+            </div>
+          ))
+        ) : (
+          <p className="text-gray-500 text-sm">No ambassadors available</p>
+        )}
       </div>
     </section>
   );

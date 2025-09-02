@@ -19,7 +19,12 @@ export default function HomePage() {
     800
   );
 
-  const { isLoading: dataLoading, hasError, products } = useInitialDataFetch();
+  const {
+    isLoading: dataLoading,
+    hasError,
+    products,
+    shops,
+  } = useInitialDataFetch();
 
   useEffect(() => {
     setIsClient(true);
@@ -74,7 +79,11 @@ export default function HomePage() {
               />
             </div>
             <div className="bg-[#EFEFEF] rounded-lg p-4 mb-6">
-              <NewAmbassadors loading={isLoading("newAmbassadors")} />
+              <NewAmbassadors
+                shops={shops?.shops}
+                error={hasError}
+                loading={isLoading("newAmbassadors")}
+              />
             </div>
             <h2 className="text-3xl font-bold mb-4"> Our Categories</h2>
             <Categories
@@ -83,7 +92,11 @@ export default function HomePage() {
             />
           </div>
           <div className="w-full lg:w-1/3 xl:w-1/4">
-            <TrendingSidebar loading={isLoading("trending")} />
+            <TrendingSidebar
+              products={products?.products}
+              shops={shops?.shops}
+              loading={isLoading("trending")}
+            />
           </div>
         </div>
       </main>

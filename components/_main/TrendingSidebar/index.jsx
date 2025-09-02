@@ -9,20 +9,17 @@ import AmbassadorCard from "@/components/_main/AmbassadorCard";
 import TrendingSidebarSkeleton from "@/components/ui/skeletons/TrendingSidebarSkeleton";
 import { useSelector } from "react-redux";
 
-export default function TrendingSidebar({ loading = false }) {
+export default function TrendingSidebar({
+  loading = false,
+  products = [],
+  shops = [],
+}) {
   const [activeTab, setActiveTab] = useState("boxes");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { products = [], loading: productsLoading } = useSelector(
-    (state) => state.product
-  );
-  const { shops = [], loading: shopsLoading } = useSelector(
-    (state) => state.shops
-  );
-
   // Filter Boxes
   const filteredBoxes = useMemo(() => {
-    if (!products) return [];
+    if (!products || !Array.isArray(products)) return [];
     if (!searchQuery.trim()) return products.slice(0, 5);
 
     const query = searchQuery.toLowerCase();
@@ -41,8 +38,7 @@ export default function TrendingSidebar({ loading = false }) {
 
   // Filter Ambassadors
   const filteredAmbassadors = useMemo(() => {
-    console.log("shopsFromFilt::", shops);
-    if (!shops) return [];
+    if (!shops || !Array.isArray(shops)) return [];
 
     // Create a working copy and sort it
     let sortedShops = [...shops].sort((a, b) => {
@@ -60,8 +56,6 @@ export default function TrendingSidebar({ loading = false }) {
 
       return bVisitedCount - aVisitedCount;
     });
-
-    console.log("sortedShops::", sortedShops);
 
     // Apply search filter and limit
     if (!searchQuery.trim()) {
@@ -83,7 +77,7 @@ export default function TrendingSidebar({ loading = false }) {
       style={{ backgroundColor: "#EFEFEF" }}
     >
       {/* Loading State */}
-      {productsLoading || shopsLoading ? (
+      {loading ? (
         <TrendingSidebarSkeleton />
       ) : (
         <>
@@ -148,7 +142,10 @@ export default function TrendingSidebar({ loading = false }) {
             <div className="space-y-4">
               {filteredAmbassadors.length > 0 ? (
                 filteredAmbassadors.map((ambassador) => (
-                  <AmbassadorCard key={ambassador.id} ambassador={ambassador} />
+                  <AmbassadorCard
+                    key={ambassador._id}
+                    ambassador={ambassador}
+                  />
                 ))
               ) : (
                 <p className="text-gray-500 text-sm">No ambassadors found</p>
