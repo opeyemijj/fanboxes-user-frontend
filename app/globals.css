@@ -96,3 +96,55 @@
 .custom-sonner-toast[data-type="loading"] {
   color: #d97706 !important;
 }
+
+/* Override focus styles for inputs and selects globally in this component */
+.filter-input:focus,
+.filter-select:focus,
+.filter-select[data-state="open"] {
+  outline: none !important;
+  border-color: #11f2eb !important;
+  box-shadow: 0 0 0 3px rgba(17, 242, 235, 0.1) !important;
+}
+
+/* Remove any yellow focus styles */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none !important;
+  border-color: #11f2eb !important;
+  box-shadow: 0 0 0 3px rgba(17, 242, 235, 0.1) !important;
+}
+
+/* Specifically target the Input component's focus */
+.filter-input:focus {
+  --tw-ring-color: rgba(17, 242, 235, 0.1) !important;
+  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0
+    var(--tw-ring-offset-width) var(--tw-ring-offset-color) !important;
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0
+    calc(3px + var(--tw-ring-offset-width)) var(--tw-ring-color) !important;
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow),
+    var(--tw-shadow, 0 0 #0000) !important;
+  border-color: #11f2eb !important;
+}
+
+/* Style for select trigger when focused */
+.filter-select[data-state="open"] {
+  border-color: #11f2eb !important;
+  box-shadow: 0 0 0 3px rgba(17, 242, 235, 0.1) !important;
+}
+
+/* Remove default focus outline */
+.filter-input,
+.filter-select {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Custom checkbox styling */
+.custom-checkbox {
+  accent-color: #11f2eb;
+}
+
+.custom-checkbox:focus {
+  outline: 2px solid #11f2eb;
+  outline-offset: 2px;
+}

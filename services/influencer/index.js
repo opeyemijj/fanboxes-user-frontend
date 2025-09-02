@@ -64,3 +64,8 @@ export const getIncomeByInfluencer = async (slug, page) => {
   const { data } = await http.get(`/vendor/shops/income?page=${page || 1}`);
   return data;
 };
+
+export const incrementVisitCount = async (slug) => {
+  const { data } = await http.patch(`/influencer/${slug}/visit`);
+  return data;
+};

@@ -1,80 +1,341 @@
+// "use client";
+// import { useState, useMemo, useEffect } from "react";
+// import Header from "@/components/_main/Header";
+// import AmbassadorCategories from "@/components/_main/AmbassadorCategories";
+// import AmbassadorGrid from "@/components/_main/AmbassadorGrid";
+// import AmbassadorFilterSidebar from "@/components/_main/AmbassadorFilterSidebar";
+// import Footer from "@/components/_main/Footer";
+// import { useSelector } from "react-redux";
+// import { ChevronLeft, ChevronRight } from "lucide-react";
+
+// export default function AmbassadorsPage() {
+//   const [enhancedData, setEnhancedData] = useState(null);
+//   const [isDataLoading, setIsDataLoading] = useState(true);
+//   const [selectedCategory, setSelectedCategory] = useState("all");
+//   const [searchTerm, setSearchTerm] = useState("");
+//   const [sortBy, setSortBy] = useState("most-popular");
+//   const [currentPage, setCurrentPage] = useState(1);
+//   const itemsPerPage = 12; // Adjust as needed
+
+//   // Get shops data from Redux
+//   const {
+//     shops,
+//     loading: shopsLoading,
+//     error: shopError,
+//   } = useSelector((state) => state.shops);
+
+//   useEffect(() => {
+//     try {
+//       const enhancedData = require("@/lib/enhanced-data");
+//       setEnhancedData(enhancedData);
+//     } catch (error) {
+//       console.warn("Enhanced data not available");
+//       setEnhancedData(null);
+//     } finally {
+//       setIsDataLoading(false);
+//     }
+//   }, []);
+
+//   // Get enhanced data for categories only
+//   const categories = enhancedData?.categories || [
+//     { id: "all", name: "All Ambassadors" },
+//     { id: "fitness", name: "Fitness" },
+//     { id: "beauty", name: "Beauty" },
+//     { id: "tech", name: "Tech" },
+//     { id: "lifestyle", name: "Lifestyle" },
+//     { id: "gaming", name: "Gaming" },
+//     { id: "fashion", name: "Fashion" },
+//   ];
+
+//   // Filter and sort ambassadors using Redux data only
+//   const filteredAmbassadors = useMemo(() => {
+//     if (!shops || shops.length === 0) return [];
+
+//     let filtered = [...shops];
+
+//     // Apply category filter - simple implementation for Redux data
+//     if (selectedCategory !== "all") {
+//       filtered = filtered.filter(
+//         (shop) =>
+//           shop.category?.toLowerCase() === selectedCategory.toLowerCase()
+//       );
+//     }
+
+//     // Apply search filter - simple implementation for Redux data
+//     if (searchTerm.trim()) {
+//       const query = searchTerm.toLowerCase();
+//       filtered = filtered.filter(
+//         (shop) =>
+//           shop?.title?.toLowerCase().includes(query) ||
+//           shop?.slug?.toLowerCase().includes(query) ||
+//           shop?.category?.toLowerCase().includes(query) ||
+//           shop?.description?.toLowerCase().includes(query)
+//       );
+//     }
+
+//     // Apply sorting
+//     switch (sortBy) {
+//       case "newest":
+//         filtered.sort(
+//           (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
+//         );
+//         break;
+//       case "alphabetical":
+//         filtered.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
+//         break;
+//       case "most-visited":
+//         filtered.sort((a, b) => (b.visitedCount || 0) - (a.visitedCount || 0));
+//         break;
+//       case "most-popular":
+//       default:
+//         // Sort by isFeatured first, then by visitedCount
+//         filtered.sort((a, b) => {
+//           const aFeatured = a.isFeatured || false;
+//           const bFeatured = b.isFeatured || false;
+
+//           if (aFeatured !== bFeatured) {
+//             return bFeatured - aFeatured;
+//           }
+
+//           return (b.visitedCount || 0) - (a.visitedCount || 0);
+//         });
+//         break;
+//     }
+
+//     return filtered;
+//   }, [shops, selectedCategory, searchTerm, sortBy]);
+
+//   // Pagination calculations
+//   const totalPages = Math.ceil(filteredAmbassadors.length / itemsPerPage);
+//   const startIndex = (currentPage - 1) * itemsPerPage;
+//   const paginatedAmbassadors = filteredAmbassadors.slice(
+//     startIndex,
+//     startIndex + itemsPerPage
+//   );
+
+//   // Reset to first page when filters change
+//   const handleFiltersChange = (callback) => {
+//     return (...args) => {
+//       setCurrentPage(1);
+//       callback(...args);
+//     };
+//   };
+
+//   // Handle pagination with smooth scroll
+//   const handlePageChange = (newPage) => {
+//     setCurrentPage(newPage);
+
+//     // Smooth scroll to top of page
+//     window.scrollTo({
+//       top: 0,
+//       behavior: "smooth",
+//     });
+//   };
+
+//   // Pagination component
+//   const Pagination = () => {
+//     if (totalPages <= 1) return null;
+
+//     const getVisiblePages = () => {
+//       const delta = 2;
+//       const range = [];
+//       const rangeWithDots = [];
+
+//       for (
+//         let i = Math.max(2, currentPage - delta);
+//         i <= Math.min(totalPages - 1, currentPage + delta);
+//         i++
+//       ) {
+//         range.push(i);
+//       }
+
+//       if (currentPage - delta > 2) {
+//         rangeWithDots.push(1, "...");
+//       } else {
+//         rangeWithDots.push(1);
+//       }
+
+//       rangeWithDots.push(...range);
+
+//       if (currentPage + delta < totalPages - 1) {
+//         rangeWithDots.push("...", totalPages);
+//       } else {
+//         rangeWithDots.push(totalPages);
+//       }
+
+//       return rangeWithDots;
+//     };
+
+//     return (
+//       <div className="flex items-center justify-center gap-2 mt-8">
+//         <button
+//           onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+//           disabled={currentPage === 1}
+//           className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+//         >
+//           <ChevronLeft className="w-4 h-4" />
+//           Previous
+//         </button>
+
+//         {getVisiblePages().map((page, index) => (
+//           <button
+//             key={index}
+//             onClick={() => typeof page === "number" && handlePageChange(page)}
+//             disabled={page === "..."}
+//             className={`px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+//               page === currentPage
+//                 ? "bg-gray-800 text-white shadow-sm"
+//                 : page === "..."
+//                 ? "text-gray-400 cursor-default"
+//                 : "text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 hover:border-gray-400"
+//             }`}
+//           >
+//             {page}
+//           </button>
+//         ))}
+
+//         <button
+//           onClick={() =>
+//             handlePageChange(Math.min(totalPages, currentPage + 1))
+//           }
+//           disabled={currentPage === totalPages}
+//           className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+//         >
+//           Next
+//           <ChevronRight className="w-4 h-4" />
+//         </button>
+//       </div>
+//     );
+//   };
+
+//   // Show loading state during SSR and initial client render
+//   if (typeof window === "undefined" || isDataLoading || shopsLoading) {
+//     return (
+//       <div className="bg-white text-black">
+//         <Header />
+//         <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24">
+//           <div className="flex items-center justify-center h-64">
+//             <div className="flex flex-col items-center">
+//               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#11F2EB]"></div>
+//               <p className="mt-4 text-lg">Loading ambassadors...</p>
+//             </div>
+//           </div>
+//         </main>
+//         <Footer />
+//       </div>
+//     );
+//   }
+
+//   // Show error state
+//   if (shopError) {
+//     return (
+//       <div className="bg-white text-black">
+//         <Header />
+//         <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24">
+//           <div className="flex items-center justify-center h-64">
+//             <div className="text-center">
+//               <div className="text-red-500 text-6xl mb-4">⚠️</div>
+//               <h3 className="text-xl font-semibold text-gray-600 mb-2">
+//                 Error loading ambassadors
+//               </h3>
+//               <p className="text-gray-500">Please try again later</p>
+//             </div>
+//           </div>
+//         </main>
+//         <Footer />
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <>
+//       <style jsx global>{`
+//         /* Custom input focus styling with brand color */
+//         input:focus,
+//         select:focus,
+//         textarea:focus {
+//           outline: none !important;
+//           border-color: #11f2eb !important;
+//           box-shadow: 0 0 0 3px rgba(17, 242, 235, 0.1) !important;
+//         }
+
+//         /* Remove default browser focus outline */
+//         *:focus {
+//           outline: none;
+//         }
+
+//         /* Custom focus for buttons and other interactive elements */
+//         button:focus-visible {
+//           outline: 2px solid #11f2eb;
+//           outline-offset: 2px;
+//         }
+//       `}</style>
+//       <div className="bg-white text-black">
+//         <Header />
+//         <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24">
+//           <div className="flex flex-col lg:flex-row gap-8 mt-8">
+//             <div className="w-full lg:w-3/3 xl:w-4/4">
+//               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+//                 <h1 className="text-2xl sm:text-3xl lg:text-5xl font-bold">
+//                   Our ambassadors
+//                 </h1>
+//                 <div className="text-sm text-gray-500">
+//                   {filteredAmbassadors.length} ambassador
+//                   {filteredAmbassadors.length !== 1 ? "s" : ""} found
+//                   {filteredAmbassadors.length > itemsPerPage && (
+//                     <span className="ml-2">
+//                       (Page {currentPage} of {totalPages})
+//                     </span>
+//                   )}
+//                 </div>
+//               </div>
+
+//               <div className="mb-8 flex flex-col lg:flex-row gap-8">
+//                 <div className="w-full lg:w-2/3 xl:w-3/4">
+//                   <AmbassadorCategories
+//                     categories={categories}
+//                     selectedCategory={selectedCategory}
+//                     onCategoryChange={handleFiltersChange(setSelectedCategory)}
+//                   />
+//                 </div>
+
+//                 <div className="w-full lg:w-1/3 xl:w-1/4">
+//                   <AmbassadorFilterSidebar
+//                     searchTerm={searchTerm}
+//                     onSearchChange={handleFiltersChange(setSearchTerm)}
+//                     sortBy={sortBy}
+//                     onSortChange={handleFiltersChange(setSortBy)}
+//                   />
+//                 </div>
+//               </div>
+
+//               <div
+//                 className="p-5 rounded-lg mb-4"
+//                 style={{ backgroundColor: "#EFEFEF" }}
+//               >
+//                 <AmbassadorGrid ambassadors={paginatedAmbassadors} />
+//               </div>
+
+//               {/* Pagination */}
+//               <Pagination />
+//             </div>
+//           </div>
+//         </main>
+//         <Footer />
+//       </div>
+//     </>
+//   );
+// }
+
 "use client";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import Header from "@/components/_main/Header";
 import AmbassadorCategories from "@/components/_main/AmbassadorCategories";
 import AmbassadorGrid from "@/components/_main/AmbassadorGrid";
 import AmbassadorFilterSidebar from "@/components/_main/AmbassadorFilterSidebar";
 import Footer from "@/components/_main/Footer";
 import { useSelector } from "react-redux";
-
-// Fallback data for ambassadors
-const fallbackAmbassadors = [
-  {
-    id: 1,
-    name: "Alex Johnson",
-    category: "fitness",
-    followers: "150K",
-    engagement: "8.2%",
-    image: "/placeholder.svg?height=200&width=200",
-    isFeatured: true,
-  },
-  {
-    id: 2,
-    name: "Sarah Miller",
-    category: "beauty",
-    followers: "450K",
-    engagement: "12.5%",
-    image: "/placeholder.svg?height=200&width=200",
-    isFeatured: false,
-  },
-  {
-    id: 3,
-    name: "Mike Chen",
-    category: "tech",
-    followers: "1.2M",
-    engagement: "5.8%",
-    image: "/placeholder.svg?height=200&width=200",
-    isFeatured: true,
-  },
-  {
-    id: 4,
-    name: "Emily Davis",
-    category: "lifestyle",
-    followers: "890K",
-    engagement: "9.1%",
-    image: "/placeholder.svg?height=200&width=200",
-    isFeatured: false,
-  },
-  {
-    id: 5,
-    name: "David Wilson",
-    category: "gaming",
-    followers: "2.3M",
-    engagement: "7.4%",
-    image: "/placeholder.svg?height=200&width=200",
-    isFeatured: true,
-  },
-  {
-    id: 6,
-    name: "Jessica Brown",
-    category: "fashion",
-    followers: "1.5M",
-    engagement: "10.2%",
-    image: "/placeholder.svg?height=200&width=200",
-    isFeatured: false,
-  },
-];
-
-// Fallback categories
-const fallbackCategories = [
-  { id: "all", name: "All Ambassadors" },
-  { id: "fitness", name: "Fitness" },
-  { id: "beauty", name: "Beauty" },
-  { id: "tech", name: "Tech" },
-  { id: "lifestyle", name: "Lifestyle" },
-  { id: "gaming", name: "Gaming" },
-  { id: "fashion", name: "Fashion" },
-];
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function AmbassadorsPage() {
   const [enhancedData, setEnhancedData] = useState(null);
@@ -82,8 +343,13 @@ export default function AmbassadorsPage() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("most-popular");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 12; // Adjust as needed
 
-  // Ambassadors redux data
+  // Create a ref for the ambassadors section
+  const ambassadorsSectionRef = useRef(null);
+
+  // Get shops data from Redux
   const {
     shops,
     loading: shopsLoading,
@@ -102,75 +368,190 @@ export default function AmbassadorsPage() {
     }
   }, []);
 
-  // Get enhanced data with fallbacks
-  const enhancedAmbassadors = enhancedData?.enhancedAmbassadors || [];
-  const categories = enhancedData?.categories || fallbackCategories;
-  const filterAmbassadorsByCategory =
-    enhancedData?.filterAmbassadorsByCategory ||
-    ((ambassadors, category) => {
-      if (category === "all") return ambassadors;
-      return ambassadors.filter((amb) => amb.category === category);
-    });
-  const searchAmbassadors =
-    enhancedData?.searchAmbassadors ||
-    ((ambassadors, term) => {
-      if (!term) return ambassadors;
-      return ambassadors.filter(
-        (amb) =>
-          amb.name.toLowerCase().includes(term.toLowerCase()) ||
-          amb.category.toLowerCase().includes(term.toLowerCase())
-      );
-    });
+  // Get enhanced data for categories only
+  const categories = enhancedData?.categories || [
+    { id: "all", name: "All Ambassadors" },
+    { id: "fitness", name: "Fitness" },
+    { id: "beauty", name: "Beauty" },
+    { id: "tech", name: "Tech" },
+    { id: "lifestyle", name: "Lifestyle" },
+    { id: "gaming", name: "Gaming" },
+    { id: "fashion", name: "Fashion" },
+  ];
 
-  const ambassadorsToUse =
-    enhancedAmbassadors.length > 0 ? enhancedAmbassadors : fallbackAmbassadors;
-
+  // Filter and sort ambassadors using Redux data only
   const filteredAmbassadors = useMemo(() => {
-    let filtered = ambassadorsToUse;
+    if (!shops || shops.length === 0) return [];
 
-    // Apply category filter
-    filtered = filterAmbassadorsByCategory(filtered, selectedCategory);
+    let filtered = [...shops];
 
-    // Apply search filter
-    filtered = searchAmbassadors(filtered, searchTerm);
+    // Apply category filter - simple implementation for Redux data
+    if (selectedCategory !== "all") {
+      filtered = filtered.filter(
+        (shop) =>
+          shop.category?.toLowerCase() === selectedCategory.toLowerCase()
+      );
+    }
+
+    // Apply search filter - simple implementation for Redux data
+    if (searchTerm.trim()) {
+      const query = searchTerm.toLowerCase();
+      filtered = filtered.filter(
+        (shop) =>
+          shop?.title?.toLowerCase().includes(query) ||
+          shop?.slug?.toLowerCase().includes(query) ||
+          shop?.category?.toLowerCase().includes(query) ||
+          shop?.description?.toLowerCase().includes(query)
+      );
+    }
 
     // Apply sorting
     switch (sortBy) {
       case "newest":
-        filtered = [...filtered].sort((a, b) => b.id - a.id);
+        filtered.sort(
+          (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
+        );
         break;
       case "alphabetical":
-        filtered = [...filtered].sort((a, b) => a.name.localeCompare(b.name));
+        filtered.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
+        break;
+      case "most-visited":
+        filtered.sort((a, b) => (b.visitedCount || 0) - (a.visitedCount || 0));
         break;
       case "most-popular":
       default:
-        filtered = [...filtered].sort((a, b) => {
-          const aFollowers = parseFollowers(a.followers);
-          const bFollowers = parseFollowers(b.followers);
-          return bFollowers - aFollowers;
+        // Sort by isFeatured first, then by visitedCount
+        filtered.sort((a, b) => {
+          const aFeatured = a.isFeatured || false;
+          const bFeatured = b.isFeatured || false;
+
+          if (aFeatured !== bFeatured) {
+            return bFeatured - aFeatured;
+          }
+
+          return (b.visitedCount || 0) - (a.visitedCount || 0);
         });
         break;
     }
 
     return filtered;
-  }, [
-    ambassadorsToUse,
-    selectedCategory,
-    searchTerm,
-    sortBy,
-    filterAmbassadorsByCategory,
-    searchAmbassadors,
-  ]);
+  }, [shops, selectedCategory, searchTerm, sortBy]);
 
-  // Helper function to parse follower strings like "150K", "1.2M"
-  function parseFollowers(followerString) {
-    if (!followerString) return 0;
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredAmbassadors.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedAmbassadors = filteredAmbassadors.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
 
-    const num = parseFloat(followerString.replace(/[KM]/g, ""));
-    if (followerString.includes("M")) return num * 1000000;
-    if (followerString.includes("K")) return num * 1000;
-    return num;
-  }
+  // Reset to first page when filters change
+  const handleFiltersChange = (callback) => {
+    return (...args) => {
+      setCurrentPage(1);
+      callback(...args);
+    };
+  };
+
+  // Handle pagination with smart scroll
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+
+    // Calculate scroll position based on screen size
+    if (ambassadorsSectionRef.current) {
+      const sectionTop = ambassadorsSectionRef.current.offsetTop;
+      const headerOffset = window.innerWidth < 768 ? 100 : 50; // More offset on mobile
+
+      const scrollPosition = Math.max(0, sectionTop - headerOffset);
+
+      window.scrollTo({
+        top: scrollPosition,
+        behavior: "smooth",
+      });
+    } else {
+      // Fallback to top of page
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  // Pagination component
+  const Pagination = () => {
+    if (totalPages <= 1) return null;
+
+    const getVisiblePages = () => {
+      const delta = 2;
+      const range = [];
+      const rangeWithDots = [];
+
+      for (
+        let i = Math.max(2, currentPage - delta);
+        i <= Math.min(totalPages - 1, currentPage + delta);
+        i++
+      ) {
+        range.push(i);
+      }
+
+      if (currentPage - delta > 2) {
+        rangeWithDots.push(1, "...");
+      } else {
+        rangeWithDots.push(1);
+      }
+
+      rangeWithDots.push(...range);
+
+      if (currentPage + delta < totalPages - 1) {
+        rangeWithDots.push("...", totalPages);
+      } else {
+        rangeWithDots.push(totalPages);
+      }
+
+      return rangeWithDots;
+    };
+
+    return (
+      <div className="flex items-center justify-center gap-2 mt-8">
+        <button
+          onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+          disabled={currentPage === 1}
+          className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+        >
+          <ChevronLeft className="w-4 h-4" />
+          Previous
+        </button>
+
+        {getVisiblePages().map((page, index) => (
+          <button
+            key={index}
+            onClick={() => typeof page === "number" && handlePageChange(page)}
+            disabled={page === "..."}
+            className={`px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+              page === currentPage
+                ? "bg-gray-800 text-white shadow-sm"
+                : page === "..."
+                ? "text-gray-400 cursor-default"
+                : "text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 hover:border-gray-400"
+            }`}
+          >
+            {page}
+          </button>
+        ))}
+
+        <button
+          onClick={() =>
+            handlePageChange(Math.min(totalPages, currentPage + 1))
+          }
+          disabled={currentPage === totalPages}
+          className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+        >
+          Next
+          <ChevronRight className="w-4 h-4" />
+        </button>
+      </div>
+    );
+  };
 
   // Show loading state during SSR and initial client render
   if (typeof window === "undefined" || isDataLoading || shopsLoading) {
@@ -190,53 +571,85 @@ export default function AmbassadorsPage() {
     );
   }
 
-  return (
-    <div className="bg-white text-black">
-      <Header />
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24">
-        <div className="flex flex-col lg:flex-row gap-8 mt-8">
-          <div className="w-full lg:w-3/3 xl:w-4/4">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-              <h1 className="text-2xl sm:text-3xl lg:text-5xl font-bold">
-                Our ambassadors
-              </h1>
-              <div className="text-sm text-gray-500">
-                {filteredAmbassadors.length} ambassador
-                {filteredAmbassadors.length !== 1 ? "s" : ""} found
-              </div>
-            </div>
-
-            <div className="mb-8 flex flex-col lg:flex-row gap-8">
-              <div className="w-full lg:w-2/3 xl:w-3/4">
-                <AmbassadorCategories
-                  categories={categories}
-                  selectedCategory={selectedCategory}
-                  onCategoryChange={setSelectedCategory}
-                />
-              </div>
-
-              <div className="w-full lg:w-1/3 xl:w-1/4">
-                <AmbassadorFilterSidebar
-                  searchTerm={searchTerm}
-                  onSearchChange={setSearchTerm}
-                  sortBy={sortBy}
-                  onSortChange={setSortBy}
-                />
-              </div>
-            </div>
-            <div
-              className="p-5 rounded-lg mb-4"
-              style={{ backgroundColor: "#EFEFEF" }}
-            >
-              {/* Use either enhanced data or shops from Redux - choose one */}
-              <AmbassadorGrid
-                ambassadors={shops.length > 0 ? shops : filteredAmbassadors}
-              />
+  // Show error state
+  if (shopError) {
+    return (
+      <div className="bg-white text-black">
+        <Header />
+        <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="text-red-500 text-6xl mb-4">⚠️</div>
+              <h3 className="text-xl font-semibold text-gray-600 mb-2">
+                Error loading ambassadors
+              </h3>
+              <p className="text-gray-500">Please try again later</p>
             </div>
           </div>
-        </div>
-      </main>
-      <Footer />
-    </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <div className="bg-white text-black">
+        <Header />
+        <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24">
+          <div className="flex flex-col lg:flex-row gap-8 mt-8">
+            <div className="w-full lg:w-3/3 xl:w-4/4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+                <h1 className="text-2xl sm:text-3xl lg:text-5xl font-bold">
+                  Our ambassadors
+                </h1>
+                <div className="text-sm text-gray-500">
+                  {filteredAmbassadors.length} ambassador
+                  {filteredAmbassadors.length !== 1 ? "s" : ""} found
+                  {filteredAmbassadors.length > itemsPerPage && (
+                    <span className="ml-2">
+                      (Page {currentPage} of {totalPages})
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="mb-8 flex flex-col lg:flex-row gap-8">
+                <div className="w-full lg:w-2/3 xl:w-3/4">
+                  <AmbassadorCategories
+                    categories={categories}
+                    selectedCategory={selectedCategory}
+                    onCategoryChange={handleFiltersChange(setSelectedCategory)}
+                  />
+                </div>
+
+                <div className="w-full lg:w-1/3 xl:w-1/4">
+                  <AmbassadorFilterSidebar
+                    searchTerm={searchTerm}
+                    onSearchChange={handleFiltersChange(setSearchTerm)}
+                    sortBy={sortBy}
+                    onSortChange={handleFiltersChange(setSortBy)}
+                  />
+                </div>
+              </div>
+
+              {/* Add ref to the ambassadors section */}
+              <div ref={ambassadorsSectionRef}>
+                <div
+                  className="p-5 rounded-lg mb-4"
+                  style={{ backgroundColor: "#EFEFEF" }}
+                >
+                  <AmbassadorGrid ambassadors={paginatedAmbassadors} />
+                </div>
+              </div>
+
+              {/* Pagination */}
+              <Pagination />
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    </>
   );
 }
