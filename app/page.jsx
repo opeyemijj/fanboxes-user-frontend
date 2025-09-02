@@ -19,7 +19,7 @@ export default function HomePage() {
     800
   );
 
-  const { isLoading: dataLoading, hasError } = useInitialDataFetch();
+  const { isLoading: dataLoading, hasError, products } = useInitialDataFetch();
 
   useEffect(() => {
     setIsClient(true);
@@ -67,7 +67,11 @@ export default function HomePage() {
           <div className="w-full lg:w-2/3 xl:w-3/4">
             <HeroCarousel loading={isLoading("hero")} />
             <div className="bg-[#EFEFEF] rounded-lg p-4 mb-6 mt-6">
-              <LatestBoxes loading={isLoading("latestBoxes")} />
+              <LatestBoxes
+                loading={isLoading("latestBoxes")}
+                products={products?.products}
+                error={hasError}
+              />
             </div>
             <div className="bg-[#EFEFEF] rounded-lg p-4 mb-6">
               <NewAmbassadors loading={isLoading("newAmbassadors")} />
