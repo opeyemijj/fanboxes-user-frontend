@@ -30,7 +30,7 @@ export default function BoxSpinner({ box }) {
     <>
       <div className="container mx-auto px-5">
         {/* Ambassador Info */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-6 px-3 sm:px-4 lg:px-8 py-6 sm:py-8 mb-6 sm:mb-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-6 px-3 sm:px-4 lg:px-8 mt-4 sm:py-0 mb-8 sm:mb-8">
           <div className="flex items-center space-x-3 sm:space-x-4">
             <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-[#11F2EB] rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
               <Image

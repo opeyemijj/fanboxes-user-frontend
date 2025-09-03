@@ -5,6 +5,11 @@ export function useDisableScrollInGameState(disabled) {
   const originalOverflowRef = useRef(null);
 
   useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+
     // Capture original value only on first run
     if (originalOverflowRef.current === null) {
       originalOverflowRef.current = document.body.style.overflow || "auto";
