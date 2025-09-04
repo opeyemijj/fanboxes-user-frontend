@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 
 import SpinningWheel from "./SpiningWheel";
 import { useSelector } from "react-redux";
-import { useGameContext } from "@/contexts/GameContext";
+import { useGameContext } from "../../../contexts/GameContext";
 
 export default function FanboxGame({ boxConfig: initialBoxConfig }) {
   const {

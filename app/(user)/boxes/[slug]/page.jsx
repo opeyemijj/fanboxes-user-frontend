@@ -65,12 +65,14 @@ import { getProductDetails } from "@/services/boxes";
 import { useEffect, useState } from "react";
 import BoxSpinnerSkeleton from "@/components/_main/BoxSpinner/BoxSpinnerSkeleton";
 import { useDisableScrollInGameState } from "@/hooks/spin-game/useDisableScrollInGameState";
-import { GameProvider, useGameContext } from "@/contexts/GameContext";
+import { GameProvider, useGameContext } from "../../../../contexts/GameContext";
 
 // Separate component to use the context
 function BoxSpinContent({ box }) {
   const { gameState } = useGameContext();
-  useDisableScrollInGameState(gameState === "spinning");
+  if (gameState) {
+    useDisableScrollInGameState(gameState === "spinning");
+  }
 
   return (
     <>

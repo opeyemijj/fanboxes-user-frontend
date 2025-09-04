@@ -3,7 +3,7 @@ import { Button } from "@/components/Button";
 import BoxContentsSkeleton from "@/components/ui/skeletons/BoxContentsSkeleton";
 import { useState, useEffect } from "react";
 import { X, ShoppingCart, Hexagon, ChevronDown, ChevronUp } from "lucide-react";
-import { useGameContext } from "@/contexts/GameContext";
+import { useGameContext } from "../../../contexts/GameContext";
 import ClientSeedModal from "@/components/_main/BoxSpinner/ClientSeedModal";
 
 export default function BoxContents({ box, loading = false }) {
