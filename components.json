@@ -15,7 +15,13 @@
     "utils": "@/lib/utils",
     "ui": "@/components/ui",
     "lib": "@/lib",
-    "hooks": "@/hooks"
+    "hooks": "@/hooks",
+    "contexts": "@/contexts",
+    "public": "@/public",
+    "app": "@/app",
+    "styles": "@/styles",
+    "guards": "@/guards",
+    "redux": "@/redux"
   },
   "iconLibrary": "lucide"
 }
