@@ -184,7 +184,7 @@ import Image from "next/image";
 
 export default function Footer() {
   return (
-    <footer className="mt-12">
+    <footer className="mt-40">
       {/* Main Section */}
       <div className="bg-white">
         <div className="container mx-auto px-6 lg:px-12 py-12">

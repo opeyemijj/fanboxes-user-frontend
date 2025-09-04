@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchProducts } from "../redux/slices/product";
 import { fetchShops } from "../redux/slices/shops";
 import { fetchCategories } from "../redux/slices/categories";
-import { testApiEndpoints } from "../services/apiTest";
 
 export const useInitialDataFetch = () => {
   const dispatch = useDispatch();

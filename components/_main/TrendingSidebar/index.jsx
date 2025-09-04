@@ -9,18 +9,17 @@ import AmbassadorCard from "@/components/_main/AmbassadorCard";
 import TrendingSidebarSkeleton from "@/components/ui/skeletons/TrendingSidebarSkeleton";
 import { useSelector } from "react-redux";
 
-export default function TrendingSidebar({ loading = false }) {
+export default function TrendingSidebar({
+  loading = false,
+  products = [],
+  shops = [],
+}) {
   const [activeTab, setActiveTab] = useState("boxes");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { products, loading: productsLoading } = useSelector(
-    (state) => state.product
-  );
-  const { shops, loading: shopsLoading } = useSelector((state) => state.shops);
-
   // Filter Boxes
   const filteredBoxes = useMemo(() => {
-    if (!products) return [];
+    if (!products || !Array.isArray(products)) return [];
     if (!searchQuery.trim()) return products.slice(0, 5);
 
     const query = searchQuery.toLowerCase();
@@ -39,11 +38,32 @@ export default function TrendingSidebar({ loading = false }) {
 
   // Filter Ambassadors
   const filteredAmbassadors = useMemo(() => {
-    if (!shops) return [];
-    if (!searchQuery.trim()) return shops.slice(0, 5);
+    if (!shops || !Array.isArray(shops)) return [];
+
+    // Create a working copy and sort it
+    let sortedShops = [...shops].sort((a, b) => {
+      // First, sort by isFeatured (featured items first)
+      const aFeatured = a.isFeatured || false;
+      const bFeatured = b.isFeatured || false;
+
+      if (aFeatured !== bFeatured) {
+        return bFeatured - aFeatured; // true (1) comes before false (0)
+      }
+
+      // If both have same featured status, sort by visitedCount (highest first)
+      const aVisitedCount = a.visitedCount || 0;
+      const bVisitedCount = b.visitedCount || 0;
+
+      return bVisitedCount - aVisitedCount;
+    });
+
+    // Apply search filter and limit
+    if (!searchQuery.trim()) {
+      return sortedShops.slice(0, 5);
+    }
 
     const query = searchQuery.toLowerCase();
-    return shops.filter((shop) => {
+    return sortedShops.filter((shop) => {
       return (
         shop?.title?.toLowerCase().includes(query) ||
         shop?.slug?.toLowerCase().includes(query)
@@ -57,7 +77,7 @@ export default function TrendingSidebar({ loading = false }) {
       style={{ backgroundColor: "#EFEFEF" }}
     >
       {/* Loading State */}
-      {productsLoading || shopsLoading ? (
+      {loading ? (
         <TrendingSidebarSkeleton />
       ) : (
         <>
@@ -122,7 +142,10 @@ export default function TrendingSidebar({ loading = false }) {
             <div className="space-y-4">
               {filteredAmbassadors.length > 0 ? (
                 filteredAmbassadors.map((ambassador) => (
-                  <AmbassadorCard key={ambassador.id} ambassador={ambassador} />
+                  <AmbassadorCard
+                    key={ambassador._id}
+                    ambassador={ambassador}
+                  />
                 ))
               ) : (
                 <p className="text-gray-500 text-sm">No ambassadors found</p>
