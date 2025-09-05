@@ -1,8 +1,14 @@
-"use client"
+"use client";
 
-import { Input } from "@/components/Input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/Select"
-import { Search } from "lucide-react"
+import { Input } from "@/components/Input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/Select";
+import { Search } from "lucide-react";
 
 export default function FilterSidebar({
   searchTerm = "",
@@ -23,17 +29,40 @@ export default function FilterSidebar({
           <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
         </div>
       </div>
+
       <div>
-        <label className="text-sm font-semibold text-gray-500 mb-2 block">SORT BY</label>
+        <label className="text-sm font-semibold text-gray-500 mb-2 block">
+          SORT BY
+        </label>
         <Select value={sortBy} onValueChange={onSortChange}>
-          <SelectTrigger className="w-full bg-gray-50">
+          <SelectTrigger className="filter-select w-full bg-gray-50 text-sm">
             <SelectValue placeholder="Sort by" />
           </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="most-popular">Most Popular</SelectItem>
-            <SelectItem value="newest">Newest</SelectItem>
-            <SelectItem value="price-low-high">Price: Low to High</SelectItem>
-            <SelectItem value="price-high-low">Price: High to Low</SelectItem>
+          <SelectContent className="bg-white border border-gray-200 shadow-lg">
+            <SelectItem
+              value="most-popular"
+              className="hover:bg-[#11F2EB]/10 focus:bg-[#11F2EB]/10 cursor-pointer"
+            >
+              MOST POPULAR
+            </SelectItem>
+            <SelectItem
+              value="newest"
+              className="hover:bg-[#11F2EB]/10 focus:bg-[#11F2EB]/10 cursor-pointer"
+            >
+              NEWEST
+            </SelectItem>
+            <SelectItem
+              value="alphabetical"
+              className="hover:bg-[#11F2EB]/10 focus:bg-[#11F2EB]/10 cursor-pointer"
+            >
+              ALPHABETICAL
+            </SelectItem>
+            <SelectItem
+              value="category"
+              className="hover:bg-[#11F2EB]/10 focus:bg-[#11F2EB]/10 cursor-pointer"
+            >
+              BY CATEGORY
+            </SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -62,5 +91,5 @@ export default function FilterSidebar({
         </div>
       </div> */}
     </aside>
-  )
+  );
 }

@@ -78,3 +78,45 @@ export const getProductReviews = async (pid) => {
   const { data } = await http.get(`/reviews/${pid}`);
   return data;
 };
+
+export const getAdminOwnedProducts = async (params = {}) => {
+  const { page = 1, limit = 12, category, search, sortBy } = params;
+
+  // Build query string
+  let queryString = `ownerType=Admin`;
+
+  // Add pagination parameters
+  queryString += `&page=${page}&limit=${limit}`;
+
+  // Add category filter if provided and not "all"
+  if (category && category !== "all") {
+    queryString += `&category=${category}`;
+  }
+
+  // Add search filter if provided
+  if (search) {
+    queryString += `&name=${encodeURIComponent(search)}`;
+  }
+
+  // Add sorting parameters
+  if (sortBy) {
+    switch (sortBy) {
+      case "newest":
+        queryString += `&date=-1`;
+        break;
+      case "price-low-high":
+        queryString += `&price=1`;
+        break;
+      case "price-high-low":
+        queryString += `&price=-1`;
+        break;
+      case "most-popular":
+      default:
+        queryString += `&top=-1`;
+        break;
+    }
+  }
+
+  const { data } = await http.get(`/products?${queryString}`);
+  return data;
+};

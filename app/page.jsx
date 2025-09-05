@@ -6,6 +6,7 @@ import LatestBoxes from "@/components/_main/LatestBoxes";
 import NewAmbassadors from "@/components/_main/NewAmbassadors";
 import Categories from "@/components/_main/Categories";
 import TrendingSidebar from "@/components/_main/TrendingSidebar";
+import TrendingSidebarSkeleton from "@/components/ui/skeletons/TrendingSidebarSkeleton";
 import Footer from "@/components/_main/Footer";
 import { useProgressiveLoading } from "@/hooks/useProgressiveLoading";
 import { useInitialDataFetch } from "@/hooks/useInitialDataFetch";
@@ -58,7 +59,7 @@ export default function HomePage() {
             <div className="flex justify-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#11F2EB]"></div>
             </div>
-            <p className="mt-2">Loading initial data...</p>
+            <p className="mt-2">Loading...</p>
           </div>
         )}
 
@@ -91,12 +92,19 @@ export default function HomePage() {
               onCategoryChange={setSelectedCategory}
             />
           </div>
+
           <div className="w-full lg:w-1/3 xl:w-1/4">
-            <TrendingSidebar
-              products={products?.products}
-              shops={shops?.shops}
-              loading={isLoading("trending")}
-            />
+            {products?.products && shops?.shops ? (
+              <TrendingSidebar
+                products={products?.products}
+                shops={shops?.shops}
+                loading={isLoading("trending")}
+              />
+            ) : (
+              <></>
+            )}
+
+            {isLoading("trending") ? <TrendingSidebarSkeleton /> : <></>}
           </div>
         </div>
       </main>

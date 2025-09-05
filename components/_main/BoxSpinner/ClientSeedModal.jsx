@@ -118,79 +118,79 @@ const ClientSeedModal = ({
 
   return (
     <div>
-      {/* Client Seed Modal */}
+      {/* Client Seed Modal - MODIFIED SECTION */}
       <AnimatePresence>
         {showClientSeedModal && (
           <Dialog
             open={showClientSeedModal}
             onOpenChange={setShowClientSeedModal}
           >
-            <DialogContent className="sm:max-w-[500px] max-w-[95vw] bg-gradient-to-br from-purple-50 to-blue-50 z-[9999] fixed">
-              <DialogHeader>
-                <DialogTitle className="text-xl sm:text-2xl text-center bg-gradient-to-r from-[#11F2EB] via-cyan-500 to-cyan-600 bg-clip-text text-transparent">
-                  <Key className="inline-block w-5 h-5 sm:w-6 sm:h-6 mr-2" />
+            <DialogContent className="sm:max-w-[450px] max-w-[90vw] bg-white border border-gray-200 rounded-lg z-[9999] fixed">
+              <DialogHeader className="pt-6">
+                <DialogTitle className="text-xl text-center text-gray-800 font-semibold">
+                  <Key className="inline-block w-5 h-5 mr-2 text-[#11F2EB]" />
                   Client Seed
                 </DialogTitle>
-                <DialogDescription className="text-center text-gray-600 text-sm sm:text-base">
-                  Your current client seed for cryptographic verification
+                <DialogDescription className="text-center text-gray-600 text-sm">
+                  Your current seed for verification
                 </DialogDescription>
               </DialogHeader>
 
-              <div className="py-4 space-y-4">
-                <div className="bg-white p-3 sm:p-4 rounded-lg border border-gray-200">
-                  <div className="flex items-center mb-2">
-                    <Key className="w-4 h-4 mr-2 text-blue-500" />
-                    <span className="font-semibold text-sm sm:text-base">
-                      Current Client Seed
-                    </span>
-                    <button
-                      onClick={() =>
-                        copyToClipboard(clientSeed, "clientSeedModal")
-                      }
-                      className="ml-2 p-1 text-gray-400 hover:text-gray-600"
-                    >
-                      <Copy className="w-4 h-4" />
-                    </button>
-                    {copiedField === "clientSeedModal" && (
-                      <span className="ml-2 text-xs text-green-500">
-                        Copied!
+              <div className="py-4 px-4">
+                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center">
+                      <Key className="w-4 h-4 mr-2 text-[#11F2EB]" />
+                      <span className="font-medium text-sm text-gray-700">
+                        Current Seed
                       </span>
-                    )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() =>
+                          copyToClipboard(clientSeed, "clientSeedModal")
+                        }
+                        className="p-1 text-gray-400 hover:text-[#11F2EB] transition-colors"
+                        title="Copy seed"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={generateAndSetClientSeed}
+                        className="p-1 text-gray-400 hover:text-[#11F2EB] transition-colors"
+                        title="Regenerate seed"
+                      >
+                        <RefreshCw className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
-                  <div className="bg-gray-100 p-2 sm:p-3 rounded font-mono text-xs sm:text-sm break-all max-h-32 overflow-y-auto">
-                    {clientSeed}
+
+                  <div className="bg-white p-3 rounded border border-gray-200">
+                    <div className="font-mono text-sm break-all text-gray-800 max-h-24 overflow-y-auto">
+                      {clientSeed}
+                    </div>
                   </div>
-                  <p className="text-xs text-gray-500 mt-2">
-                    This seed is used along with the server seed to determine
-                    spin outcomes. Changing it will affect future spin results.
+
+                  {copiedField === "clientSeedModal" && (
+                    <div className="text-xs text-green-600 mt-2 text-center">
+                      Copied to clipboard!
+                    </div>
+                  )}
+
+                  <p className="text-xs text-gray-500 mt-3">
+                    This seed is used for cryptographic verification of spin
+                    outcomes.
                   </p>
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mt-4">
-                <Button
-                  variant="outline"
-                  className="h-10 sm:h-12 text-sm sm:text-lg border-2 border-gray-300 
-                    hover:border-gray-400 hover:text-black hover:bg-gray-50 w-full sm:w-1/3"
-                  onClick={() => setShowClientSeedModal(false)}
-                >
-                  Close
-                </Button>
-                <Button
-                  className="h-10 sm:h-12 text-sm sm:text-lg bg-gradient-to-r from-[#11F2EB] via-cyan-500 to-cyan-600 
-                    hover:from-cyan-400 hover:via-[#11F2EB] hover:to-blue-700 w-full sm:w-2/3"
-                  onClick={handleRegenerateClientSeed}
-                >
-                  <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
-                  Regenerate Seed
-                </Button>
-              </div>
+              {/* Removed the bottom close button as requested */}
             </DialogContent>
           </Dialog>
         )}
       </AnimatePresence>
 
-      {/* Seed Verification Modal */}
+      {/* Seed Verification Modal (UNCHANGED) */}
       <AnimatePresence>
         {showSeedModal && (
           <Dialog open={showSeedModal} onOpenChange={() => {}}>

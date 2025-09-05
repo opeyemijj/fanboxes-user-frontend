@@ -335,12 +335,12 @@ export default function BoxContents({ box, loading = false }) {
                     <Hexagon className="h-5 w-5" />
                     SPIN FOR ×{selectedItem.value?.toLocaleString() || "0"}
                   </Button>
-                  <button
+                  {/* <button
                     onClick={closePopup}
                     className="w-full text-gray-600 font-medium py-2.5 text-base hover:text-gray-800 transition-colors"
                   >
                     CLOSE
-                  </button>
+                  </button> */}
                 </div>
               </div>
 

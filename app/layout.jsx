@@ -29,6 +29,7 @@ export default function RootLayout({ children }) {
           showSpinner={true}
           easing="ease"
           speed={200}
+          zIndex={99999}
         />
         <ReduxProvider>
           <AuthProvider>
