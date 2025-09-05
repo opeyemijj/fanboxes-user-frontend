@@ -98,7 +98,7 @@ export default function TrendingSidebar({
 
           {/* Tabs */}
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-2xl font-bold">Trending</h3>
+            <h4 className="text-xl font-bold">Trending</h4>
             <div className="flex items-center gap-1 ml-auto">
               <Button
                 onClick={() => setActiveTab("boxes")}

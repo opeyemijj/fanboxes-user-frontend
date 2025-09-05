@@ -57,12 +57,6 @@ export default function FilterSidebar({
             >
               ALPHABETICAL
             </SelectItem>
-            <SelectItem
-              value="category"
-              className="hover:bg-[#11F2EB]/10 focus:bg-[#11F2EB]/10 cursor-pointer"
-            >
-              BY CATEGORY
-            </SelectItem>
           </SelectContent>
         </Select>
       </div>

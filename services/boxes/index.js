@@ -104,6 +104,9 @@ export const getAdminOwnedProducts = async (params = {}) => {
       case "newest":
         queryString += `&date=-1`;
         break;
+      case "alphabetical":
+        queryString += `&alphabetical=1`;
+        break;
       case "price-low-high":
         queryString += `&price=1`;
         break;
@@ -111,8 +114,9 @@ export const getAdminOwnedProducts = async (params = {}) => {
         queryString += `&price=-1`;
         break;
       case "most-popular":
-      default:
         queryString += `&top=-1`;
+      default:
+        queryString += ``;
         break;
     }
   }
