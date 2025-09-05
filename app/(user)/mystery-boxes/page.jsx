@@ -32,7 +32,7 @@ export default function MysteryBoxesPage() {
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(1);
+  const [itemsPerPage] = useState(12);
   const [totalItems, setTotalItems] = useState(0);
 
   const totalPages = Math.ceil(totalItems / itemsPerPage);
