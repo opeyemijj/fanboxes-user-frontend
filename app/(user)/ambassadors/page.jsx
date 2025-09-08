@@ -1,5 +1,5 @@
 // "use client";
-// import { useState, useMemo, useEffect } from "react";
+// import { useState, useMemo, useEffect, useRef, use } from "react";
 // import Header from "@/components/_main/Header";
 // import AmbassadorCategories from "@/components/_main/AmbassadorCategories";
 // import AmbassadorGrid from "@/components/_main/AmbassadorGrid";
@@ -10,12 +10,19 @@
 
 // export default function AmbassadorsPage() {
 //   const [enhancedData, setEnhancedData] = useState(null);
-//   const [isDataLoading, setIsDataLoading] = useState(true);
+//   const [isDataLoading, setIsDataLoading] = useState(false);
 //   const [selectedCategory, setSelectedCategory] = useState("all");
 //   const [searchTerm, setSearchTerm] = useState("");
 //   const [sortBy, setSortBy] = useState("most-popular");
 //   const [currentPage, setCurrentPage] = useState(1);
 //   const itemsPerPage = 12; // Adjust as needed
+
+//   // Create a ref for the ambassadors section
+//   const ambassadorsSectionRef = useRef(null);
+
+//   const reduxCategories = useSelector(
+//     (state) => state?.categories?.categories || []
+//   );
 
 //   // Get shops data from Redux
 //   const {
@@ -25,27 +32,10 @@
 //   } = useSelector((state) => state.shops);
 
 //   useEffect(() => {
-//     try {
-//       const enhancedData = require("@/lib/enhanced-data");
-//       setEnhancedData(enhancedData);
-//     } catch (error) {
-//       console.warn("Enhanced data not available");
-//       setEnhancedData(null);
-//     } finally {
+//     if (shops && reduxCategories) {
 //       setIsDataLoading(false);
 //     }
-//   }, []);
-
-//   // Get enhanced data for categories only
-//   const categories = enhancedData?.categories || [
-//     { id: "all", name: "All Ambassadors" },
-//     { id: "fitness", name: "Fitness" },
-//     { id: "beauty", name: "Beauty" },
-//     { id: "tech", name: "Tech" },
-//     { id: "lifestyle", name: "Lifestyle" },
-//     { id: "gaming", name: "Gaming" },
-//     { id: "fashion", name: "Fashion" },
-//   ];
+//   }, [shops, reduxCategories]);
 
 //   // Filter and sort ambassadors using Redux data only
 //   const filteredAmbassadors = useMemo(() => {
@@ -121,15 +111,28 @@
 //     };
 //   };
 
-//   // Handle pagination with smooth scroll
+//   // Handle pagination with smart scroll
 //   const handlePageChange = (newPage) => {
 //     setCurrentPage(newPage);
 
-//     // Smooth scroll to top of page
-//     window.scrollTo({
-//       top: 0,
-//       behavior: "smooth",
-//     });
+//     // Calculate scroll position based on screen size
+//     if (ambassadorsSectionRef.current) {
+//       const sectionTop = ambassadorsSectionRef.current.offsetTop;
+//       const headerOffset = window.innerWidth < 768 ? 100 : 50; // More offset on mobile
+
+//       const scrollPosition = Math.max(0, sectionTop - headerOffset);
+
+//       window.scrollTo({
+//         top: scrollPosition,
+//         behavior: "smooth",
+//       });
+//     } else {
+//       // Fallback to top of page
+//       window.scrollTo({
+//         top: 0,
+//         behavior: "smooth",
+//       });
+//     }
 //   };
 
 //   // Pagination component
@@ -249,27 +252,6 @@
 
 //   return (
 //     <>
-//       <style jsx global>{`
-//         /* Custom input focus styling with brand color */
-//         input:focus,
-//         select:focus,
-//         textarea:focus {
-//           outline: none !important;
-//           border-color: #11f2eb !important;
-//           box-shadow: 0 0 0 3px rgba(17, 242, 235, 0.1) !important;
-//         }
-
-//         /* Remove default browser focus outline */
-//         *:focus {
-//           outline: none;
-//         }
-
-//         /* Custom focus for buttons and other interactive elements */
-//         button:focus-visible {
-//           outline: 2px solid #11f2eb;
-//           outline-offset: 2px;
-//         }
-//       `}</style>
 //       <div className="bg-white text-black">
 //         <Header />
 //         <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24">
@@ -293,7 +275,7 @@
 //               <div className="mb-8 flex flex-col lg:flex-row gap-8">
 //                 <div className="w-full lg:w-2/3 xl:w-3/4">
 //                   <AmbassadorCategories
-//                     categories={categories}
+//                     categories={reduxCategories}
 //                     selectedCategory={selectedCategory}
 //                     onCategoryChange={handleFiltersChange(setSelectedCategory)}
 //                   />
@@ -309,11 +291,14 @@
 //                 </div>
 //               </div>
 
-//               <div
-//                 className="p-5 rounded-lg mb-4"
-//                 style={{ backgroundColor: "#EFEFEF" }}
-//               >
-//                 <AmbassadorGrid ambassadors={paginatedAmbassadors} />
+//               {/* Add ref to the ambassadors section */}
+//               <div ref={ambassadorsSectionRef}>
+//                 <div
+//                   className="p-5 rounded-lg mb-4"
+//                   style={{ backgroundColor: "#EFEFEF" }}
+//                 >
+//                   <AmbassadorGrid ambassadors={paginatedAmbassadors} />
+//                 </div>
 //               </div>
 
 //               {/* Pagination */}
@@ -338,16 +323,20 @@ import { useSelector } from "react-redux";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function AmbassadorsPage() {
-  const [enhancedData, setEnhancedData] = useState(null);
-  const [isDataLoading, setIsDataLoading] = useState(true);
+  // Add hydration state to prevent mismatches
+  const [isHydrated, setIsHydrated] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("most-popular");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 12; // Adjust as needed
+  const itemsPerPage = 12;
 
   // Create a ref for the ambassadors section
   const ambassadorsSectionRef = useRef(null);
+
+  const reduxCategories = useSelector(
+    (state) => state?.categories?.categories || []
+  );
 
   // Get shops data from Redux
   const {
@@ -356,28 +345,10 @@ export default function AmbassadorsPage() {
     error: shopError,
   } = useSelector((state) => state.shops);
 
+  // Handle hydration
   useEffect(() => {
-    try {
-      const enhancedData = require("@/lib/enhanced-data");
-      setEnhancedData(enhancedData);
-    } catch (error) {
-      console.warn("Enhanced data not available");
-      setEnhancedData(null);
-    } finally {
-      setIsDataLoading(false);
-    }
+    setIsHydrated(true);
   }, []);
-
-  // Get enhanced data for categories only
-  const categories = enhancedData?.categories || [
-    { id: "all", name: "All Ambassadors" },
-    { id: "fitness", name: "Fitness" },
-    { id: "beauty", name: "Beauty" },
-    { id: "tech", name: "Tech" },
-    { id: "lifestyle", name: "Lifestyle" },
-    { id: "gaming", name: "Gaming" },
-    { id: "fashion", name: "Fashion" },
-  ];
 
   // Filter and sort ambassadors using Redux data only
   const filteredAmbassadors = useMemo(() => {
@@ -387,6 +358,7 @@ export default function AmbassadorsPage() {
 
     // Apply category filter - simple implementation for Redux data
     if (selectedCategory !== "all") {
+      // console.log("shop::", shops);
       filtered = filtered.filter(
         (shop) =>
           shop.category?.toLowerCase() === selectedCategory.toLowerCase()
@@ -553,8 +525,8 @@ export default function AmbassadorsPage() {
     );
   };
 
-  // Show loading state during SSR and initial client render
-  if (typeof window === "undefined" || isDataLoading || shopsLoading) {
+  // Show consistent loading state during hydration
+  if (!isHydrated || shopsLoading) {
     return (
       <div className="bg-white text-black">
         <Header />
@@ -593,63 +565,62 @@ export default function AmbassadorsPage() {
   }
 
   return (
-    <>
-      <div className="bg-white text-black">
-        <Header />
-        <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24">
-          <div className="flex flex-col lg:flex-row gap-8 mt-8">
-            <div className="w-full lg:w-3/3 xl:w-4/4">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-                <h1 className="text-2xl sm:text-3xl lg:text-5xl font-bold">
-                  Our ambassadors
-                </h1>
-                <div className="text-sm text-gray-500">
-                  {filteredAmbassadors.length} ambassador
-                  {filteredAmbassadors.length !== 1 ? "s" : ""} found
-                  {filteredAmbassadors.length > itemsPerPage && (
-                    <span className="ml-2">
-                      (Page {currentPage} of {totalPages})
-                    </span>
-                  )}
-                </div>
+    <div className="bg-white text-black">
+      <Header />
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24">
+        <div className="flex flex-col lg:flex-row gap-8 mt-8">
+          <div className="w-full lg:w-3/3 xl:w-4/4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+              <h1 className="text-2xl sm:text-3xl lg:text-5xl font-bold">
+                Our ambassadors
+              </h1>
+              <div className="text-sm text-gray-500">
+                {filteredAmbassadors.length} ambassador
+                {filteredAmbassadors.length !== 1 ? "s" : ""} found
+                {filteredAmbassadors.length > itemsPerPage && (
+                  <span className="ml-2">
+                    (Page {currentPage} of {totalPages})
+                  </span>
+                )}
               </div>
-
-              <div className="mb-8 flex flex-col lg:flex-row gap-8">
-                <div className="w-full lg:w-2/3 xl:w-3/4">
-                  <AmbassadorCategories
-                    categories={categories}
-                    selectedCategory={selectedCategory}
-                    onCategoryChange={handleFiltersChange(setSelectedCategory)}
-                  />
-                </div>
-
-                <div className="w-full lg:w-1/3 xl:w-1/4">
-                  <AmbassadorFilterSidebar
-                    searchTerm={searchTerm}
-                    onSearchChange={handleFiltersChange(setSearchTerm)}
-                    sortBy={sortBy}
-                    onSortChange={handleFiltersChange(setSortBy)}
-                  />
-                </div>
-              </div>
-
-              {/* Add ref to the ambassadors section */}
-              <div ref={ambassadorsSectionRef}>
-                <div
-                  className="p-5 rounded-lg mb-4"
-                  style={{ backgroundColor: "#EFEFEF" }}
-                >
-                  <AmbassadorGrid ambassadors={paginatedAmbassadors} />
-                </div>
-              </div>
-
-              {/* Pagination */}
-              <Pagination />
             </div>
+
+            <div className="mb-8 flex flex-col lg:flex-row gap-8">
+              <div className="w-full lg:w-2/3 xl:w-3/4">
+                <AmbassadorCategories
+                  categories={reduxCategories}
+                  selectedCategory={selectedCategory}
+                  // onCategoryChange={handleFiltersChange(setSelectedCategory)}
+                  onCategoryChange={() => {}}
+                />
+              </div>
+
+              <div className="w-full lg:w-1/3 xl:w-1/4">
+                <AmbassadorFilterSidebar
+                  searchTerm={searchTerm}
+                  onSearchChange={handleFiltersChange(setSearchTerm)}
+                  sortBy={sortBy}
+                  onSortChange={handleFiltersChange(setSortBy)}
+                />
+              </div>
+            </div>
+
+            {/* Add ref to the ambassadors section */}
+            <div ref={ambassadorsSectionRef}>
+              <div
+                className="p-5 rounded-lg mb-4"
+                style={{ backgroundColor: "#EFEFEF" }}
+              >
+                <AmbassadorGrid ambassadors={paginatedAmbassadors} />
+              </div>
+            </div>
+
+            {/* Pagination */}
+            <Pagination />
           </div>
-        </main>
-        <Footer />
-      </div>
-    </>
+        </div>
+      </main>
+      <Footer />
+    </div>
   );
 }

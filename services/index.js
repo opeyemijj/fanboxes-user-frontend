@@ -412,7 +412,7 @@ export const getShopByUser = async () => {
 };
 
 export const getShops = async () => {
-  const { data } = await http.get(`/shops`);
+  const { data } = await http.get(`/shops?paginated=false`);
   return data;
 };
 export const getAllCategoriesByUser = async () => {
