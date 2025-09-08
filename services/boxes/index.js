@@ -121,6 +121,6 @@ export const getAdminOwnedProducts = async (params = {}) => {
     }
   }
 
-  const { data } = await http.get(`/products?${queryString}`);
+  const { data } = await http.get(`/products?${queryString}&isActive=true`);
   return data;
 };
