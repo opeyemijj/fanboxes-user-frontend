@@ -5,6 +5,7 @@ export const fetchShops = createAsyncThunk(
   "shops/fetchShops",
   async (_, { rejectWithValue }) => {
     try {
+      // console.log("fetching shops...");
       const [allShops, homeShops] = await Promise.all([getShops()]);
 
       return {
@@ -41,6 +42,7 @@ const slice = createSlice({
         state.error = null;
       })
       .addCase(fetchShops.fulfilled, (state, action) => {
+        // console.log("Fetched shops successfully:", action.payload);
         state.loading = false;
         state.shops = [...action.payload.all, ...action.payload.home];
         state.error = null;
