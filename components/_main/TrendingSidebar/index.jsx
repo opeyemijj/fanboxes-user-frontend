@@ -20,10 +20,37 @@ export default function TrendingSidebar({
   // Filter Boxes
   const filteredBoxes = useMemo(() => {
     if (!products || !Array.isArray(products)) return [];
-    if (!searchQuery.trim()) return products.slice(0, 5);
+
+    // Create a working copy and sort it - THREE-LEVEL PRIORITY
+    let sortedProducts = [...products].sort((a, b) => {
+      // Priority 1: isFeatured (featured items first)
+      const aFeatured = a.isFeatured || false;
+      const bFeatured = b.isFeatured || false;
+
+      if (aFeatured !== bFeatured) {
+        return bFeatured - aFeatured; // true (1) comes before false (0)
+      }
+
+      // Priority 2: visitedCount (highest first)
+      const aVisitedCount = a.visitedCount || 0;
+      const bVisitedCount = b.visitedCount || 0;
+
+      if (aVisitedCount !== bVisitedCount) {
+        return bVisitedCount - aVisitedCount;
+      }
+
+      // Priority 3: createdAt (newest first)
+      const aCreatedAt = new Date(a.createdAt || 0);
+      const bCreatedAt = new Date(b.createdAt || 0);
+
+      return bCreatedAt - aCreatedAt;
+    });
+
+    // Apply search filter and limit
+    if (!searchQuery.trim()) return sortedProducts.slice(0, 5);
 
     const query = searchQuery.toLowerCase();
-    return products.filter((product) => {
+    const filtered = sortedProducts.filter((product) => {
       return (
         product?.name?.toLowerCase().includes(query) ||
         product?.description?.toLowerCase().includes(query) ||
@@ -34,15 +61,18 @@ export default function TrendingSidebar({
         )
       );
     });
+
+    return filtered.slice(0, 5);
   }, [products, searchQuery]);
 
   // Filter Ambassadors
   const filteredAmbassadors = useMemo(() => {
     if (!shops || !Array.isArray(shops)) return [];
+    console.log("shops in sidebar", shops);
 
-    // Create a working copy and sort it
+    // Create a working copy and sort it - THREE-LEVEL PRIORITY
     let sortedShops = [...shops].sort((a, b) => {
-      // First, sort by isFeatured (featured items first)
+      // Priority 1: isFeatured (featured items first)
       const aFeatured = a.isFeatured || false;
       const bFeatured = b.isFeatured || false;
 
@@ -50,12 +80,22 @@ export default function TrendingSidebar({
         return bFeatured - aFeatured; // true (1) comes before false (0)
       }
 
-      // If both have same featured status, sort by visitedCount (highest first)
+      // Priority 2: visitedCount (highest first)
       const aVisitedCount = a.visitedCount || 0;
       const bVisitedCount = b.visitedCount || 0;
 
-      return bVisitedCount - aVisitedCount;
+      if (aVisitedCount !== bVisitedCount) {
+        return bVisitedCount - aVisitedCount;
+      }
+
+      // Priority 3: createdAt (newest first)
+      const aCreatedAt = new Date(a.createdAt || 0);
+      const bCreatedAt = new Date(b.createdAt || 0);
+
+      return bCreatedAt - aCreatedAt;
     });
+
+    console.log("sortedShops", sortedShops);
 
     // Apply search filter and limit
     if (!searchQuery.trim()) {
