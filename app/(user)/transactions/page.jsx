@@ -3,6 +3,9 @@ import { useState, useEffect, useRef } from "react";
 import { fetchWalletBalanceAndHistory } from "@/services/profile";
 import Footer from "@/components/_main/Footer";
 import Header from "@/components/_main/Header";
+import TransactionDetailsModal from "@/components/_main/Transactions/TransactionDetailsModal";
+import SkeletonLoader from "@/components/_main/Transactions/TransactionPageSkeletonLoader";
+import TransactionsListSkeletonLoader from "@/components/_main/Transactions/TransactionListSkeleton";
 import {
   ArrowDown,
   ArrowUp,
@@ -200,173 +203,30 @@ const Transactions = () => {
 
   const handlePageChange = (newPage) => {
     if (newPage !== page) {
-      setLoadingHistory(true);
+      // Immediate scroll to top of transaction container
+      if (transactionsRef.current) {
+        transactionsRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
+
       setPage(newPage);
-
-      // Store the scroll position reference before the update
-      const scrollTarget = transactionsRef.current;
-
-      // Use a slight delay and check if element exists
-      setTimeout(() => {
-        if (scrollTarget) {
-          scrollTarget.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-            inline: "nearest",
-          });
-        }
-      }, 300); // Increased delay to ensure content is rendering
     }
   };
 
   const handleLimitChange = (newLimit) => {
-    setLoadingHistory(true);
+    // Immediate scroll to top of transaction container
+    if (transactionsRef.current) {
+      transactionsRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+
     setLimit(Number(newLimit));
-    setPage(1); // Reset to first page when changing limit
+    setPage(1);
   };
-
-  // Skeleton Loader Component
-  const SkeletonLoader = () => (
-    <div className="bg-gray-50 text-black min-h-screen">
-      <Header />
-      <main className="container mx-auto px-3 sm:px-6 lg:px-8 pt-20 pb-16 flex-grow">
-        {/* Balance Card Skeleton */}
-        <div className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 rounded-2xl p-6 mb-6 shadow-xl relative overflow-hidden">
-          <div className="relative z-10">
-            <div className="flex items-center mb-4">
-              <div className="w-8 h-8 bg-gray-600/50 rounded-lg animate-pulse mr-3"></div>
-              <div className="h-4 w-32 bg-gray-600/50 rounded animate-pulse"></div>
-            </div>
-
-            <div className="flex items-baseline mb-6">
-              <div className="h-8 w-6 bg-gray-600/50 rounded animate-pulse mr-1"></div>
-              <div className="h-12 w-48 bg-gray-600/50 rounded-lg animate-pulse"></div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <div className="h-6 w-24 bg-gray-600/50 rounded-full animate-pulse"></div>
-              <div className="h-10 w-28 bg-gray-600/50 rounded-lg animate-pulse"></div>
-            </div>
-          </div>
-        </div>
-
-        {/* Filters Skeleton */}
-        <div className="bg-white rounded-xl shadow-sm p-4 mb-5 border border-gray-100">
-          <div className="flex flex-col sm:flex-row gap-3">
-            <div className="flex-1 flex flex-col sm:flex-row gap-3">
-              <div className="relative flex-1 h-11 bg-gray-200 rounded-lg animate-pulse"></div>
-              <div className="relative flex-1 h-11 bg-gray-200 rounded-lg animate-pulse"></div>
-            </div>
-          </div>
-        </div>
-
-        {/* Transactions List Skeleton */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="px-4 sm:px-6 py-4 border-b border-gray-100 bg-gray-50">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-              <div className="h-6 w-48 bg-gray-200 rounded animate-pulse mb-2 sm:mb-0"></div>
-              <div className="h-4 w-32 bg-gray-200 rounded animate-pulse"></div>
-            </div>
-          </div>
-
-          {/* Transaction Items Skeleton */}
-          {[1, 2, 3, 4, 5].map((item) => (
-            <div
-              key={item}
-              className="px-4 sm:px-6 py-4 border-b border-gray-100"
-            >
-              <div className="flex items-start space-x-3 sm:space-x-4">
-                {/* Icon Skeleton */}
-                <div className="flex-shrink-0 mt-1">
-                  <div className="w-10 h-10 bg-gray-200 rounded-full animate-pulse"></div>
-                </div>
-
-                {/* Content Skeleton */}
-                <div className="flex-grow min-w-0">
-                  <div className="flex flex-col space-y-3">
-                    {/* Top row */}
-                    <div className="flex items-start justify-between">
-                      <div className="h-5 w-40 bg-gray-200 rounded animate-pulse"></div>
-                      <div className="h-6 w-20 bg-gray-200 rounded animate-pulse"></div>
-                    </div>
-
-                    {/* Middle row */}
-                    <div className="flex flex-wrap items-center gap-2">
-                      <div className="h-6 w-16 bg-gray-200 rounded-full animate-pulse"></div>
-                      <div className="h-6 w-20 bg-gray-200 rounded-full animate-pulse"></div>
-                      <div className="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
-                    </div>
-
-                    {/* Bottom row */}
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                      <div className="h-4 w-32 bg-gray-200 rounded animate-pulse"></div>
-                      <div className="h-4 w-40 bg-gray-200 rounded animate-pulse mt-1 sm:mt-0"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </main>
-      <Footer />
-    </div>
-  );
-
-  const TransactionsListSkeletonLoader = () => (
-    <div className="bg-gray-50 text-black min-h-screen">
-      <main className="container mx-auto px-3 sm:px-6 lg:px-8 pt-20 pb-16 flex-grow">
-        {/* Transactions List Skeleton */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="px-4 sm:px-6 py-4 border-b border-gray-100 bg-gray-50">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-              <div className="h-6 w-48 bg-gray-200 rounded animate-pulse mb-2 sm:mb-0"></div>
-              <div className="h-4 w-32 bg-gray-200 rounded animate-pulse"></div>
-            </div>
-          </div>
-
-          {/* Transaction Items Skeleton */}
-          {[1, 2, 3, 4, 5].map((item) => (
-            <div
-              key={item}
-              className="px-4 sm:px-6 py-4 border-b border-gray-100"
-            >
-              <div className="flex items-start space-x-3 sm:space-x-4">
-                {/* Icon Skeleton */}
-                <div className="flex-shrink-0 mt-1">
-                  <div className="w-10 h-10 bg-gray-200 rounded-full animate-pulse"></div>
-                </div>
-
-                {/* Content Skeleton */}
-                <div className="flex-grow min-w-0">
-                  <div className="flex flex-col space-y-3">
-                    {/* Top row */}
-                    <div className="flex items-start justify-between">
-                      <div className="h-5 w-40 bg-gray-200 rounded animate-pulse"></div>
-                      <div className="h-6 w-20 bg-gray-200 rounded animate-pulse"></div>
-                    </div>
-
-                    {/* Middle row */}
-                    <div className="flex flex-wrap items-center gap-2">
-                      <div className="h-6 w-16 bg-gray-200 rounded-full animate-pulse"></div>
-                      <div className="h-6 w-20 bg-gray-200 rounded-full animate-pulse"></div>
-                      <div className="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
-                    </div>
-
-                    {/* Bottom row */}
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                      <div className="h-4 w-32 bg-gray-200 rounded animate-pulse"></div>
-                      <div className="h-4 w-40 bg-gray-200 rounded animate-pulse mt-1 sm:mt-0"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </main>
-    </div>
-  );
 
   if (loading) {
     return <SkeletonLoader />;
@@ -476,10 +336,15 @@ const Transactions = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm p-4 mb-5 border border-gray-100">
-          <div className="flex flex-col sm:flex-row gap-3">
+        <div
+          ref={transactionsRef}
+          className="bg-white rounded-xl shadow-sm p-4 mb-5 border border-gray-100"
+        >
+          <div className="flex flex-col lg:flex-row gap-4">
+            {/* Left side - Filters */}
             <div className="flex-1 flex flex-col sm:flex-row gap-3">
-              <div className="relative flex-1">
+              {/* Status Filter */}
+              <div className="relative flex-1 min-w-0">
                 <select
                   className="w-full pl-10 pr-8 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#11F2EB]/50 focus:border-[#11F2EB] transition-colors"
                   value={filterStatus}
@@ -493,12 +358,13 @@ const Transactions = () => {
                 <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               </div>
 
-              <div className="relative flex-1">
+              {/* Date Range Filter */}
+              <div className="relative flex-1 min-w-0">
                 <button
                   className="w-full pl-10 pr-8 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#11F2EB]/50 focus:border-[#11F2EB] text-left flex items-center justify-between transition-colors"
                   onClick={() => setShowDatePicker(!showDatePicker)}
                 >
-                  <span>
+                  <span className="truncate">
                     {dateRange.from && dateRange.to
                       ? `${formatDate(dateRange.from)} - ${formatDate(
                           dateRange.to
@@ -506,7 +372,7 @@ const Transactions = () => {
                       : "Select date range"}
                   </span>
                   <ChevronDown
-                    className={`w-4 h-4 transition-transform ${
+                    className={`w-4 h-4 ml-2 flex-shrink-0 transition-transform ${
                       showDatePicker ? "rotate-180" : ""
                     }`}
                   />
@@ -539,7 +405,7 @@ const Transactions = () => {
                       <h4 className="font-medium text-gray-900 mb-2">
                         Custom range
                       </h4>
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                           <label className="block text-xs text-gray-500 mb-1">
                             From
@@ -593,7 +459,7 @@ const Transactions = () => {
 
                     <div className="flex justify-between mt-4 pt-3 border-t border-gray-200">
                       <button
-                        className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800"
+                        className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 transition-colors"
                         onClick={clearDateFilter}
                       >
                         Clear
@@ -608,6 +474,36 @@ const Transactions = () => {
                   </div>
                 )}
               </div>
+            </div>
+
+            {/* Right side - Transaction count and pagination controls */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end lg:justify-end gap-3 lg:min-w-max">
+              {/* Transaction count - hidden on mobile, visible on sm+ */}
+              <p className="hidden sm:block text-sm text-gray-500 whitespace-nowrap">
+                {filteredTransactions?.length || 0} of{" "}
+                {transactionsData.pagination.totalCount || 0} transactions
+              </p>
+
+              {/* Records per page selector */}
+              <div className="relative flex-shrink-0 w-full sm:w-auto">
+                <select
+                  className="w-full sm:w-auto appearance-none pl-3 pr-8 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#11F2EB]/50 focus:border-[#11F2EB] bg-white transition-colors"
+                  value={limit}
+                  onChange={(e) => handleLimitChange(e.target.value)}
+                >
+                  <option value="5">5 per page</option>
+                  <option value="10">10 per page</option>
+                  <option value="20">20 per page</option>
+                  <option value="50">50 per page</option>
+                </select>
+                <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
+              </div>
+
+              {/* Transaction count for mobile - visible only on mobile */}
+              <p className="block sm:hidden text-sm text-gray-500 text-center">
+                {filteredTransactions?.length || 0} of{" "}
+                {transactionsData.pagination.totalCount || 0} transactions
+              </p>
             </div>
           </div>
 
@@ -628,32 +524,21 @@ const Transactions = () => {
           )}
         </div>
 
-        <div
-          ref={transactionsRef}
-          className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
-        >
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="px-4 sm:px-6 py-4 border-b border-gray-100 bg-gray-50">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-              {/* <h3 className="text-lg font-semibold text-gray-900 mb-2 sm:mb-0">
-                Recent Transactions
-              </h3>
-              <p className="text-sm text-gray-500">
-                {filteredTransactions?.length || 0} of{" "}
-                {transactionsData?.transactions?.length || 0} transactions
-              </p> */}
-
               <div className="px-4 sm:px-6 py-4 border-b border-gray-100 bg-gray-50">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2 sm:mb-0 mr-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+                  <h3 className="text-lg font-semibold text-gray-900 justify-self-start">
                     Recent Transactions
                   </h3>
-                  <div className="flex items-center gap-4">
-                    <p className="text-sm text-gray-500">
+                  {/* <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3 justify-self-end">
+                    <p className="text-sm text-gray-500 sm:text-right">
                       {filteredTransactions?.length || 0} of{" "}
-                      {transactionsData?.transactions?.length || 0} transactions
+                      {transactionsData.pagination.totalCount || 0} transactions
                     </p>
 
-                    {/* Records per page selector */}
+                   
                     <div className="relative">
                       <select
                         className="appearance-none pl-3 pr-8 py-1.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#11F2EB]/50 focus:border-[#11F2EB] bg-white"
@@ -667,7 +552,7 @@ const Transactions = () => {
                       </select>
                       <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
@@ -881,118 +766,16 @@ const Transactions = () => {
       <Footer />
 
       {showDetailsModal && selectedTransaction && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-9999">
-          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200 flex justify-between items-center">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Transaction Details
-              </h3>
-              <button
-                onClick={closeModal}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="p-6">
-              <div className="flex justify-center mb-6">
-                {getTransactionIcon(
-                  selectedTransaction.transactionType,
-                  selectedTransaction.category
-                )}
-              </div>
-
-              <div className="text-center mb-6">
-                <p
-                  className={`text-2xl font-bold ${
-                    selectedTransaction.transactionType === "credit"
-                      ? "text-green-600"
-                      : "text-red-600"
-                  }`}
-                >
-                  {selectedTransaction.transactionType === "credit" ? "+" : "-"}
-                  ${formatAmount(selectedTransaction.amount)}
-                </p>
-                <p className="text-gray-600 mt-1">
-                  {selectedTransaction.description}
-                </p>
-                <div className="mt-3 flex justify-center">
-                  {getStatusBadge(selectedTransaction.status)}
-                </div>
-              </div>
-
-              <div className="space-y-4 border-t border-gray-200 pt-4">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Reference ID</span>
-                  <span className="font-medium font-mono text-sm">
-                    {selectedTransaction.referenceId}
-                  </span>
-                </div>
-
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Category</span>
-                  <span className="font-medium capitalize">
-                    {selectedTransaction.category}
-                  </span>
-                </div>
-
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Payment Method</span>
-                  <span className="font-medium capitalize">
-                    {selectedTransaction.paymentMethod}
-                  </span>
-                </div>
-
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Date & Time</span>
-                  <span className="font-medium">
-                    {formatDate(selectedTransaction.transactionDate)} at{" "}
-                    {formatTime(selectedTransaction.transactionDate)}
-                  </span>
-                </div>
-
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Status</span>
-                  <span className="font-medium capitalize">
-                    {selectedTransaction.status}
-                  </span>
-                </div>
-
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Balance After</span>
-                  <span className="font-medium">
-                    ${formatAmount(selectedTransaction.availableBalance)}
-                  </span>
-                </div>
-              </div>
-
-              {selectedTransaction.metadata && (
-                <div className="mt-6 pt-4 border-t border-gray-200">
-                  <h4 className="font-medium text-gray-900 mb-2">
-                    Additional Information
-                  </h4>
-                  {selectedTransaction.metadata.initiatedBy && (
-                    <div className="text-sm text-gray-600">
-                      Initiated by:{" "}
-                      {selectedTransaction.metadata.initiatedBy.firstName}{" "}
-                      {selectedTransaction.metadata.initiatedBy.lastName}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            <div className="p-6 border-t border-gray-200 bg-gray-50 rounded-b-2xl">
-              <button
-                onClick={closeModal}
-                className="w-full py-3 bg-[#11F2EB] text-slate-800 font-medium rounded-lg hover:bg-[#0ED9D3] transition-colors"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
+        <TransactionDetailsModal
+          isOpen={!!selectedTransaction}
+          onClose={closeModal}
+          transaction={selectedTransaction}
+          getTransactionIcon={getTransactionIcon}
+          getStatusBadge={getStatusBadge}
+          formatAmount={formatAmount}
+          formatDate={formatDate}
+          formatTime={formatTime}
+        />
       )}
     </div>
   );

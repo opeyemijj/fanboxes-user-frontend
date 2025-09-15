@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -21,7 +21,8 @@ import { useAuth } from "@/components/AuthProvider";
 import { useSelector } from "react-redux";
 import HeaderWalletBalance from "./HeaderWalletBalance";
 
-export default function Header() {
+function Header() {
+  console.log("header rendered...");
   const userData = useSelector((state) => state.user);
   const [showTopUpPopup, setShowTopUpPopup] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
@@ -349,3 +350,5 @@ export default function Header() {
     </>
   );
 }
+
+export default React.memo(Header);
