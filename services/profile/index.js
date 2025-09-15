@@ -36,3 +36,15 @@ export const getCart = async (ids) => {
   });
   return data;
 };
+
+export const fetchWalletBalanceAndHistory = async (limit = 5, page = 1) => {
+  try {
+    const { data } = await http.get(
+      `/wallet/balance-and-history?limit=${limit}&page=${page}`
+    );
+    return data;
+  } catch (err) {
+    console.error("Error fetching balance:", err);
+    throw err;
+  }
+};

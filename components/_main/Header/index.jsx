@@ -14,10 +14,12 @@ import {
   LogOut,
   Menu,
   X,
+  Receipt,
 } from "lucide-react";
 import TopUpPopup from "../TopUpPopup";
 import { useAuth } from "@/components/AuthProvider";
 import { useSelector } from "react-redux";
+import HeaderWalletBalance from "./HeaderWalletBalance";
 
 export default function Header() {
   const userData = useSelector((state) => state.user);
@@ -45,6 +47,7 @@ export default function Header() {
     { icon: User, label: "My Profile", href: "/profile" },
     { icon: Package, label: "My Orders", href: "/orders" },
     { icon: RotateCcw, label: "My Spins", href: "/spins" },
+    { icon: Receipt, label: "Transaction History", href: "/transactions" },
     { icon: Settings, label: "Account Settings", href: "/settings" },
   ];
 
@@ -104,9 +107,10 @@ export default function Header() {
                   <Button
                     onClick={() => setShowTopUpPopup(true)}
                     variant="outline"
-                    className="flex items-center space-x-2 border-gray-200 bg-transparent hover:bg-[#11F2EB] hover:text-white hover:border-[#11F2EB] transition-colors"
+                    className="flex items-center border-gray-200 bg-transparent hover:bg-[#11F2EB] hover:text-white hover:border-[#11F2EB] transition-colors"
                   >
-                    <span className="font-semibold">x1,200</span>
+                    {/* <span className="font-semibold">x1,200</span> */}
+                    <HeaderWalletBalance />
                     <Hexagon className="h-4 w-4 text-gray-500" />
                   </Button>
                   <div className="relative">
@@ -212,9 +216,10 @@ export default function Header() {
                 <Button
                   onClick={() => setShowTopUpPopup(true)}
                   variant="outline"
-                  className="mr-4 flex items-center space-x-2 border-gray-200 bg-transparent hover:bg-[#11F2EB] hover:text-white hover:border-[#11F2EB] transition-colors"
+                  className="mr-4 flex items-center border-gray-200 bg-transparent hover:bg-[#11F2EB] hover:text-white hover:border-[#11F2EB] transition-colors"
                 >
-                  <span className="font-semibold">x1,200</span>
+                  {/* <span className="font-semibold">x1,200</span> */}
+                  <HeaderWalletBalance />
                   <Hexagon className="h-4 w-4 text-gray-500" />
                 </Button>
               )}

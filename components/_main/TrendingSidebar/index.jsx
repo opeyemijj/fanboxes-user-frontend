@@ -7,7 +7,6 @@ import { Search } from "lucide-react";
 import TrendingBoxCard from "@/components/_main/TrendingBoxCard";
 import AmbassadorCard from "@/components/_main/AmbassadorCard";
 import TrendingSidebarSkeleton from "@/components/ui/skeletons/TrendingSidebarSkeleton";
-import { useSelector } from "react-redux";
 
 export default function TrendingSidebar({
   loading = false,
@@ -68,7 +67,6 @@ export default function TrendingSidebar({
   // Filter Ambassadors
   const filteredAmbassadors = useMemo(() => {
     if (!shops || !Array.isArray(shops)) return [];
-    console.log("shops in sidebar", shops);
 
     // Create a working copy and sort it - THREE-LEVEL PRIORITY
     let sortedShops = [...shops].sort((a, b) => {
@@ -94,8 +92,6 @@ export default function TrendingSidebar({
 
       return bCreatedAt - aCreatedAt;
     });
-
-    console.log("sortedShops", sortedShops);
 
     // Apply search filter and limit
     if (!searchQuery.trim()) {
