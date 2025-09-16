@@ -23,11 +23,11 @@ export default function TopUpPopup({ isOpen, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={onClose}
+        onClick={() => {}}
       />
 
       {/* Modal */}
@@ -40,16 +40,8 @@ export default function TopUpPopup({ isOpen, onClose }) {
           <X className="h-5 w-5" />
         </button>
 
-        {/* View Profile Link */}
-        {/* <div className="absolute top-6 right-16">
-          <button className="text-sm font-medium text-gray-600 hover:text-gray-800 flex items-center space-x-1">
-            <span>VIEW PROFILE</span>
-            <ArrowRight className="h-3 w-3" />
-          </button>
-        </div> */}
-
         {/* Title */}
-        <h2 className="text-2xl font-bold text-black mb-8">
+        <h2 className="text-2xl font-bold text-black mb-7">
           Top up your account
         </h2>
 
@@ -61,17 +53,17 @@ export default function TopUpPopup({ isOpen, onClose }) {
 
           {/* Payment Method Icons */}
           <div className="flex items-center space-x-2 mb-6">
-            <div className="w-8 h-6 bg-red-500 rounded flex items-center justify-center">
+            <div className="px-2 h-6 bg-red-500 rounded flex items-center justify-center">
               <div className="w-4 h-3 bg-red-600 rounded-full"></div>
               <div className="w-4 h-3 bg-orange-400 rounded-full -ml-2"></div>
             </div>
-            <div className="w-8 h-6 bg-blue-600 rounded flex items-center justify-center text-white text-xs font-bold">
+            <div className="px-2 h-6 bg-blue-600 rounded flex items-center justify-center text-white text-xs font-bold">
               VISA
             </div>
-            <div className="w-8 h-6 bg-black rounded flex items-center justify-center text-white text-xs font-bold">
+            <div className="px-2 h-6 bg-black rounded flex items-center justify-center text-white text-xs font-bold">
               Pay
             </div>
-            <div className="w-8 h-6 bg-blue-500 rounded flex items-center justify-center text-white text-xs font-bold">
+            <div className="px-2 h-6 bg-blue-500 rounded flex items-center justify-center text-white text-xs font-bold">
               AMEX
             </div>
           </div>
@@ -127,7 +119,7 @@ export default function TopUpPopup({ isOpen, onClose }) {
         {/* Select Method Button */}
         <Button
           variant="outline"
-          className="w-full mb-4 py-3 border-2 border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg font-medium bg-transparent"
+          className="w-full mb-4 py-3 border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-700 rounded-lg font-medium bg-transparent"
         >
           SELECT METHOD
         </Button>

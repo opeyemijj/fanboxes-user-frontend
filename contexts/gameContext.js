@@ -29,6 +29,7 @@ export const GameProvider = ({ children, box }) => {
   const [clientSeed, setClientSeed] = useState("");
   const [nonce, setNonce] = useState(1);
   const [createSpinApiError, setCreateSpinApiError] = useState("");
+  const [insufficientBalError, setInSufficientBalError] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [isEditingBox, setIsEditingBox] = useState(false);
 
@@ -67,6 +68,8 @@ export const GameProvider = ({ children, box }) => {
       }
 
       setGameState("waiting");
+      setInSufficientBalError(false);
+      setCreateSpinApiError("");
 
       if (resultsOnly) {
         // Call the spin API with current box configuration
@@ -98,6 +101,10 @@ export const GameProvider = ({ children, box }) => {
     } catch (error) {
       console.error("❌ Error during spin:", error);
       setGameState("idle");
+
+      if (error?.response?.data?.errorCode === "INSUFFICIENT_BALANCE") {
+        setInSufficientBalError(true);
+      }
       setCreateSpinApiError(
         error?.response?.data?.message ||
           error?.message ||
@@ -135,6 +142,7 @@ export const GameProvider = ({ children, box }) => {
     isEditingBox,
     currentBoxConfig,
     editableBoxConfig,
+    insufficientBalError,
 
     // Setters
     setGameState,

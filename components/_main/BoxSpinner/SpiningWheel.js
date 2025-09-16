@@ -67,6 +67,10 @@ export default function SpinningWheel({
   const hash = spinResultData?.hash || "";
 
   useEffect(() => {
+    console.log("sp-sw", { isSpinning, isWaitingForResult });
+  }, [isSpinning, isWaitingForResult]);
+
+  useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 768) {
         setRadius(250);
@@ -263,14 +267,16 @@ export default function SpinningWheel({
 
   const handleSpinClick = async () => {
     // Show seed verification modal
-    setShowSeedModal(true);
+    // setShowSeedModal(true);
 
     // Call onSpin with true to get the spin result data
     const result = await onSpin(true);
-    if (result && result._id) {
-      setSpinRecordId(result._id);
-    }
-    setSpinResultData(result);
+
+    if (result) onSpin(false, result); //spin directly
+    // if (result && result._id) {
+    //   setSpinRecordId(result._id);
+    // }
+    // setSpinResultData(result);
   };
 
   const handleContinueToSpin = () => {

@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import SpinningWheel from "./SpiningWheel";
 import { useSelector } from "react-redux";
 import { useGameContext } from "@/contexts/gameContext";
+import TopUpPopup from "../TopUpPopup";
 
 export default function FanboxGame({ boxConfig: initialBoxConfig }) {
   const {
@@ -20,6 +21,7 @@ export default function FanboxGame({ boxConfig: initialBoxConfig }) {
     isEditingBox,
     currentBoxConfig,
     editableBoxConfig,
+    insufficientBalError,
 
     // Setters
     setGameState,
@@ -39,6 +41,12 @@ export default function FanboxGame({ boxConfig: initialBoxConfig }) {
     generateAndSetClientSeed,
     resetGame,
   } = useGameContext();
+
+  const [showTopUpPopup, setShowTopUpPopup] = useState(false);
+
+  useEffect(() => {
+    setShowTopUpPopup(insufficientBalError);
+  }, [insufficientBalError]);
 
   const handleBoxConfigUpdate = () => {
     try {
@@ -133,6 +141,14 @@ export default function FanboxGame({ boxConfig: initialBoxConfig }) {
           clientSeed={clientSeed}
         />
       </div>
+
+      {/* Top Up Popup */}
+      {showTopUpPopup && (
+        <TopUpPopup
+          isOpen={showTopUpPopup}
+          onClose={() => setShowTopUpPopup(false)}
+        />
+      )}
     </div>
   );
 }

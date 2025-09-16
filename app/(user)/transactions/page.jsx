@@ -39,19 +39,19 @@ const Transactions = () => {
 
   const fetchBalance = useCallback(async () => {
     try {
-      console.log("fetch history called...");
+      // console.log("fetch history called...");
       setLoading(true);
       const params = { limit, page };
       if (filterStatus && filterStatus !== "all") params.status = filterStatus;
 
       // Add date range filters if they exist
-      console.log("DR::", dateRange);
+      // console.log("DR::", dateRange);
       if (dateRange.from) params.fromDate = dateRange.from.toISOString();
       if (dateRange.to) params.toDate = dateRange.to.toISOString();
 
-      console.log("PARAMS TO SEND::", params);
+      // console.log("PARAMS TO SEND::", params);
       const response = await fetchWalletBalanceAndHistory(params);
-      console.log("Wallet balance response:", response);
+      // console.log("Wallet balance response:", response);
 
       if (!response.success) {
         throw new Error("Failed to fetch balance data");
@@ -126,14 +126,14 @@ const Transactions = () => {
 
   const getStatusBadge = (status) => {
     const statusStyles = {
-      completed: "bg-green-50 text-green-700",
+      completed: "bg-green-100 text-green-800",
       pending: "bg-yellow-50 text-yellow-700",
       failed: "bg-red-50 text-red-700",
     };
 
     return (
       <span
-        className={`px-2.5 py-1 rounded-full text-xs font-medium ${
+        className={`px-2.5 py-1 rounded-full text-sm font-medium ${
           statusStyles[status] || statusStyles.pending
         }`}
       >

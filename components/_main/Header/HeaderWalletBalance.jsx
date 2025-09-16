@@ -11,7 +11,7 @@ const HeaderWalletBalance = () => {
       try {
         setLoading(true);
         const response = await fetchWalletBalanceAndHistory();
-        console.log("Wallet balance response:", response);
+        // console.log("Wallet balance response:", response);
 
         if (!response.success) {
           throw new Error("Failed to fetch balance data");
