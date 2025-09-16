@@ -1,10 +1,11 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { fetchWalletBalanceAndHistory } from "@/services/profile";
 import Footer from "@/components/_main/Footer";
 import Header from "@/components/_main/Header";
 import TransactionDetailsModal from "@/components/_main/Transactions/TransactionDetailsModal";
 import SkeletonLoader from "@/components/_main/Transactions/TransactionPageSkeletonLoader";
+import TransactionsPagination from "@/components/_main/Transactions/TransactionsPagination";
 import TransactionsListSkeletonLoader from "@/components/_main/Transactions/TransactionListSkeleton";
 import {
   ArrowDown,
@@ -15,8 +16,6 @@ import {
   X,
   Wallet,
   ChevronDown,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
 
 const Transactions = () => {
@@ -27,37 +26,63 @@ const Transactions = () => {
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [dateRange, setDateRange] = useState({ from: null, to: null });
+  const [pendingDateRange, setPendingDateRange] = useState({
+    from: null,
+    to: null,
+  });
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [limit, setLimit] = useState(5);
   const [page, setPage] = useState(1);
   const [loadingHistory, setLoadingHistory] = useState(false);
+  const [shouldRefetch, setShouldRefetch] = useState(false);
   const transactionsRef = useRef(null);
 
-  useEffect(() => {
-    const fetchBalance = async () => {
-      try {
-        console.log("fetch history called...");
-        setLoading(true);
-        const response = await fetchWalletBalanceAndHistory(limit, page);
-        console.log("Wallet balance response:", response);
+  const fetchBalance = useCallback(async () => {
+    try {
+      console.log("fetch history called...");
+      setLoading(true);
+      const params = { limit, page };
+      if (filterStatus && filterStatus !== "all") params.status = filterStatus;
 
-        if (!response.success) {
-          throw new Error("Failed to fetch balance data");
-        }
+      // Add date range filters if they exist
+      console.log("DR::", dateRange);
+      if (dateRange.from) params.fromDate = dateRange.from.toISOString();
+      if (dateRange.to) params.toDate = dateRange.to.toISOString();
 
-        const data = response.data;
-        setTransactionsData(data);
-      } catch (err) {
-        setError("Error fetching balance");
-        console.error("Error fetching balance:", err);
-      } finally {
-        setLoading(false);
-        setLoadingHistory(false);
+      console.log("PARAMS TO SEND::", params);
+      const response = await fetchWalletBalanceAndHistory(params);
+      console.log("Wallet balance response:", response);
+
+      if (!response.success) {
+        throw new Error("Failed to fetch balance data");
       }
-    };
 
+      const data = response.data;
+      setTransactionsData(data);
+    } catch (err) {
+      setError("Error fetching balance");
+      console.error("Error fetching balance:", err);
+    } finally {
+      setLoading(false);
+      setLoadingHistory(false);
+      setShouldRefetch(false);
+    }
+  }, [limit, page, filterStatus, dateRange]);
+
+  useEffect(() => {
     fetchBalance();
-  }, [limit, page]);
+  }, [fetchBalance]);
+
+  // Handle manual refetch triggers
+  useEffect(() => {
+    if (shouldRefetch) {
+      fetchBalance();
+    }
+  }, [shouldRefetch, fetchBalance]);
+
+  useEffect(() => {
+    setPendingDateRange(dateRange);
+  }, [dateRange]);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -136,28 +161,6 @@ const Transactions = () => {
     );
   };
 
-  // Filter transactions based on status and date range
-  const filteredTransactions = transactionsData?.transactions?.filter(
-    (transaction) => {
-      const matchesStatus =
-        filterStatus === "all" || transaction.status === filterStatus;
-
-      // Date range filtering
-      let matchesDateRange = true;
-      if (dateRange.from && dateRange.to) {
-        const transactionDate = new Date(transaction.transactionDate);
-        const fromDate = new Date(dateRange.from);
-        const toDate = new Date(dateRange.to);
-        toDate.setHours(23, 59, 59, 999); // Include entire end date
-
-        matchesDateRange =
-          transactionDate >= fromDate && transactionDate <= toDate;
-      }
-
-      return matchesStatus && matchesDateRange;
-    }
-  );
-
   const handleTransactionClick = (transaction) => {
     setSelectedTransaction(transaction);
     setShowDetailsModal(true);
@@ -168,13 +171,36 @@ const Transactions = () => {
     setSelectedTransaction(null);
   };
 
-  const handleDateRangeSelect = (from, to) => {
+  const handlePredefinedDateRange = (from, to) => {
     setDateRange({ from, to });
+    setPendingDateRange({ from, to });
+    setPage(1);
+    setShouldRefetch(true);
     setShowDatePicker(false);
+    setLoadingHistory(true);
   };
 
   const clearDateFilter = () => {
     setDateRange({ from: null, to: null });
+    setPendingDateRange({ from: null, to: null });
+    setPage(1);
+    setShouldRefetch(true);
+    setLoadingHistory(true);
+  };
+
+  const applyDateFilter = () => {
+    setDateRange(pendingDateRange);
+    setPage(1);
+    setShouldRefetch(true);
+    setShowDatePicker(false);
+    setLoadingHistory(true);
+  };
+
+  const handleStatusChange = (newStatus) => {
+    setFilterStatus(newStatus);
+    setPage(1);
+    setShouldRefetch(true);
+    setLoadingHistory(true);
   };
 
   // Predefined date ranges
@@ -319,9 +345,6 @@ const Transactions = () => {
 
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div className="flex items-center">
-                {/* <div className="text-white/70 text-xs bg-white/10 backdrop-blur-sm rounded-full px-3 py-1.5 border border-white/20">
-                  {transactionsData?.transactions?.length || 0} transactions
-                </div> */}
                 <div className="text-white/70 text-xs bg-white/10 backdrop-blur-sm rounded-full px-3 py-1.5 border border-white/20">
                   {transactionsData?.pagination?.totalCount || 0} total
                   transactions
@@ -348,7 +371,7 @@ const Transactions = () => {
                 <select
                   className="w-full pl-10 pr-8 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#11F2EB]/50 focus:border-[#11F2EB] transition-colors"
                   value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value)}
+                  onChange={(e) => handleStatusChange(e.target.value)}
                 >
                   <option value="all">All Status</option>
                   <option value="completed">Completed</option>
@@ -392,7 +415,7 @@ const Transactions = () => {
                             key={index}
                             className="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-[#11F2EB]/10 hover:text-[#11F2EB] rounded-md transition-colors"
                             onClick={() =>
-                              handleDateRangeSelect(range.from, range.to)
+                              handlePredefinedDateRange(range.from, range.to)
                             }
                           >
                             {range.label}
@@ -414,15 +437,15 @@ const Transactions = () => {
                             type="date"
                             className="w-full px-3 py-2 text-sm border border-gray-200 rounded-md focus:ring-2 focus:ring-[#11F2EB]/50 focus:border-[#11F2EB]"
                             value={
-                              dateRange.from
-                                ? new Date(dateRange.from)
+                              pendingDateRange.from
+                                ? new Date(pendingDateRange.from)
                                     .toISOString()
                                     .split("T")[0]
                                 : ""
                             }
                             onChange={(e) =>
-                              setDateRange({
-                                ...dateRange,
+                              setPendingDateRange({
+                                ...pendingDateRange,
                                 from: e.target.value
                                   ? new Date(e.target.value)
                                   : null,
@@ -438,15 +461,15 @@ const Transactions = () => {
                             type="date"
                             className="w-full px-3 py-2 text-sm border border-gray-200 rounded-md focus:ring-2 focus:ring-[#11F2EB]/50 focus:border-[#11F2EB]"
                             value={
-                              dateRange.to
-                                ? new Date(dateRange.to)
+                              pendingDateRange.to
+                                ? new Date(pendingDateRange.to)
                                     .toISOString()
                                     .split("T")[0]
                                 : ""
                             }
                             onChange={(e) =>
-                              setDateRange({
-                                ...dateRange,
+                              setPendingDateRange({
+                                ...pendingDateRange,
                                 to: e.target.value
                                   ? new Date(e.target.value)
                                   : null,
@@ -466,7 +489,7 @@ const Transactions = () => {
                       </button>
                       <button
                         className="px-4 py-1.5 text-sm bg-[#11F2EB] text-slate-800 font-medium rounded-md hover:bg-[#0ED9D3] transition-colors"
-                        onClick={() => setShowDatePicker(false)}
+                        onClick={applyDateFilter}
                       >
                         Apply
                       </button>
@@ -480,7 +503,7 @@ const Transactions = () => {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end lg:justify-end gap-3 lg:min-w-max">
               {/* Transaction count - hidden on mobile, visible on sm+ */}
               <p className="hidden sm:block text-sm text-gray-500 whitespace-nowrap">
-                {filteredTransactions?.length || 0} of{" "}
+                {transactionsData?.transactions?.length || 0} of{" "}
                 {transactionsData.pagination.totalCount || 0} transactions
               </p>
 
@@ -501,7 +524,7 @@ const Transactions = () => {
 
               {/* Transaction count for mobile - visible only on mobile */}
               <p className="block sm:hidden text-sm text-gray-500 text-center">
-                {filteredTransactions?.length || 0} of{" "}
+                {transactionsData?.transactions?.length || 0} of{" "}
                 {transactionsData.pagination.totalCount || 0} transactions
               </p>
             </div>
@@ -532,27 +555,6 @@ const Transactions = () => {
                   <h3 className="text-lg font-semibold text-gray-900 justify-self-start">
                     Recent Transactions
                   </h3>
-                  {/* <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3 justify-self-end">
-                    <p className="text-sm text-gray-500 sm:text-right">
-                      {filteredTransactions?.length || 0} of{" "}
-                      {transactionsData.pagination.totalCount || 0} transactions
-                    </p>
-
-                   
-                    <div className="relative">
-                      <select
-                        className="appearance-none pl-3 pr-8 py-1.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#11F2EB]/50 focus:border-[#11F2EB] bg-white"
-                        value={limit}
-                        onChange={(e) => handleLimitChange(e.target.value)}
-                      >
-                        <option value="5">5 per page</option>
-                        <option value="10">10 per page</option>
-                        <option value="20">20 per page</option>
-                        <option value="50">50 per page</option>
-                      </select>
-                      <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
-                    </div>
-                  </div> */}
                 </div>
               </div>
             </div>
@@ -560,9 +562,9 @@ const Transactions = () => {
 
           {loadingHistory ? (
             <TransactionsListSkeletonLoader />
-          ) : filteredTransactions?.length > 0 ? (
+          ) : transactionsData?.transactions?.length > 0 ? (
             <div className="divide-y divide-gray-100">
-              {filteredTransactions.map((transaction) => (
+              {transactionsData?.transactions.map((transaction) => (
                 <div
                   key={transaction._id}
                   className="px-4 sm:px-6 py-4 hover:bg-gray-50 transition-colors duration-150 cursor-pointer"
@@ -605,18 +607,6 @@ const Transactions = () => {
                         </div>
 
                         {/* Second row: Badges and Balance (mobile stacked, desktop inline) */}
-                        {/* <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
-                          <div className="flex flex-wrap items-center gap-2">
-                            {getStatusBadge(transaction.status)}
-                            {getCategoryBadge(transaction.category)}
-                          </div>
-                          <div className="text-right sm:ml-4">
-                            <p className="text-sm text-gray-500">
-                              Balance: $
-                              {formatAmount(transaction.availableBalance)}
-                            </p>
-                          </div>
-                        </div> */}
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
                           <div className="flex flex-wrap items-center gap-2">
                             {getStatusBadge(transaction.status)}
@@ -684,83 +674,15 @@ const Transactions = () => {
         </div>
 
         {transactionsData?.pagination &&
-          transactionsData.pagination.totalPages > 1 && (
-            <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="text-sm text-gray-700">
-                Showing {(page - 1) * limit + 1} to{" "}
-                {Math.min(page * limit, transactionsData.pagination.totalCount)}{" "}
-                of {transactionsData.pagination.totalCount} transactions
-              </div>
-              <div className="flex items-center space-x-2">
-                <button
-                  disabled={
-                    !transactionsData.pagination.hasPrev || loadingHistory
-                  }
-                  onClick={() => handlePageChange(page - 1)}
-                  className="p-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-
-                <div className="flex items-center space-x-1">
-                  {Array.from(
-                    {
-                      length: Math.min(
-                        5,
-                        transactionsData.pagination.totalPages
-                      ),
-                    },
-                    (_, i) => {
-                      // Show pages around current page
-                      let pageNum;
-                      if (transactionsData.pagination.totalPages <= 5) {
-                        pageNum = i + 1;
-                      } else if (page <= 3) {
-                        pageNum = i + 1;
-                      } else if (
-                        page >=
-                        transactionsData.pagination.totalPages - 2
-                      ) {
-                        pageNum =
-                          transactionsData.pagination.totalPages - 4 + i;
-                      } else {
-                        pageNum = page - 2 + i;
-                      }
-
-                      return (
-                        <button
-                          key={pageNum}
-                          onClick={() => handlePageChange(pageNum)}
-                          className={`w-8 h-8 text-sm rounded-lg transition-colors ${
-                            page === pageNum
-                              ? "bg-slate-900 text-[#0ED9D3] font-medium"
-                              : "text-[#0ED9D3] bg-slate-600 border border-gray-300 hover:bg-gray-50"
-                          }`}
-                          disabled={loadingHistory}
-                        >
-                          {pageNum}
-                        </button>
-                      );
-                    }
-                  )}
-
-                  {transactionsData.pagination.totalPages > 5 &&
-                    page < transactionsData.pagination.totalPages - 2 && (
-                      <span className="px-2 text-gray-500">...</span>
-                    )}
-                </div>
-
-                <button
-                  disabled={
-                    !transactionsData.pagination.hasNext || loadingHistory
-                  }
-                  onClick={() => handlePageChange(page + 1)}
-                  className="p-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
+          transactionsData.pagination.totalPages > 1 &&
+          transactionsData?.transactions?.length > 0 && (
+            <TransactionsPagination
+              page={page}
+              limit={limit}
+              loading={loadingHistory}
+              pagination={transactionsData.pagination}
+              onPageChange={handlePageChange}
+            />
           )}
       </main>
       <Footer />

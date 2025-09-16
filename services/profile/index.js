@@ -37,11 +37,35 @@ export const getCart = async (ids) => {
   return data;
 };
 
-export const fetchWalletBalanceAndHistory = async (limit = 5, page = 1) => {
+export const fetchWalletBalanceAndHistory = async (params = {}) => {
   try {
-    const { data } = await http.get(
-      `/wallet/balance-and-history?limit=${limit}&page=${page}`
-    );
+    const { limit, page, status, transactionType, fromDate, toDate } = params;
+
+    // Create URLSearchParams object for proper URL encoding
+    const searchParams = new URLSearchParams();
+
+    // Add parameters only if they exist and are valid
+    if (limit !== undefined && limit !== null)
+      searchParams.append("limit", limit.toString());
+    if (page !== undefined && page !== null)
+      searchParams.append("page", page.toString());
+
+    // Only add status if it exists and is not 'all'
+    if (status && status !== "all") searchParams.append("status", status);
+
+    if (transactionType)
+      searchParams.append("transactionType", transactionType);
+    if (fromDate) searchParams.append("fromDate", fromDate);
+    if (toDate) searchParams.append("toDate", toDate);
+
+    // Build the URL
+    const queryString = searchParams.toString();
+    const url = `/wallet/balance-and-history${
+      queryString ? `?${queryString}` : ""
+    }`;
+
+    console.log({ url });
+    const { data } = await http.get(url);
     return data;
   } catch (err) {
     console.error("Error fetching balance:", err);
