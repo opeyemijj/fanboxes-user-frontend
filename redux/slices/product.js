@@ -10,7 +10,7 @@ export const fetchProducts = createAsyncThunk(
   "product/fetchProducts",
   async (_, { rejectWithValue }) => {
     try {
-      console.log("fetching prods...");
+      // console.log("fetching prods...");
       const [allProducts, featuredProducts, bestSellingProducts] =
         await Promise.all([
           getAllProducts(),

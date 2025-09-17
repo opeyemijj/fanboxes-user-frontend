@@ -64,7 +64,7 @@ export const fetchWalletBalanceAndHistory = async (params = {}) => {
       queryString ? `?${queryString}` : ""
     }`;
 
-    console.log({ url });
+    // console.log({ url });
     const { data } = await http.get(url);
     return data;
   } catch (err) {

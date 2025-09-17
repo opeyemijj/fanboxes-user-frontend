@@ -1,12 +1,12 @@
 "use client";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { fetchWalletBalanceAndHistory } from "@/services/profile";
-import Footer from "@/components/_main/Footer";
-import Header from "@/components/_main/Header";
+import { useRouter } from "next/navigation";
 import TransactionDetailsModal from "@/components/_main/Transactions/TransactionDetailsModal";
 import SkeletonLoader from "@/components/_main/Transactions/TransactionPageSkeletonLoader";
 import TransactionsPagination from "@/components/_main/Transactions/TransactionsPagination";
 import TransactionsListSkeletonLoader from "@/components/_main/Transactions/TransactionListSkeleton";
+import { toastError } from "@/lib/toast";
 import {
   ArrowDown,
   ArrowUp,
@@ -18,7 +18,8 @@ import {
   ChevronDown,
 } from "lucide-react";
 
-const Transactions = () => {
+const TransactionsListing = () => {
+  const router = useRouter();
   const [transactionsData, setTransactionsData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -61,7 +62,17 @@ const Transactions = () => {
       setTransactionsData(data);
     } catch (err) {
       setError("Error fetching balance");
-      console.error("Error fetching balance:", err);
+      if (
+        err?.response &&
+        err.response.status === 401 &&
+        err.response.statusText === "Unauthorized"
+      ) {
+        toastError(
+          err.response?.data?.message ||
+            "Session Expired. Please login to continue"
+        );
+        router.replace("/login");
+      }
     } finally {
       setLoading(false);
       setLoadingHistory(false);
@@ -261,7 +272,7 @@ const Transactions = () => {
   if (error) {
     return (
       <div className="bg-gray-50 text-black min-h-screen flex flex-col">
-        <Header />
+        {/* <Header /> */}
         <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16 flex-grow">
           <div className="flex items-center justify-center h-96">
             <div className="bg-white rounded-xl shadow-sm p-6 max-w-md w-full">
@@ -299,20 +310,20 @@ const Transactions = () => {
             </div>
           </div>
         </main>
-        <Footer />
+        {/* <Footer /> */}
       </div>
     );
   }
 
   return (
     <div className="bg-gray-50 text-black min-h-screen flex flex-col">
-      <Header />
-      <main className="container mx-auto px-3 sm:px-6 lg:px-8 pt-20 pb-16 flex-grow">
+      {/* <Header /> */}
+      <main className="container mx-auto pt-0 pb-16 flex-grow">
         {/* Header Section */}
         <div className="mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+          {/* <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
             Transaction History
-          </h1>
+          </h1> */}
           <p className="text-sm sm:text-base text-gray-600">
             View and manage your account transactions
           </p>
@@ -685,7 +696,7 @@ const Transactions = () => {
             />
           )}
       </main>
-      <Footer />
+      {/* <Footer /> */}
 
       {showDetailsModal && selectedTransaction && (
         <TransactionDetailsModal
@@ -703,4 +714,4 @@ const Transactions = () => {
   );
 };
 
-export default Transactions;
+export default TransactionsListing;

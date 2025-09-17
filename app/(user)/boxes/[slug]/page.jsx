@@ -47,7 +47,7 @@ export default function BoxSpinPage({ params }) {
         setBox(null);
         setApiLoading(false);
       }
-      console.log(apiData, "Getting products from api", params);
+      // console.log(apiData, "Getting products from api", params);
     }
     callingProductApi();
   }, []);

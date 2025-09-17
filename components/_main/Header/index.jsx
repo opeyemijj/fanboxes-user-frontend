@@ -22,7 +22,7 @@ import { useSelector } from "react-redux";
 import HeaderWalletBalance from "./HeaderWalletBalance";
 
 function Header() {
-  console.log("header rendered...");
+  // console.log("header rendered...");
   const userData = useSelector((state) => state.user);
   const [showTopUpPopup, setShowTopUpPopup] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
@@ -45,11 +45,19 @@ function Header() {
   };
 
   const dropdownItems = [
-    { icon: User, label: "My Profile", href: "/profile" },
-    { icon: Package, label: "My Orders", href: "/orders" },
-    { icon: RotateCcw, label: "My Spins", href: "/spins" },
-    { icon: Receipt, label: "Transaction History", href: "/transactions" },
-    { icon: Settings, label: "Account Settings", href: "/settings" },
+    { icon: User, label: "My Profile", href: "/account?tab=profile" },
+    { icon: Package, label: "My Orders", href: "/account?tab=orders" },
+    { icon: RotateCcw, label: "My Spins", href: "/account?tab=spins" },
+    {
+      icon: Receipt,
+      label: "Transaction History",
+      href: "/account?tab=transactions",
+    },
+    {
+      icon: Settings,
+      label: "Account Settings",
+      href: "/account?tab=settings",
+    },
   ];
 
   // Close mobile menu when route changes
@@ -111,7 +119,7 @@ function Header() {
                     className="flex items-center border-gray-200 bg-transparent hover:bg-[#11F2EB] hover:text-white hover:border-[#11F2EB] transition-colors"
                   >
                     {/* <span className="font-semibold">x1,200</span> */}
-                    <HeaderWalletBalance />
+                    <HeaderWalletBalance handleLogout={handleLogout} />
                     <Hexagon className="h-4 w-4 text-gray-500" />
                   </Button>
                   <div className="relative">
@@ -220,7 +228,7 @@ function Header() {
                   className="mr-4 flex items-center border-gray-200 bg-transparent hover:bg-[#11F2EB] hover:text-white hover:border-[#11F2EB] transition-colors"
                 >
                   {/* <span className="font-semibold">x1,200</span> */}
-                  <HeaderWalletBalance />
+                  <HeaderWalletBalance handleLogout={handleLogout} />
                   <Hexagon className="h-4 w-4 text-gray-500" />
                 </Button>
               )}

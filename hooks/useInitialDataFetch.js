@@ -19,10 +19,10 @@ export const useInitialDataFetch = () => {
     hasFetched.current = true;
 
     const fetchInitialData = async () => {
-      console.log("Check how many time");
+      // console.log("Check how many time");
 
       try {
-        console.log("[v0] Fetching initial data...");
+        // console.log("[v0] Fetching initial data...");
 
         // const testResults = await testApiEndpoints();
         // if (testResults) {
@@ -35,7 +35,7 @@ export const useInitialDataFetch = () => {
           dispatch(fetchCategories()),
         ]);
 
-        console.log("[v0] Initial data fetch completed");
+        // console.log("[v0] Initial data fetch completed");
       } catch (error) {
         console.error("[v0] Error fetching initial data:", error);
       }

@@ -1,0 +1,60 @@
+"use client";
+import TransactionsListing from "@/components/_main/Transactions/TransactionsListing";
+import ModernTabs from "@/components/modern-tabs";
+import Footer from "@/components/_main/Footer";
+import Header from "@/components/_main/Header";
+
+const Account = () => {
+  const tabList = [
+    {
+      tabName: "Profile",
+      queryId: "profile",
+      activeUrlElement: "/profile",
+      component: null,
+    },
+    {
+      tabName: "Address Details",
+      queryId: "address",
+      activeUrlElement: "/address-details",
+      component: null,
+    },
+    {
+      tabName: "My Orders",
+      queryId: "orders",
+      activeUrlElement: "/orders",
+      component: null,
+    },
+    {
+      tabName: "Spin History",
+      queryId: "spins",
+      activeUrlElement: "/spins",
+      component: null,
+    },
+    {
+      tabName: "Transaction History",
+      queryId: "transactions",
+      activeUrlElement: "/transactions",
+      component: <TransactionsListing />,
+    },
+    {
+      tabName: "Account Settings",
+      queryId: "settings",
+      activeUrlElement: "/settings",
+      component: null,
+    },
+  ];
+
+  return (
+    <div>
+      <Header />
+      <div className="bg-gray-50 min-h-screen mt-10 py-10">
+        <div className="container mx-auto px-3 sm:px-6 lg:px-8 pt-6 pb-16">
+          <ModernTabs tabList={tabList} />
+        </div>
+      </div>
+      <Footer />
+    </div>
+  );
+};
+
+export default Account;

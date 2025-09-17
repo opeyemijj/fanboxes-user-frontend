@@ -70,7 +70,7 @@ function VerifySpinContent() {
         return;
       }
 
-      console.log("box data:", apiData.data);
+      // console.log("box data:", apiData.data);
       setBoxData(apiData.data);
     } catch (err) {
       setError(err.message);
@@ -94,7 +94,7 @@ function VerifySpinContent() {
         return;
       }
 
-      console.log("Spin result:", apiData.data);
+      // console.log("Spin result:", apiData.data);
       setSpinResult(apiData.data);
 
       // Also fetch box details for additional information

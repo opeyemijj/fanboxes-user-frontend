@@ -28,7 +28,7 @@ function getTokenFromRedux() {
 }
 
 const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.BASE_URL;
-console.log(baseURL);
+// console.log(baseURL);
 const http = axios.create({
   baseURL: baseURL + `/api`,
   timeout: 30000,

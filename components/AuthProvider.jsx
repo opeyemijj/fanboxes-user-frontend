@@ -19,7 +19,7 @@ export function AuthProvider({ children }) {
 
   async function signup(payload) {
     try {
-      console.log("signup called ffrom auth prov...");
+      // console.log("signup called ffrom auth prov...");
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
         {
@@ -38,8 +38,8 @@ export function AuthProvider({ children }) {
       }
 
       const data = await res.json();
-      console.log("dispatching...");
-      console.log("dataToDispatch", data);
+      // console.log("dispatching...");
+      // console.log("dataToDispatch", data);
       dispatch(setLogin({ token: data.token, ...data.user }));
       return { success: data?.success || false, message: data?.message || "" };
     } catch (error) {
@@ -49,7 +49,7 @@ export function AuthProvider({ children }) {
 
   async function login(email, password) {
     try {
-      console.log("login called ffrom auth prov...");
+      // console.log("login called ffrom auth prov...");
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
         method: "POST",
         headers: {
@@ -65,7 +65,7 @@ export function AuthProvider({ children }) {
       }
 
       const data = await res.json();
-      console.log("dispatching...");
+      // console.log("dispatching...");
       dispatch(setLogin({ token: data.token, ...data.user }));
       return { success: data?.success || false, message: data?.message || "" };
     } catch (error) {

@@ -60,7 +60,7 @@ export const updateCategoryByAdmin = async ({ currentSlug, ...payload }) => {
 };
 
 export const verifySpinByAdmin = async ({ ...payload }) => {
-  console.log(payload, "check the spin varify payload in api");
+  // console.log(payload, "check the spin varify payload in api");
   const { data } = await http.post(`/admin/spin-verify`, payload);
   return data;
 };
@@ -119,11 +119,6 @@ export const updateItemBoxByAdmin = async ({ currentSlug, ...payload }) => {
 };
 
 export const updateBoxItemOddByAdmin = async ({ currentSlug, ...payload }) => {
-  console.log(
-    currentSlug,
-    payload,
-    "Check the backend api is calling for update item odd"
-  );
   const { data: response } = await http.put(
     `/admin/boxItemOdd/${currentSlug}`,
     payload

@@ -37,21 +37,21 @@ export default function AmbassadorsPage() {
   } = useSelector((state) => state.shops);
 
   // Get products and categories loading states
-  const {
-    products,
-    loading: productsLoading,
-    error: productsError,
-  } = useSelector((state) => state.product);
+  // const {
+  //   products,
+  //   loading: productsLoading,
+  //   error: productsError,
+  // } = useSelector((state) => state.product);
 
-  const {
-    categories,
-    loading: categoriesLoading,
-    error: categoriesError,
-  } = useSelector((state) => state.categories);
+  // const {
+  //   categories,
+  //   loading: categoriesLoading,
+  //   error: categoriesError,
+  // } = useSelector((state) => state.categories);
 
-  useEffect(() => {
-    console.log("shps changed::", shops);
-  }, [shops]);
+  // useEffect(() => {
+  //   console.log("shps changed::", shops);
+  // }, [shops]);
 
   // Fetch data on component mount
   useEffect(() => {

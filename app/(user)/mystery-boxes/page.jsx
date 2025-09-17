@@ -58,7 +58,7 @@ export default function MysteryBoxesPage() {
   };
 
   async function fetchAdminProducts(page = 1, resetFilters = false) {
-    console.log("Starting fetchAdminProducts...");
+    // console.log("Starting fetchAdminProducts...");
     setIsLoading(true);
     setError(null);
 
@@ -78,10 +78,10 @@ export default function MysteryBoxesPage() {
         sortBy: actualSortBy,
       });
 
-      console.log("API Response:", response);
+      // console.log("API Response:", response);
 
       if (response?.success) {
-        console.log("Setting admin boxes:", response.data);
+        // console.log("Setting admin boxes:", response.data);
         setAdminBoxes(response.data || []);
         setTotalItems(response.total || 0);
 
@@ -122,7 +122,7 @@ export default function MysteryBoxesPage() {
       setError("Failed to load mystery boxes. Please reload the page.");
     }
 
-    console.log("Setting loading to false");
+    // console.log("Setting loading to false");
     setIsLoading(false);
   }
 

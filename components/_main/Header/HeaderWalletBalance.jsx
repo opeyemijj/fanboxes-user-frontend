@@ -1,10 +1,14 @@
+"use client";
 import { useState, useEffect } from "react";
 import { fetchWalletBalanceAndHistory } from "@/services/profile";
+import { useRouter } from "next/navigation";
+import { toastError, toastWarning } from "@/lib/toast";
 
-const HeaderWalletBalance = () => {
+const HeaderWalletBalance = ({ handleLogout }) => {
   const [balanceData, setBalanceData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchBalance = async () => {
@@ -21,9 +25,16 @@ const HeaderWalletBalance = () => {
 
         setBalanceData(data);
       } catch (err) {
-        // setError(err.message);
-        setError("Error fetching balance");
-        console.error("Error fetching balance:", err);
+        // setError("Error fetching balance");
+        console.error("Error fetching balance:", err.response);
+        if (
+          err?.response &&
+          err.response.status === 401 &&
+          err.response.statusText === "Unauthorized"
+        ) {
+          toastWarning("Session Expired, please login");
+          handleLogout();
+        }
       } finally {
         setLoading(false);
       }
@@ -42,14 +53,14 @@ const HeaderWalletBalance = () => {
 
   if (error) {
     return (
-      <div className="p-4 text-red-500">
-        <span className="font-semibold">Error: {error}</span>
+      <div className="pr-1 text-red-500">
+        <span className="font-medium">{error}</span>
       </div>
     );
   }
 
   return (
-    <div className="px-2">
+    <div className="pr-1">
       <span className="font-semibold">
         {balanceData.balance.availableBalance.toLocaleString()}
       </span>

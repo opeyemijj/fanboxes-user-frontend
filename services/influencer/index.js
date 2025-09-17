@@ -33,7 +33,7 @@ export const createInfluencerProduct = async (payload) => {
   return response;
 };
 export const createInfluencerBoxItem = async (payload) => {
-  console.log(payload, "OKK SEE");
+  // console.log(payload, "OKK SEE");
   const { data: response } = await http.post(`/vendor/boxItem`, payload);
   return response;
 };

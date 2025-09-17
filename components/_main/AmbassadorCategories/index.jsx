@@ -12,7 +12,7 @@ export default function AmbassadorCategories({
 
   const categoriesToUse = [allCategory, ...categories];
 
-  console.log("categoriesToUse", categoriesToUse);
+  // console.log("categoriesToUse", categoriesToUse);
 
   return (
     <section className="my-2">

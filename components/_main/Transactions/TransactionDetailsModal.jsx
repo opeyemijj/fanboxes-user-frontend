@@ -156,8 +156,6 @@ export default function TransactionDetailsModal({
 }) {
   if (!isOpen || !transaction) return null;
 
-  console.log("MMM::", transaction);
-
   const winningItem = transaction.metadata?.spinResult?.winningItem;
   const boxDetails = transaction.metadata?.boxDetails;
   const initiatedBy = transaction.metadata?.initiatedBy;

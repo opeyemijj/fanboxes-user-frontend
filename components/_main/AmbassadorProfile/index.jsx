@@ -3,6 +3,12 @@ import { Button } from "@/components/Button";
 import { Bell, Instagram, Music } from "lucide-react";
 
 export default function AmbassadorProfile({ ambassador }) {
+  const handleSocialClick = (link) => {
+    if (link) {
+      window.open(link, "_blank", "noopener,noreferrer");
+    }
+  };
+
   return (
     <div className="bg-white rounded-lg p-6 mb-8 shadow-sm">
       <div className="md:flex items-start space-x-6">
@@ -26,24 +32,36 @@ export default function AmbassadorProfile({ ambassador }) {
               <Bell className="h-4 w-4 mr-2" />
               GET UPDATES
             </Button>
+
+            {/* Instagram Button */}
             <Button
               variant="outline"
               size="icon"
               className="rounded-full bg-transparent"
+              onClick={() => handleSocialClick(ambassador?.instagramLink)}
+              disabled={!ambassador?.instagramLink}
             >
               <Instagram className="h-4 w-4" />
             </Button>
+
+            {/* TikTok Button */}
             <Button
               variant="outline"
               size="icon"
               className="rounded-full bg-transparent"
+              onClick={() => handleSocialClick(ambassador?.tiktokLink)}
+              disabled={!ambassador?.tiktokLink}
             >
               <Music className="h-4 w-4" />
             </Button>
+
+            {/* Facebook Button */}
             <Button
               variant="outline"
               size="icon"
               className="rounded-full bg-transparent"
+              onClick={() => handleSocialClick(ambassador?.facebookLink)}
+              disabled={!ambassador?.facebookLink}
             >
               <span className="text-sm font-bold">f</span>
             </Button>

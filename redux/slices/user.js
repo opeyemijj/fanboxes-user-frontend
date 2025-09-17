@@ -18,10 +18,10 @@ const slice = createSlice({
 
   reducers: {
     setLogin(state, action) {
-      console.log("Login action payload:", action.payload);
+      // console.log("Login action payload:", action.payload);
       state.user = action.payload;
       state.isAuthenticated = true;
-      console.log("set user data::", state.user);
+      // console.log("set user data::", state.user);
     },
     setLogout(state) {
       state.user = null;

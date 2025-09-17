@@ -4,7 +4,7 @@ import { Button } from "@/components/Button";
 
 export default function AmbassadorCard({ ambassador, isNew }) {
   if (!ambassador) {
-    console.log("[v0] Ambassador card received no data");
+    // console.log("[v0] Ambassador card received no data");
     return null;
   }
 

@@ -2,7 +2,7 @@ import BoxCard from "@/components/_main/BoxCard";
 import { ambassadorBoxesData } from "@/lib/ambassadors-data";
 
 export default function AmbassadorBoxes({ ambassador, boxes }) {
-  console.log(boxes, "What kind's of box are coming here?");
+  // console.log(boxes, "What kind's of box are coming here?");
   const ambassadorBoxes =
     boxes ||
     ambassadorBoxesData.filter((box) => box.ambassadorId === ambassador.id);
