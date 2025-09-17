@@ -1,5 +1,5 @@
 // "use client";
-// import { useState, useEffect, useCallback } from "react";
+// import { useState, useEffect, useCallback, useRef } from "react";
 // import { useRouter, useSearchParams, usePathname } from "next/navigation";
 // import {
 //   FileText,
@@ -18,6 +18,10 @@
 //   const searchParams = useSearchParams();
 //   const [activeTab, setActiveTab] = useState("");
 
+//   // Ref for the tab container and individual tab buttons
+//   const tabContainerRef = useRef(null);
+//   const tabRefs = useRef({});
+
 //   // Get the first tab's identifier as default
 //   const defaultTab = tabList[0]?.queryId || "";
 
@@ -34,6 +38,42 @@
 //     return iconMap[tabName] || <FileText className="w-4 h-4" />;
 //   }, []);
 
+//   // Function to scroll active tab into view
+//   const scrollActiveTabIntoView = useCallback((tabQueryId) => {
+//     const activeTabElement = tabRefs.current[tabQueryId];
+//     const container = tabContainerRef.current;
+
+//     if (activeTabElement && container) {
+//       // Use a small delay to ensure the DOM has updated
+//       setTimeout(() => {
+//         const containerRect = container.getBoundingClientRect();
+//         const tabRect = activeTabElement.getBoundingClientRect();
+
+//         // Calculate if the tab is outside the visible area
+//         const isTabVisible =
+//           tabRect.left >= containerRect.left &&
+//           tabRect.right <= containerRect.right;
+
+//         if (!isTabVisible) {
+//           // Calculate scroll position to center the active tab
+//           const containerScrollLeft = container.scrollLeft;
+//           const tabOffsetLeft = activeTabElement.offsetLeft;
+//           const tabWidth = activeTabElement.offsetWidth;
+//           const containerWidth = container.offsetWidth;
+
+//           // Center the tab in the container
+//           const targetScrollLeft =
+//             tabOffsetLeft - containerWidth / 2 + tabWidth / 2;
+
+//           container.scrollTo({
+//             left: Math.max(0, targetScrollLeft),
+//             behavior: "smooth",
+//           });
+//         }
+//       }, 50);
+//     }
+//   }, []);
+
 //   // Determine active tab based on query parameter
 //   useEffect(() => {
 //     const tabQueryParam = searchParams.get("tab");
@@ -41,6 +81,8 @@
 
 //     if (isValidTab) {
 //       setActiveTab(tabQueryParam);
+//       // Scroll the active tab into view
+//       scrollActiveTabIntoView(tabQueryParam);
 //     } else {
 //       // Set default tab and update URL if no valid tab is found
 //       setActiveTab(defaultTab);
@@ -51,8 +93,18 @@
 //         params.set("tab", defaultTab);
 //         router.replace(`${pathname}?${params.toString()}`, { scroll: false });
 //       }
+
+//       // Scroll the default tab into view
+//       scrollActiveTabIntoView(defaultTab);
 //     }
-//   }, [searchParams, tabList, defaultTab, pathname, router]);
+//   }, [
+//     searchParams,
+//     tabList,
+//     defaultTab,
+//     pathname,
+//     router,
+//     scrollActiveTabIntoView,
+//   ]);
 
 //   // Handle tab click - Update query string
 //   const handleTabClick = useCallback(
@@ -63,8 +115,11 @@
 //       // Use replace instead of push to avoid adding to browser history
 //       router.replace(`${pathname}?${params.toString()}`, { scroll: false });
 //       setActiveTab(tab.queryId);
+
+//       // Scroll the clicked tab into view
+//       scrollActiveTabIntoView(tab.queryId);
 //     },
-//     [searchParams, pathname, router]
+//     [searchParams, pathname, router, scrollActiveTabIntoView]
 //   );
 
 //   // Get active tab component
@@ -104,12 +159,18 @@
 //       <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-6 overflow-hidden">
 //         <div className="relative">
 //           {/* Tab List */}
-//           <div className="flex overflow-x-auto scrollbar-hide">
+//           <div
+//             ref={tabContainerRef}
+//             className="flex overflow-x-auto scrollbar-hide"
+//           >
 //             {tabList.map((tab, index) => {
 //               const isActive = activeTab === tab.queryId;
 //               return (
 //                 <button
 //                   key={index}
+//                   ref={(el) => {
+//                     tabRefs.current[tab.queryId] = el;
+//                   }}
 //                   onClick={() => handleTabClick(tab)}
 //                   className={`
 //                     relative flex items-center space-x-2 px-4 sm:px-6 py-4 text-sm font-medium whitespace-nowrap
@@ -163,7 +224,7 @@
 // export default ModernTabs;
 
 "use client";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import {
   FileText,
@@ -176,7 +237,26 @@ import {
 } from "lucide-react";
 import UserProfileHeader from "@/components/_main/Account/UserProfileHeader";
 
-const ModernTabs = ({ tabList }) => {
+// Loading component for the suspense fallback
+const TabsLoading = () => (
+  <div className="w-full">
+    <UserProfileHeader />
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-6 overflow-hidden">
+      <div className="flex space-x-1 p-1">
+        {[1, 2, 3, 4].map((i) => (
+          <div
+            key={i}
+            className="h-12 bg-gray-200 rounded animate-pulse flex-1"
+          />
+        ))}
+      </div>
+    </div>
+    <div className="h-96 bg-gray-100 rounded-xl animate-pulse" />
+  </div>
+);
+
+// The actual tabs component (unchanged logic)
+const ModernTabsContent = ({ tabList }) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -320,7 +400,7 @@ const ModernTabs = ({ tabList }) => {
       <UserProfileHeader />
 
       {/* Tab Navigation */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-6 overflow-hidden">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-6 overflow-hidden px-3">
         <div className="relative">
           {/* Tab List */}
           <div
@@ -382,6 +462,15 @@ const ModernTabs = ({ tabList }) => {
         )}
       </div>
     </div>
+  );
+};
+
+// Main component with Suspense wrapper
+const ModernTabs = ({ tabList }) => {
+  return (
+    <Suspense fallback={<TabsLoading />}>
+      <ModernTabsContent tabList={tabList} />
+    </Suspense>
   );
 };
 
