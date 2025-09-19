@@ -498,8 +498,9 @@ const SpinListing = () => {
       setError("Error fetching spin history");
       if (
         err?.response &&
-        err.response.status === 401 &&
-        err.response.statusText === "Unauthorized"
+        err.response.status === 401
+        //  &&
+        // err.response.statusText === "Unauthorized"
       ) {
         toastError(
           err.response?.data?.message ||

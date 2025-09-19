@@ -64,8 +64,9 @@ const TransactionsListing = () => {
       setError("Error fetching balance");
       if (
         err?.response &&
-        err.response.status === 401 &&
-        err.response.statusText === "Unauthorized"
+        err.response.status === 401
+        // &&
+        // err.response.statusText === "Unauthorized"
       ) {
         toastError(
           err.response?.data?.message ||
