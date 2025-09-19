@@ -3,17 +3,19 @@ import { useState, useEffect } from "react";
 import { fetchWalletBalanceAndHistory } from "@/services/profile";
 import { useRouter } from "next/navigation";
 import { toastError, toastWarning } from "@/lib/toast";
+import { useSelector, useDispatch } from "react-redux";
+import { updateUserAvailableBalance } from "@/redux/slices/user";
 
-const HeaderWalletBalance = ({ handleLogout }) => {
-  const [balanceData, setBalanceData] = useState(null);
-  const [loading, setLoading] = useState(true);
+const HeaderWalletBalance = ({ handleLogout, availableBalance }) => {
+  const [balanceData, setBalanceData] = useState(availableBalance || null);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const router = useRouter();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchBalance = async () => {
       try {
-        setLoading(true);
         const response = await fetchWalletBalanceAndHistory();
         // console.log("Wallet balance response:", response);
 
@@ -22,8 +24,9 @@ const HeaderWalletBalance = ({ handleLogout }) => {
         }
 
         const data = await response.data;
+        dispatch(updateUserAvailableBalance(data?.balance?.availableBalance));
 
-        setBalanceData(data);
+        // setBalanceData(data);
       } catch (err) {
         // setError("Error fetching balance");
         console.error("Error fetching balance:", err.response);
@@ -32,11 +35,9 @@ const HeaderWalletBalance = ({ handleLogout }) => {
           err.response.status === 401 &&
           err.response.statusText === "Unauthorized"
         ) {
-          toastWarning("Session Expired, please login");
+          // toastWarning("Session Expired, please login");
           handleLogout();
         }
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -51,18 +52,18 @@ const HeaderWalletBalance = ({ handleLogout }) => {
     );
   }
 
-  if (error) {
-    return (
-      <div className="pr-1 text-red-500">
-        <span className="font-medium">{error}</span>
-      </div>
-    );
-  }
+  // if (error) {
+  //   return (
+  //     <div className="pr-1 text-red-500">
+  //       <span className="font-medium">{error}</span>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="pr-1">
       <span className="font-semibold">
-        {balanceData?.balance?.availableBalance?.toLocaleString()}
+        {availableBalance ? availableBalance?.toLocaleString() : ""}
       </span>
     </div>
   );

@@ -5,6 +5,10 @@ import { useSelector } from "react-redux";
 import { usePathname, useRouter } from "next/navigation";
 import { initializeSpin } from "../services/boxes/spin-game/index";
 import { toastError } from "@/lib/toast";
+import {
+  getCashToCreditConversionRate,
+  getResellPercentage,
+} from "@/services/boxes";
 
 const GameContext = createContext();
 
@@ -32,6 +36,8 @@ export const GameProvider = ({ children, box }) => {
   const [insufficientBalError, setInSufficientBalError] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [isEditingBox, setIsEditingBox] = useState(false);
+  const [resellRule, setResellRule] = useState(null);
+  const [cashToCreditConvRate, setCashTocreditConvRate] = useState(null);
 
   // Make box config dynamic and editable
   const [currentBoxConfig, setCurrentBoxConfig] = useState(box);
@@ -41,6 +47,8 @@ export const GameProvider = ({ children, box }) => {
 
   useEffect(() => {
     setMounted(true);
+    fetchCashToCreditConversionRate();
+    fetchCurrentResellPercentage();
     generateAndSetClientSeed();
   }, []);
 
@@ -48,6 +56,30 @@ export const GameProvider = ({ children, box }) => {
     setCurrentBoxConfig(box);
     setEditableBoxConfig(JSON.stringify(box, null, 2));
   }, [box]);
+
+  async function fetchCashToCreditConversionRate() {
+    try {
+      const res = await getCashToCreditConversionRate();
+      if (res?.success) {
+        const { _id, value, valueType, slug } = res.data;
+        setCashTocreditConvRate({ _id, value, valueType, slug });
+      }
+    } catch (error) {
+      console.error("err fetching resell perc:", error);
+    }
+  }
+
+  async function fetchCurrentResellPercentage() {
+    try {
+      const res = await getResellPercentage();
+      if (res?.success) {
+        const { _id, value, valueType, slug } = res.data;
+        setResellRule({ _id, value, valueType, slug });
+      }
+    } catch (error) {
+      console.error("err fetching resell perc:", error);
+    }
+  }
 
   function generateAndSetClientSeed() {
     const initialClientSeed = Math.random().toString(36).substring(2, 15);
@@ -143,6 +175,8 @@ export const GameProvider = ({ children, box }) => {
     currentBoxConfig,
     editableBoxConfig,
     insufficientBalError,
+    resellRule,
+    cashToCreditConvRate,
 
     // Setters
     setGameState,

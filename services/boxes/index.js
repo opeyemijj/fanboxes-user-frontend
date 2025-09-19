@@ -124,3 +124,30 @@ export const getAdminOwnedProducts = async (params = {}) => {
   const { data } = await http.get(`/products?${queryString}&isActive=true`);
   return data;
 };
+
+export const getResellPercentage = async () => {
+  const { data } = await http
+    .get(`/user/credits/get-resell-percentage`)
+    .catch((e) => {
+      throw e;
+    });
+  return data;
+};
+
+export const getCashToCreditConversionRate = async () => {
+  const { data } = await http
+    .get(`/user/credits/cash-to-credit-rate`)
+    .catch((e) => {
+      throw e;
+    });
+  return data;
+};
+
+export const resellSpinForCredits = async (payload) => {
+  const { data } = await http
+    .post(`/wallet/resell-spin-for-credits`, payload)
+    .catch((e) => {
+      throw e;
+    });
+  return data;
+};

@@ -22,6 +22,8 @@ export default function FanboxGame({ boxConfig: initialBoxConfig }) {
     currentBoxConfig,
     editableBoxConfig,
     insufficientBalError,
+    resellRule,
+    cashToCreditConvRate,
 
     // Setters
     setGameState,
@@ -139,6 +141,8 @@ export default function FanboxGame({ boxConfig: initialBoxConfig }) {
           setCreateSpinApiError={setCreateSpinApiError}
           generateAndSetClientSeed={generateAndSetClientSeed}
           clientSeed={clientSeed}
+          resellRule={resellRule}
+          cashToCreditConvRate={cashToCreditConvRate}
         />
       </div>
 

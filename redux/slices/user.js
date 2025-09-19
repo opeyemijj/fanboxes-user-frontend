@@ -43,6 +43,9 @@ const slice = createSlice({
     updateShippingAddress(state, action) {
       state.user.shippingAddress = action.payload;
     },
+    updateUserAvailableBalance(state, action) {
+      state.user.availableBalance = action.payload;
+    },
     updateUserRole(state) {
       state.user.role = "vendor";
     },
@@ -74,6 +77,7 @@ export const {
   updateUserRole,
   updateFollowShop,
   updateShippingAddress,
+  updateUserAvailableBalance,
 } = slice.actions;
 
 // ----------------------------------------------------------------------

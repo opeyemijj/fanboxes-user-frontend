@@ -8,6 +8,8 @@ import {
   User,
   CheckCircle,
   ExternalLink,
+  Coins,
+  Zap,
 } from "lucide-react";
 
 export default function TransactionDetailsModal({
@@ -25,6 +27,9 @@ export default function TransactionDetailsModal({
   const winningItem = transaction.metadata?.spinResult?.winningItem;
   const boxDetails = transaction.metadata?.boxDetails;
   const initiatedBy = transaction.metadata?.initiatedBy;
+  const isSpinResell = transaction.category === "spin resell";
+  const isSpinDebit =
+    transaction.category === "spend" && transaction.metadata?.spinTransaction;
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[9999]">
@@ -52,7 +57,7 @@ export default function TransactionDetailsModal({
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto">
           <div className="p-6 space-y-6">
-            {/* Main Transaction Summary - Updated with dark blue gradient */}
+            {/* Main Transaction Summary */}
             <div className="relative bg-gradient-to-br from-[#13192c] via-[#0C2539] to-[#13192c] rounded-2xl p-6 shadow-xl overflow-hidden">
               {/* Pattern overlay */}
               <div className="absolute inset-0 opacity-15">
@@ -68,9 +73,13 @@ export default function TransactionDetailsModal({
               {/* Content */}
               <div className="relative text-center">
                 <div className="p-4 bg-white/10 backdrop-blur-sm rounded-full shadow-lg inline-flex mb-4 ring-2 ring-[#11F2EB]/30">
-                  {getTransactionIcon(
-                    transaction.transactionType,
-                    transaction.category
+                  {isSpinResell ? (
+                    <Coins className="w-6 h-6 text-amber-300" />
+                  ) : (
+                    getTransactionIcon(
+                      transaction.transactionType,
+                      transaction.category
+                    )
                   )}
                 </div>
                 <div
@@ -97,13 +106,55 @@ export default function TransactionDetailsModal({
               </div>
             </div>
 
-            {/* Winning Item Card - Compact */}
+            {/* Resell Details Card - For spin resell transactions */}
+            {isSpinResell && (
+              <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg p-4 border border-amber-100">
+                <div className="flex items-center gap-2 mb-3">
+                  <Coins className="w-4 h-4 text-amber-600" />
+                  <h3 className="text-sm font-semibold text-gray-900">
+                    Token Resell Details
+                  </h3>
+                </div>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="text-gray-600">Original Value:</span>
+                    <p className="font-medium text-gray-900">
+                      ${transaction.metadata?.originalItemValue}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Resell Rate:</span>
+                    <p className="font-medium text-amber-600">
+                      {transaction.metadata?.resellRule?.valueType ===
+                      "percentage"
+                        ? `${transaction.metadata.resellRule.value}%`
+                        : `$${transaction.metadata.resellRule?.value}`}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Conversion Rate:</span>
+                    <p className="font-medium text-gray-900">
+                      1 Credit = ${transaction.metadata?.conversionRate || 1}{" "}
+                      USD
+                    </p>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Final Amount:</span>
+                    <p className="font-medium text-emerald-600">
+                      ${transaction.metadata?.calculatedAmount}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Winning Item Card */}
             {winningItem && (
               <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg p-3 border border-amber-100">
                 <div className="flex items-center gap-2 mb-2">
                   <Trophy className="w-4 h-4 text-amber-600" />
                   <h3 className="text-sm font-semibold text-gray-900">
-                    Winning Item
+                    {isSpinResell ? "Resold Item" : "Winning Item"}
                   </h3>
                 </div>
                 <div className="flex gap-3">
@@ -131,7 +182,7 @@ export default function TransactionDetailsModal({
               </div>
             )}
 
-            {/* Box Details Card - Compact */}
+            {/* Box Details Card */}
             {boxDetails && (
               <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-3 border border-blue-100">
                 <div className="flex items-center gap-2 mb-2">
@@ -165,7 +216,7 @@ export default function TransactionDetailsModal({
               </div>
             )}
 
-            {/* Transaction Information Grid - Equal Heights */}
+            {/* Transaction Information Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Basic Details */}
               <div className="space-y-2">
@@ -258,7 +309,7 @@ export default function TransactionDetailsModal({
               </div>
             </div>
 
-            {/* Verification Details - Simplified with link */}
+            {/* Verification Details */}
             {transaction.metadata?.spinResult?.verification && (
               <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-4 border border-purple-100">
                 <div className="flex items-center justify-between mb-3">
@@ -299,9 +350,10 @@ export default function TransactionDetailsModal({
                   <div>
                     <span className="text-gray-600">Result:</span>
                     <p className="font-mono text-xs bg-white p-2 rounded mt-1">
-                      {transaction.metadata.spinResult.verification.normalized.toFixed(
-                        6
-                      )}
+                      {parseFloat(
+                        transaction.metadata.spinResult?.verification
+                          ?.normalized
+                      )?.toFixed(6)}
                     </p>
                   </div>
                 </div>

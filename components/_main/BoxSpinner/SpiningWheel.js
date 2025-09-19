@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/Button";
+import { useDispatch } from "react-redux";
 import {
   Hexagon,
   Target,
@@ -16,6 +17,9 @@ import {
   Loader,
   X,
   RefreshCw,
+  Crown,
+  Coins,
+  Zap,
 } from "lucide-react";
 import {
   Dialog,
@@ -25,6 +29,134 @@ import {
   DialogDescription,
 } from "./GameDialogues";
 import ClientSeedModal from "./ClientSeedModal";
+import { resellSpinForCredits } from "@/services/boxes";
+import { toastError, toastSuccess } from "@/lib/toast";
+import { updateUserAvailableBalance } from "@/redux/slices/user";
+
+/* -------------  GoldenRibbon  ------------- */
+const GoldenRibbon = ({ delay = 0, duration = 4, uniqueKey }) => {
+  /* random starting position inside the central 50 % of the container */
+  const startLeft = 25 + Math.random() * 50; // 25 % – 75 %
+
+  const ribbonVariants = {
+    initial: {
+      y: -80, // slightly above viewport
+      x: 0,
+      left: `${startLeft}%`,
+      rotate: Math.random() * 360,
+      opacity: 0, // Start fully transparent
+    },
+    animate: {
+      y: 600, // fall through the whole card
+      x: (Math.random() - 0.5) * 120, // small drift
+      rotate: Math.random() * 720 + 360,
+      opacity: [0, 1, 1, 0.8, 0], // Smooth fade in, stay visible, then gradual fade out
+      transition: {
+        duration,
+        delay,
+        ease: [0.25, 0.1, 0.25, 1], // Smooth ease-in-out
+        opacity: {
+          duration,
+          times: [0, 0.1, 0.7, 0.9, 1], // Gradual fade in/out
+          ease: "easeInOut",
+        },
+      },
+    },
+  };
+
+  const ribbonStyle = {
+    position: "absolute",
+    width: Math.random() * 6 + 3, // 5-11px width
+    height: Math.random() * 14 + 10,
+    background: `linear-gradient(45deg,#FFD700,#FFA500,#FFFF00,#FFD700,#DAA520)`,
+    borderRadius: "2px",
+    boxShadow: "0 0 4px rgba(255,215,0,0.7)",
+  };
+
+  return (
+    <motion.div
+      key={uniqueKey}
+      className="pointer-events-none"
+      style={ribbonStyle}
+      variants={ribbonVariants}
+      initial="initial"
+      animate="animate"
+      exit={{ opacity: 0 }} // Smooth exit animation
+    />
+  );
+};
+
+/* -------------  GoldenConfetti  ------------- */
+const GoldenConfetti = ({ isActive }) => {
+  const [ribbons, setRibbons] = useState([]);
+  const [isStopping, setIsStopping] = useState(false);
+
+  useEffect(() => {
+    if (!isActive) {
+      setIsStopping(true);
+      // Let existing ribbons finish their animation naturally
+      const timer = setTimeout(() => {
+        setRibbons([]);
+        setIsStopping(false);
+      }, 5000); // Wait for all ribbons to finish animating
+      return () => clearTimeout(timer);
+    }
+
+    setIsStopping(false);
+
+    const createRibbons = () => {
+      const newRibbons = [];
+      for (let i = 0; i < 20; i++) {
+        newRibbons.push({
+          id: `ribbon-${Date.now()}-${i}-${Math.random()
+            .toString(36)
+            .substr(2, 9)}`,
+          delay: Math.random() * 2,
+          duration: Math.random() * 1 + 3.5,
+        });
+      }
+      setRibbons(newRibbons);
+    };
+
+    createRibbons();
+
+    const interval = setInterval(() => {
+      if (!isActive || isStopping) return;
+
+      const additional = Array.from({ length: 10 }, (_, i) => ({
+        id: `ribbon-${Date.now()}-${i}-${Math.random()
+          .toString(36)
+          .substr(2, 9)}`,
+        delay: Math.random() * 1.2,
+        duration: Math.random() * 1 + 3.5,
+      }));
+      setRibbons((prev) => {
+        // Keep only the most recent ribbons to prevent memory issues
+        const recentRibbons = prev.slice(-30);
+        return [...recentRibbons, ...additional];
+      });
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [isActive, isStopping]);
+
+  if (!isActive && ribbons.length === 0) return null;
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none z-10">
+      <AnimatePresence>
+        {ribbons.map((r) => (
+          <GoldenRibbon
+            key={r.id}
+            uniqueKey={r.id}
+            delay={r.delay}
+            duration={r.duration}
+          />
+        ))}
+      </AnimatePresence>
+    </div>
+  );
+};
 
 export default function SpinningWheel({
   items,
@@ -38,6 +170,8 @@ export default function SpinningWheel({
   setCreateSpinApiError,
   generateAndSetClientSeed,
   clientSeed,
+  resellRule,
+  cashToCreditConvRate,
 }) {
   const [showModal, setShowModal] = useState(false);
   const [showSeedModal, setShowSeedModal] = useState(false);
@@ -50,6 +184,7 @@ export default function SpinningWheel({
   const [itemSize, setItemSize] = useState(160);
   const [showWinningItem, setShowWinningItem] = useState(false);
   const [currentSpeed, setCurrentSpeed] = useState(0);
+  const [showConfetti, setShowConfetti] = useState(false);
   const spinnerRef = useRef(null);
   const winnerIndexRef = useRef(0);
   const animationRef = useRef(null);
@@ -57,6 +192,9 @@ export default function SpinningWheel({
   const startRotationRef = useRef(0);
   const targetRotationRef = useRef(0);
   const [spinRecordId, setSpinRecordId] = useState(null);
+  const [showResellModal, setShowResellModal] = useState(false);
+  const [resellLoading, setResellLoading] = useState(false);
+  const dispatch = useDispatch();
 
   // Extract seed data from spinResultData
   // const clientSeed = spinResultData?.clientSeed || "";
@@ -65,10 +203,6 @@ export default function SpinningWheel({
   const nonce = spinResultData?.nonce || 0;
   const createdAt = spinResultData?.createdAt || "";
   const hash = spinResultData?.hash || "";
-
-  useEffect(() => {
-    console.log("sp-sw", { isSpinning, isWaitingForResult });
-  }, [isSpinning, isWaitingForResult]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -88,6 +222,17 @@ export default function SpinningWheel({
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  // Auto-stop confetti after 5 seconds
+  useEffect(() => {
+    if (showConfetti) {
+      const timer = setTimeout(() => {
+        setShowConfetti(false);
+      }, 5000); // Stop after 5 seconds
+
+      return () => clearTimeout(timer);
+    }
+  }, [showConfetti]);
 
   const numItems = items.length;
   const angleStep = 360 / numItems;
@@ -173,12 +318,12 @@ export default function SpinningWheel({
     console.log("🔍 WINNER POSITION VERIFICATION:");
     console.log(`   📐 Winner base angle: ${winnerBaseAngle.toFixed(6)}°`);
     console.log(`   🔄 Current rotation: ${currentRotation.toFixed(6)}°`);
-    console.log(`   📍 Winner position: ${normalizedPosition.toFixed(6)}°`);
+    // console.log(`   📍 Winner position: ${normalizedPosition.toFixed(6)}°`);
     console.log(`   🎯 Target (winning spot): ${WINNING_SPOT_ANGLE}°`);
     console.log(
       `   📏 Distance from target: ${distanceFromWinningSpot.toFixed(6)}°`
     );
-    console.log(`   ✅ At winning spot: ${distanceFromWinningSpot < 1}`);
+    // console.log(`   ✅ At winning spot: ${distanceFromWinningSpot < 1}`);
 
     return distanceFromWinningSpot < 1; // Allow 1 degree tolerance
   };
@@ -233,11 +378,12 @@ export default function SpinningWheel({
           onSpinComplete();
           setTimeout(() => {
             setShowModal(true);
+            setShowConfetti(true); // Start confetti when modal opens
           }, 500);
         }, 300);
       } else {
-        console.error("❌ ERROR: Winner is not at the winning spot!");
-        console.log("🔧 Attempting to force correct position...");
+        // console.error("❌ ERROR: Winner is not at the winning spot!");
+        // console.log("🔧 Attempting to force correct position...");
 
         // Force the exact position as a fallback
         const winnerBaseAngle = winnerIndexRef.current * angleStep;
@@ -258,6 +404,7 @@ export default function SpinningWheel({
             onSpinComplete();
             setTimeout(() => {
               setShowModal(true);
+              setShowConfetti(true); // Start confetti when modal opens
             }, 500);
           }, 300);
         }
@@ -276,7 +423,7 @@ export default function SpinningWheel({
     // if (result && result._id) {
     //   setSpinRecordId(result._id);
     // }
-    // setSpinResultData(result);
+    setSpinResultData(result);
   };
 
   const handleContinueToSpin = () => {
@@ -337,6 +484,7 @@ export default function SpinningWheel({
 
   // Handle modal close with page refresh
   const handleModalClose = () => {
+    setShowConfetti(false); // Stop confetti when modal closes
     setShowModal(false);
     // Refresh the page after modal closes
     setTimeout(() => {
@@ -347,11 +495,11 @@ export default function SpinningWheel({
   useEffect(() => {
     if (isSpinning && winningItem) {
       console.log("🎡 STARTING PRECISE SPIN CALCULATION");
-      console.log("🔐 Backend determined winner:", {
-        id: winningItem.id,
-        name: winningItem.name,
-        value: winningItem.value,
-      });
+      // console.log("🔐 Backend determined winner:", {
+      //   id: winningItem.id,
+      //   name: winningItem.name,
+      //   value: winningItem.value,
+      // });
 
       winnerIndexRef.current = items.findIndex(
         (item) => item._id === winningItem._id
@@ -367,8 +515,8 @@ export default function SpinningWheel({
       console.log("📊 WHEEL SETUP:");
       console.log(`   🎲 Total items: ${items.length}`);
       console.log(`   📏 Angle per item: ${angleStep.toFixed(6)}°`);
-      console.log(`   🎯 Winning spot: ${WINNING_SPOT_ANGLE}° (center front)`);
-      console.log(`   🏆 Winner index: ${winnerIndexRef.current}`);
+      // console.log(`   🎯 Winning spot: ${WINNING_SPOT_ANGLE}° (center front)`);
+      // console.log(`   🏆 Winner index: ${winnerIndexRef.current}`);
 
       // Calculate exact rotation needed
       const targetRotation = calculateWinningRotation(
@@ -385,9 +533,9 @@ export default function SpinningWheel({
       console.log(
         `   📊 From: ${rotation.toFixed(6)}° to ${targetRotation.toFixed(6)}°`
       );
-      console.log(
-        `   🎯 Winner will land at: ${WINNING_SPOT_ANGLE}° (absolute center front)`
-      );
+      // console.log(
+      //   `   🎯 Winner will land at: ${WINNING_SPOT_ANGLE}° (absolute center front)`
+      // );
 
       // Start animation
       if (animationRef.current) {
@@ -449,6 +597,60 @@ export default function SpinningWheel({
       normalizedAngle,
     };
   };
+
+  // Helper function to calculate resell amount
+  const calculateResellAmount = (originalValue, resellRule) => {
+    if (!resellRule) return originalValue * 0.8; // Fallback to 80%
+
+    if (resellRule.valueType === "percentage") {
+      return originalValue * (resellRule.value / 100);
+    } else {
+      return resellRule.value || 0;
+    }
+  };
+
+  // Helper function to get resell display text
+  const getResellDisplayText = (originalValue, resellRule) => {
+    if (!resellRule) return `Based on 80% resell value of $${originalValue}`;
+
+    if (resellRule.valueType === "percentage") {
+      return `Based on ${resellRule.value}% resell value of $${originalValue}`;
+    } else {
+      return `Fixed resell price of $${resellRule.value || 0}`;
+    }
+  };
+
+  async function handleClaimTokenFromSpinReward() {
+    try {
+      setResellLoading(true);
+      // console.log({ spinResultData, spinRecordId });
+      const res = await resellSpinForCredits({ spinId: spinResultData._id });
+      console.log({ res });
+      if (res?.success) {
+        toastSuccess("You have been credited successully");
+        // update balance in redux
+        dispatch(
+          updateUserAvailableBalance(res?.data?.transaction.availableBalance)
+        );
+      } else {
+        toastError(
+          "An unexpected error occurred, and no credits have been deducted yet. Please try again later"
+        );
+      }
+
+      setResellLoading(false);
+      setShowResellModal(false);
+      handleModalClose();
+    } catch (error) {
+      console.log("EEE::", error);
+      setResellLoading(false);
+      setShowResellModal(false);
+      toastError(
+        `${error.response?.data?.message}. No credits have been deducted from your account yet` ||
+          "An unexpected error occurred, and no credits have been deducted yet. Please try again later"
+      );
+    }
+  }
 
   return (
     <>
@@ -635,7 +837,7 @@ export default function SpinningWheel({
       </div>
 
       {/*Client Seed Modal & Seed Verification Modal */}
-      <ClientSeedModal
+      {/* <ClientSeedModal
         onSpin={onSpin}
         isWaitingForResult={isWaitingForResult}
         createSpinApiError={createSpinApiError}
@@ -653,122 +855,369 @@ export default function SpinningWheel({
         setShowClientSeedModal={setShowClientSeedModal}
         showClientSeedModal={showClientSeedModal}
         clientSeed={clientSeed}
-      />
+      /> */}
 
-      {/* Winner Modal - HIGH Z-INDEX */}
+      {/* Winner Modal - HIGH Z-INDEX with Golden Confetti */}
       <AnimatePresence>
         {showModal && winningItem && !isSpinning && (
-          <Dialog open={showModal} onOpenChange={handleModalClose}>
-            <DialogContent className="sm:max-w-[425px] max-w-[95vw] bg-gradient-to-br from-cyan-50 to-blue-50 z-[9999] fixed">
-              <DialogHeader>
-                <DialogTitle className="text-2xl sm:text-3xl text-center bg-gradient-to-r from-[#11F2EB] via-cyan-500 to-cyan-600 bg-clip-text text-transparent">
-                  🎉 Congratulations! 🎉
-                </DialogTitle>
-                <DialogDescription className="text-center text-gray-600 text-base sm:text-lg">
-                  You've won an amazing prize!
-                </DialogDescription>
-              </DialogHeader>
-              <div className="py-4 sm:py-6 flex flex-col items-center">
-                <motion.div
-                  initial={{ scale: 0.5, opacity: 0, rotateY: -180 }}
-                  animate={{ scale: 1, opacity: 1, rotateY: 0 }}
-                  transition={{
-                    duration: 0.6,
-                    type: "spring",
-                    stiffness: 200,
-                    damping: 20,
-                  }}
-                  className="relative w-full max-w-xs"
+          <Dialog open={showModal} onOpenChange={() => {}}>
+            <DialogContent className="sm:max-w-[500px] max-w-[95vw] bg-gradient-to-br from-cyan-50 to-blue-50 z-[9999] fixed p-0 overflow-hidden rounded-2xl">
+              {/* Golden Confetti Animation */}
+              <GoldenConfetti isActive={showConfetti} />
+
+              {/* Close Button */}
+              <button
+                onClick={handleModalClose}
+                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white/80 hover:bg-white transition-colors z-20 shadow-sm"
+              >
+                <svg
+                  className="w-5 h-5 text-gray-700"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-700 rounded-full blur-xl opacity-30 scale-110" />
-                  <div className="relative bg-white rounded-2xl p-3 sm:p-4 shadow-2xl flex justify-center items-center">
-                    <img
-                      src={winningItem.images[0]?.url || "/placeholder.svg"}
-                      alt={winningItem.name}
-                      width={200}
-                      height={200}
-                      className="object-contain h-40 sm:h-48 w-auto"
-                    />
-                  </div>
-                </motion.div>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+
+              <div className="flex flex-col items-center pt-6 pb-4 px-6 relative z-10">
+                <DialogHeader className="mb-3">
+                  <DialogTitle className="text-2xl font-bold text-center text-gray-800">
+                    You've won!
+                  </DialogTitle>
+                </DialogHeader>
+
+                {/* Item Display */}
                 <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3, duration: 0.4 }}
-                  className="text-center mt-4 sm:mt-6"
+                  initial={{ scale: 0.95, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                  className="relative mb-4"
                 >
-                  <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">
+                  <img
+                    src={winningItem.images[0]?.url || "/placeholder.svg"}
+                    alt={winningItem.name}
+                    width={140}
+                    height={140}
+                    className="object-contain h-32 w-auto mx-auto"
+                  />
+                  <h3 className="text-lg font-bold text-gray-800 text-center mt-2 max-w-xs">
                     {winningItem.name}
                   </h3>
-                  <p className="text-gray-600 text-base sm:text-lg">
-                    Value: ${winningItem.value}
-                  </p>
+                </motion.div>
 
-                  <p className="text-xs sm:text-sm text-gray-500 mt-2">
-                    {spinResultData && (
-                      <button
-                        onClick={() => {
-                          const queryParams = new URLSearchParams({
-                            clientSeed: spinResultData?.clientSeed || "",
-                            serverSeed: spinResultData?.serverSeed || "",
-                            serverSeedHash:
-                              spinResultData?.serverSeedHash || "",
-                            nonce: spinResultData?.nonce || "",
-                            hash: spinResultData?.hash || "",
-                            createdAt: spinResultData?.createdAt || "",
-                            normalized: spinResultData?.normalized || "",
-                            boxSlug: spinResultData?.boxDetails?.slug || "",
-                          }).toString();
+                {/* Value Display - With arrow between original buttons */}
+                <div className="flex items-center justify-center gap-2 mb-4">
+                  {/* Cash Value - Original Style */}
+                  <div className="flex flex-col items-center">
+                    <div className="bg-gray-800 rounded-lg px-4 py-2 mb-1">
+                      <span className="text-white font-semibold">
+                        ${winningItem.value}
+                      </span>
+                    </div>
+                    <span className="text-xs text-gray-600">Cash Value</span>
+                  </div>
 
-                          window.open(`/verify-spin?${queryParams}`, "_blank");
-                        }}
-                        className="inline-flex items-center text-cyan-600 hover:text-[#11F2EB] underline transition-colors duration-200 text-xs sm:text-sm"
+                  {/* Conversion Arrow */}
+                  <div className="flex flex-col items-start mx-1 pt-5 mb-7">
+                    <motion.div
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: 0.3, duration: 0.5 }}
+                      className="w-6 h-6 bg-transparent rounded-full flex items-start justify-center"
+                    >
+                      <svg
+                        className="w-4 h-4 text-gray-700"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="14"
-                          height="14"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
+                        <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
-                          className="mr-1"
-                        >
-                          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                          <polyline points="15 3 21 3 21 9"></polyline>
-                          <line x1="10" y1="14" x2="21" y2="3"></line>
-                        </svg>
-                        Verify integrity of spin result
-                      </button>
-                    )}
-                  </p>
-                </motion.div>
+                          strokeWidth={2}
+                          d="M13 7l5 5m0 0l-5 5m5-5H6"
+                        />
+                      </svg>
+                    </motion.div>
+                  </div>
+
+                  {/* Credit Value with Hexagon - Original Style */}
+                  <div className="flex flex-col items-center">
+                    <div className="bg-gray-800 rounded-lg px-3 py-2 mb-1 flex items-center">
+                      <Hexagon
+                        className="h-4 w-4 text-yellow-400 mr-1"
+                        fill="currentColor"
+                      />
+                      <span className="text-white font-semibold">
+                        {winningItem.value}
+                      </span>
+                    </div>
+                    <span className="text-xs text-gray-600">Credit Value</span>
+                  </div>
+                </div>
+
+                {/* Conversion Rate Bar */}
+                <div className="w-full max-w-sm bg-gray-200 rounded-full h-2 mb-5 relative overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: "100%" }}
+                    transition={{ delay: 0.5, duration: 1, ease: "easeOut" }}
+                    className="absolute left-0 top-0 h-full bg-gradient-to-r from-blue-500 to-amber-500 py-1"
+                  />
+                  <div className="p-0.5 absolute left-0 top-0 w-full h-full flex items-center justify-center">
+                    <span className="text-xs font-medium text-gray-700 bg-white/80 px-2 rounded-full">
+                      Conversion Rate: 1 Credit = $
+                      {cashToCreditConvRate?.value || 1} USD
+                    </span>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="grid grid-cols-2 gap-3 w-full max-w-sm">
+                  <Button
+                    className="w-full h-11 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium rounded-lg transition-colors"
+                    onClick={() => setShowResellModal(true)} // Open resell confirmation modal
+                  >
+                    CLAIM TOKENS
+                  </Button>
+                  <Button
+                    className="w-full h-11 bg-gradient-to-r from-[#11F2EB] to-cyan-600 
+                   hover:from-cyan-500 hover:to-[#11F2EB] text-slate-800 font-medium rounded-lg shadow-sm"
+                    onClick={handleModalClose}
+                  >
+                    SHIP ITEM →
+                  </Button>
+                </div>
               </div>
-              <motion.div
-                className="grid grid-cols-2 gap-3 sm:gap-4"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5, duration: 0.4 }}
-              >
-                <Button
-                  variant="outline"
-                  className="w-full h-10 sm:h-12 text-xs sm:text-lg border-2 border-[#11F2EB] hover:border-cyan-500 hover:bg-blue-50 bg-transparent hover:text-black"
-                  onClick={handleModalClose}
+
+              {/* Verification link */}
+              {spinResultData && (
+                <div className="px-6 pb-3 pt-2 border-t border-gray-200 relative z-10">
+                  <button
+                    onClick={() => {
+                      const queryParams = new URLSearchParams({
+                        clientSeed: spinResultData?.clientSeed || "",
+                        serverSeed: spinResultData?.serverSeed || "",
+                        serverSeedHash: spinResultData?.serverSeedHash || "",
+                        nonce: spinResultData?.nonce || "",
+                        hash: spinResultData?.hash || "",
+                        createdAt: spinResultData?.createdAt || "",
+                        normalized: spinResultData?.normalized || "",
+                        boxSlug: spinResultData?.boxDetails?.slug || "",
+                      }).toString();
+
+                      window.open(`/verify-spin?${queryParams}`, "_blank");
+                    }}
+                    className="text-xs text-gray-500 hover:text-cyan-600 transition-colors duration-200 flex items-center justify-center w-full"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="mr-1"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <polyline points="15 3 21 3 21 9"></polyline>
+                      <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                    Verify spin integrity
+                  </button>
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
+        )}
+
+        {/* Resell Confirmation Modal */}
+        {showResellModal && winningItem && !isSpinning && (
+          <Dialog open={showResellModal} onOpenChange={() => {}}>
+            <DialogContent className="sm:max-w-[500px] max-w-[95vw] bg-white z-[10000] fixed p-0 overflow-hidden rounded-2xl shadow-xl top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+              <div className="px-6 py-16">
+                {/* Close Button - Disabled during loading */}
+                <button
+                  onClick={() => !resellLoading && setShowResellModal(false)}
+                  disabled={resellLoading}
+                  className={`absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full ${
+                    resellLoading
+                      ? "bg-gray-200 cursor-not-allowed"
+                      : "bg-white/80 hover:bg-white"
+                  } transition-colors z-20 shadow-sm`}
                 >
-                  <span className="hidden sm:inline">💰 Sell for Credits</span>
-                  <span className="sm:hidden">💰 Sell</span>
-                </Button>
-                <Button
-                  className="w-full h-10 sm:h-12 text-xs sm:text-lg bg-gradient-to-r from-[#11F2EB] via-cyan-500 to-cyan-600 
-    hover:from-cyan-400 hover:via-[#11F2EB] hover:to-blue-700"
-                  onClick={handleModalClose}
-                >
-                  <span className="hidden sm:inline">📦 Ship to Me</span>
-                  <span className="sm:hidden">📦 Ship</span>
-                </Button>
-              </motion.div>
+                  <svg
+                    className={`w-5 h-5 ${
+                      resellLoading ? "text-gray-400" : "text-gray-700"
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+
+                <DialogHeader className="mb-4">
+                  <DialogTitle className="text-xl font-bold text-center text-gray-800">
+                    Confirm Token Claim
+                  </DialogTitle>
+                  <DialogDescription className="text-center text-gray-600">
+                    Review the conversion details before proceeding
+                  </DialogDescription>
+                </DialogHeader>
+
+                {/* Calculate values based on resellRule and conversion rate */}
+                {(() => {
+                  const originalValue = winningItem.value;
+                  const conversionRate = cashToCreditConvRate?.value || 1;
+                  const finalAmount = calculateResellAmount(
+                    originalValue,
+                    resellRule
+                  );
+                  const creditsAmount = finalAmount / conversionRate;
+                  const displayText = getResellDisplayText(
+                    originalValue,
+                    resellRule
+                  );
+
+                  return (
+                    <>
+                      {/* Conversion Details */}
+                      <div className="bg-gray-50 rounded-lg p-4 mb-5">
+                        <div className="grid grid-cols-2 gap-4 mb-3">
+                          <div className="text-center">
+                            <div className="text-sm text-gray-600 mb-1">
+                              Original Value
+                            </div>
+                            <div className="text-lg font-bold text-gray-800">
+                              ${originalValue}
+                            </div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-sm text-gray-600 mb-1">
+                              {resellRule?.valueType === "percentage"
+                                ? "Resell Rate"
+                                : "Fixed Price"}
+                            </div>
+                            <div className="text-lg font-bold text-amber-600">
+                              {resellRule?.valueType === "percentage"
+                                ? `${resellRule.value}%`
+                                : `$${resellRule?.value}`}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="bg-white rounded-lg p-3 border border-gray-200">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-sm text-gray-600">
+                              You will receive:
+                            </span>
+                            <span className="text-lg font-bold text-green-600">
+                              ${finalAmount.toFixed(0).toLocaleString()}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="text-sm text-gray-600">
+                              Credits equivalent:
+                            </span>
+                            <span className="text-lg font-bold text-gray-800 flex items-center">
+                              <Hexagon
+                                className="h-4 w-4 ml-1.5 text-[#FFD700]"
+                                fill="#FFD700"
+                              />
+                              {creditsAmount.toFixed(0).toLocaleString()}
+                            </span>
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {displayText} • 1 Credit = ${conversionRate} USD
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Warning Message */}
+                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-5">
+                        <div className="flex items-start">
+                          <svg
+                            className="w-5 h-5 text-yellow-500 mr-2 mt-0.5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                            />
+                          </svg>
+                          <span className="text-sm text-yellow-700">
+                            This action cannot be undone. The item will be
+                            converted to tokens at the current resell rate.
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <Button
+                          className="w-full h-11 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium rounded-lg transition-colors"
+                          onClick={() => setShowResellModal(false)}
+                          disabled={resellLoading}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          className="w-full h-11 bg-gradient-to-r from-[#11F2EB] to-cyan-600 
+                         hover:from-cyan-500 hover:to-[#11F2EB] text-slate-800 font-medium rounded-lg shadow-sm flex items-center justify-center"
+                          onClick={() => {
+                            handleClaimTokenFromSpinReward();
+                          }}
+                          disabled={resellLoading}
+                        >
+                          {resellLoading ? (
+                            <>
+                              <Loader className="w-4 h-4 mr-2 animate-spin" />
+                              Processing...
+                            </>
+                          ) : (
+                            "Confirm Claim"
+                          )}
+                        </Button>
+                      </div>
+
+                      {/* Loading Overlay */}
+                      {resellLoading && (
+                        <div className="absolute inset-0 bg-white/80 rounded-2xl flex items-center justify-center">
+                          <div className="text-center">
+                            <Loader className="w-8 h-8 animate-spin text-cyan-600 mx-auto mb-2" />
+                            <p className="text-gray-700 font-medium">
+                              Processing your claim...
+                            </p>
+                            <p className="text-sm text-gray-500 mt-1">
+                              Please wait while we process your tokens
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
+              </div>
             </DialogContent>
           </Dialog>
         )}
