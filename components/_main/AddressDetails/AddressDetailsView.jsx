@@ -3,7 +3,7 @@ import { MapPin, Edit3, Plus, Map, Navigation, Home } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { updateMyShippingAddress } from "@/services/profile";
 import { updateShippingAddress } from "@/redux/slices/user";
-import { toastError, toastSuccess, toastWarning } from "@/lib/toast";
+import { toastError, toastSuccess, toastWarning, toastInfo } from "@/lib/toast";
 
 const AddressDetailsView = ({ user }) => {
   const [showAddModal, setShowAddModal] = useState(false);
@@ -18,6 +18,7 @@ const AddressDetailsView = ({ user }) => {
   const [mapCoordinates, setMapCoordinates] = useState(null);
   const [isGeocoding, setIsGeocoding] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
   const [geocodingFailed, setGeocodingFailed] = useState(false);
   const dispatch = useDispatch();
 
@@ -121,6 +122,7 @@ const AddressDetailsView = ({ user }) => {
 
   // Function to handle using current location
   const handleUseCurrentLocation = () => {
+    setIsGettingLocation(true);
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
@@ -153,16 +155,17 @@ const AddressDetailsView = ({ user }) => {
               setAddressData(newAddressData);
               setMapCoordinates({ lat: latitude, lon: longitude });
               setGeocodingFailed(false);
-              // alert("Location detected and address fields updated!");
-              toastWarning("Location detected and address fields updated!");
+              toastInfo("Location detected and address fields updated!");
             } else {
               throw new Error("Unable to get address from coordinates");
             }
           } catch (error) {
             console.error("Reverse geocoding failed:", error);
-            toastWarning(
+            toastError(
               "Location detected but unable to convert to address. Please enter manually."
             );
+          } finally {
+            setIsGettingLocation(false);
           }
         },
         (error) => {
@@ -180,7 +183,8 @@ const AddressDetailsView = ({ user }) => {
             default:
               errorMessage += "Unknown error occurred.";
           }
-          toastWarning(errorMessage + " Please enter your address manually.");
+          toastError(errorMessage + " Please enter your address manually.");
+          setIsGettingLocation(false);
         },
         {
           enableHighAccuracy: true,
@@ -190,6 +194,7 @@ const AddressDetailsView = ({ user }) => {
       );
     } else {
       toastError("Geolocation is not supported by your browser.");
+      setIsGettingLocation(false);
     }
   };
 
@@ -462,14 +467,24 @@ const AddressDetailsView = ({ user }) => {
               {/* ---------- Current-location shortcut ---------- */}
               <button
                 onClick={handleUseCurrentLocation}
+                disabled={isGettingLocation}
                 className="mb-6 w-full inline-flex items-center justify-center gap-2
                rounded-lg border border-gray-200 bg-gray-100 px-4 py-3
                text-sm font-semibold text-gray-800
                hover:bg-[#DCFDFB] hover:text-gray-800
-               transition-all"
+               transition-all disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                <Navigation className="h-4 w-4" />
-                Use Current Location
+                {isGettingLocation ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#11F2EB]"></div>
+                    Detecting Location...
+                  </>
+                ) : (
+                  <>
+                    <Navigation className="h-4 w-4" />
+                    Use Current Location
+                  </>
+                )}
               </button>
 
               {/* ---------- Address form ---------- */}
@@ -519,17 +534,17 @@ const AddressDetailsView = ({ user }) => {
 
             {/* Footer - Matching spin history modal style */}
             <div className="px-8 py-6 bg-gray-50 border-t border-gray-100 flex-shrink-0">
-              <div className="flex gap-4">
+              <div className="flex flex-col sm:flex-row gap-4">
                 <button
                   onClick={() => setShowAddModal(false)}
-                  className="flex-1 py-4 px-6 border border-gray-200 rounded-xl text-gray-700 hover:bg-gray-100 transition-colors font-medium"
+                  className="flex-1 py-3 sm:py-4 px-6 border border-gray-200 rounded-xl text-gray-700 hover:bg-gray-100 transition-colors font-medium"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleSaveAddress}
-                  disabled={isSaving}
-                  className="flex-1 py-4 bg-gradient-to-r from-[#11F2EB] to-[#0ED9D3] text-slate-800 font-semibold rounded-xl hover:from-[#0ED9D3] hover:to-[#0BC5BF] transition-all duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={isSaving || isGettingLocation}
+                  className="flex-1 py-3 sm:py-4 bg-gradient-to-r from-[#11F2EB] to-[#0ED9D3] text-slate-800 font-semibold rounded-xl hover:from-[#0ED9D3] hover:to-[#0BC5BF] transition-all duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSaving ? "Saving..." : "Save Address"}
                 </button>
