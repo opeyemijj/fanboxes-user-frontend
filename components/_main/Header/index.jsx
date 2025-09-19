@@ -91,7 +91,7 @@ function Header() {
                         : "bg-[#EFEFEF] text-gray-600 hover:bg-[#11F2EB] hover:text-white"
                     }`}
                   >
-                    MYSTERY BOXES
+                    BOXES
                   </Button>
                 </Link>
                 <Link href="/ambassadors">
@@ -261,7 +261,7 @@ function Header() {
                         : "bg-[#EFEFEF] text-gray-600 hover:bg-[#11F2EB] hover:text-white"
                     }`}
                   >
-                    MYSTERY BOXES
+                    BOXES
                   </Button>
                 </Link>
                 <Link href="/ambassadors">

@@ -329,7 +329,7 @@ const TransactionsListing = () => {
           </p>
         </div>
 
-        <div className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 rounded-2xl p-6 mb-6 shadow-xl relative overflow-hidden">
+        <div className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 rounded-2xl p-4 mb-6 shadow-xl relative overflow-hidden">
           {/* Decorative elements with primary color accents */}
           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#11F2EB]/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
           <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-[#11F2EB]/10 to-transparent rounded-full -translate-x-12 translate-y-12"></div>
@@ -349,7 +349,7 @@ const TransactionsListing = () => {
               <span className="text-white/80 text-xl sm:text-2xl font-semibold mr-1">
                 $
               </span>
-              <span className="text-white text-3xl sm:text-4xl lg:text-5xl font-bold">
+              <span className="text-white text-2xl sm:text-3xl lg:text-4xl font-bold">
                 {formatAmount(transactionsData?.balance?.availableBalance || 0)}
               </span>
             </div>

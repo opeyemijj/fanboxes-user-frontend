@@ -3,8 +3,12 @@ import TransactionsListing from "@/components/_main/Transactions/TransactionsLis
 import ModernTabs from "@/components/modern-tabs";
 import Footer from "@/components/_main/Footer";
 import Header from "@/components/_main/Header";
+import SpinListing from "@/components/_main/SpinHistory/SpinListing";
+import AddressDetailsView from "@/components/_main/AddressDetails/AddressDetailsView";
+import { useSelector } from "react-redux";
 
 const Account = () => {
+  const user = useSelector((state) => state?.user?.user || null);
   const tabList = [
     {
       tabName: "Profile",
@@ -16,7 +20,7 @@ const Account = () => {
       tabName: "Address Details",
       queryId: "address",
       activeUrlElement: "/address-details",
-      component: null,
+      component: <AddressDetailsView user={user} />,
     },
     {
       tabName: "My Orders",
@@ -28,7 +32,7 @@ const Account = () => {
       tabName: "Spin History",
       queryId: "spins",
       activeUrlElement: "/spins",
-      component: null,
+      component: <SpinListing />,
     },
     {
       tabName: "Transaction History",

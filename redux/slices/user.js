@@ -40,6 +40,9 @@ const slice = createSlice({
     verifyUser(state) {
       state.user.isVerified = true;
     },
+    updateShippingAddress(state, action) {
+      state.user.shippingAddress = action.payload;
+    },
     updateUserRole(state) {
       state.user.role = "vendor";
     },
@@ -70,6 +73,7 @@ export const {
   verifyUser,
   updateUserRole,
   updateFollowShop,
+  updateShippingAddress,
 } = slice.actions;
 
 // ----------------------------------------------------------------------

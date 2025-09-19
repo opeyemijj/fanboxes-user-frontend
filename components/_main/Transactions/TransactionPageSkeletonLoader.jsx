@@ -1,7 +1,7 @@
 // Skeleton Loader Component
 const SkeletonLoader = () => (
   <div className="bg-gray-50 text-black min-h-screen">
-    <main className="container mx-auto px-3 sm:px-6 lg:px-8 pt-20 pb-16 flex-grow">
+    <main className="container px-3 sm:px-4 lg:px-6 pt-0 pb-10 flex-grow">
       {/* Balance Card Skeleton */}
       <div className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 rounded-2xl p-6 mb-6 shadow-xl relative overflow-hidden">
         <div className="relative z-10">

@@ -72,3 +72,12 @@ export const fetchWalletBalanceAndHistory = async (params = {}) => {
     throw err;
   }
 };
+
+export const updateMyShippingAddress = async (payload = {}) => {
+  const { data } = await http
+    .patch(`/users/update-shipping-address`, payload)
+    .catch((err) => {
+      throw err;
+    });
+  return data;
+};
