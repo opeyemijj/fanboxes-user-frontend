@@ -112,7 +112,7 @@ export default function TransactionDetailsModal({
                 <div className="flex items-center gap-2 mb-3">
                   <Coins className="w-4 h-4 text-amber-600" />
                   <h3 className="text-sm font-semibold text-gray-900">
-                    Token Resell Details
+                    Resell Details
                   </h3>
                 </div>
                 <div className="grid grid-cols-2 gap-4 text-sm">
@@ -154,7 +154,9 @@ export default function TransactionDetailsModal({
                 <div className="flex items-center gap-2 mb-2">
                   <Trophy className="w-4 h-4 text-amber-600" />
                   <h3 className="text-sm font-semibold text-gray-900">
-                    {isSpinResell ? "Resold Item" : "Winning Item"}
+                    {isSpinResell
+                      ? "Item Won And Resold For Credits"
+                      : "Winning Item"}
                   </h3>
                 </div>
                 <div className="flex gap-3">

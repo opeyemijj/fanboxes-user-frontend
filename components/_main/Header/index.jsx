@@ -231,7 +231,10 @@ function Header() {
                   className="mr-4 flex items-center border-gray-200 bg-transparent hover:bg-[#11F2EB] hover:text-white hover:border-[#11F2EB] transition-colors"
                 >
                   {/* <span className="font-semibold">x1,200</span> */}
-                  <HeaderWalletBalance handleLogout={handleLogout} />
+                  <HeaderWalletBalance
+                    handleLogout={handleLogout}
+                    availableBalance={userData?.user?.availableBalance}
+                  />
                   <Hexagon className="h-4 w-4 text-gray-500" />
                 </Button>
               )}

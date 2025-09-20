@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { getMySpinHistory } from "@/services/boxes/spin-game";
 import { useRouter } from "next/navigation";
@@ -16,6 +17,7 @@ import {
   CheckCircle,
   Zap,
   TrendingUp,
+  DollarSign,
 } from "lucide-react";
 
 // Pagination Component
@@ -158,6 +160,42 @@ const SpinDetailsModal = ({
                 </div>
               </div>
             </div>
+
+            {/* Resell Information Card */}
+            {spin.processedForResell && (
+              <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-4 border border-green-100">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <h3 className="text-sm font-semibold text-gray-900">
+                      Item Resold
+                    </h3>
+                  </div>
+                  {spin.resellTransactionRef && (
+                    <a
+                      href={`/account?tab=transactions&txn=${spin.resellTransactionRef}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 text-xs text-green-600 hover:text-green-800 font-medium"
+                    >
+                      View Transaction
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  )}
+                </div>
+                <div className="text-sm text-gray-700">
+                  <p>This item has been successfully resold for credits.</p>
+                  {spin.resellTransactionRef && (
+                    <p className="mt-1 text-xs">
+                      Transaction Ref:{" "}
+                      <span className="font-mono bg-white px-2 py-1 rounded text-xs">
+                        {spin.resellTransactionRef}
+                      </span>
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Winning Item Card */}
             {spin.winningItem && (
@@ -561,11 +599,26 @@ const SpinListing = () => {
     );
   };
 
+  const getResellStatusBadge = (spin) => {
+    if (spin.processedForResell) {
+      return (
+        <span className="px-2.5 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 flex items-center gap-1">
+          <CheckCircle className="w-3 h-3" />
+          Resold
+        </span>
+      );
+    }
+    return null;
+  };
+
   const getStatusBadge = (spin) => {
     return (
-      <span className="px-2.5 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-        Won
-      </span>
+      <>
+        <span className="px-2.5 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+          Won
+        </span>
+        {getResellStatusBadge(spin)}
+      </>
     );
   };
 
@@ -655,9 +708,8 @@ const SpinListing = () => {
 
   // Calculate statistics
   const totalSpins = spinHistory?.pagination?.total || 0;
-  const uniqueBoxes = new Set(
-    spinHistory?.data?.map((spin) => spin.boxId) || []
-  ).size;
+  const resoldSpins =
+    spinHistory?.data?.filter((spin) => spin.processedForResell).length || 0;
   const rarestWin = spinHistory?.data?.reduce((rarest, spin) => {
     if (!rarest || spin.winningItem?.odd < rarest.winningItem?.odd) {
       return spin;
@@ -747,21 +799,21 @@ const SpinListing = () => {
                 <p className="text-white/60 text-xs mt-1">All-time spins</p>
               </div>
 
-              {/* Unique Boxes */}
+              {/* Items Resold */}
               <div className="bg-black/20 backdrop-blur-sm rounded-xl p-4 border border-white/10">
                 <div className="flex items-center mb-3">
                   <div className="w-8 h-8 bg-[#11F2EB]/20 rounded-lg flex items-center justify-center mr-3">
-                    <Box className="w-4 h-4 text-[#11F2EB]" />
+                    <DollarSign className="w-4 h-4 text-[#11F2EB]" />
                   </div>
                   <h3 className="text-white text-sm font-medium">
-                    Unique Boxes
+                    Items Resold
                   </h3>
                 </div>
                 <div className="text-2xl font-bold text-white">
-                  {uniqueBoxes}
+                  {resoldSpins}
                 </div>
                 <p className="text-white/60 text-xs mt-1">
-                  Different boxes spun
+                  Converted to credits
                 </p>
               </div>
 

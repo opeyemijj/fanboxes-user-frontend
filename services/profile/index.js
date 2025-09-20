@@ -81,3 +81,12 @@ export const updateMyShippingAddress = async (payload = {}) => {
     });
   return data;
 };
+
+export const getTransactionByRefId = async (ref) => {
+  const { data } = await http
+    .get(`/wallet/get-transaction-by-ref?refId=${ref}`)
+    .catch((err) => {
+      throw err;
+    });
+  return data;
+};
