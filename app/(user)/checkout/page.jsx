@@ -84,10 +84,10 @@ const CheckoutScreen = () => {
 
   // Calculate shipping fee on component mount and when user details change
   useEffect(() => {
-    if (mounted && cart.user?.shippingAddress && cart.items.length > 0) {
+    if (mounted && cart.items.length > 0) {
       calculateShipping();
     }
-  }, [mounted, cart.user?.shippingAddress, cart.items]);
+  }, [mounted, cart.items]);
 
   const calculateShipping = async () => {
     if (!mounted) return;
