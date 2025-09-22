@@ -21,7 +21,8 @@
     "app": "@/app",
     "styles": "@/styles",
     "guards": "@/guards",
-    "redux": "@/redux"
+    "redux": "@/redux",
+    "services": "@/services"
   },
   "iconLibrary": "lucide"
 }

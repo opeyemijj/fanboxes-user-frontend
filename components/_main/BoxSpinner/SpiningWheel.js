@@ -1,6 +1,6 @@
 "use client";
-
 import { useState, useEffect, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/Button";
 import { useDispatch } from "react-redux";
@@ -33,131 +33,8 @@ import { resellSpinForCredits } from "@/services/boxes";
 import { toastError, toastSuccess } from "@/lib/toast";
 import { updateUserAvailableBalance } from "@/redux/slices/user";
 import ResellConfirmationModal from "./ResellConfirmationModal";
-
-/* -------------  GoldenRibbon  ------------- */
-const GoldenRibbon = ({ delay = 0, duration = 4, uniqueKey }) => {
-  /* random starting position inside the central 50 % of the container */
-  const startLeft = 25 + Math.random() * 50; // 25 % – 75 %
-
-  const ribbonVariants = {
-    initial: {
-      y: -80, // slightly above viewport
-      x: 0,
-      left: `${startLeft}%`,
-      rotate: Math.random() * 360,
-      opacity: 0, // Start fully transparent
-    },
-    animate: {
-      y: 600, // fall through the whole card
-      x: (Math.random() - 0.5) * 120, // small drift
-      rotate: Math.random() * 720 + 360,
-      opacity: [0, 1, 1, 0.8, 0], // Smooth fade in, stay visible, then gradual fade out
-      transition: {
-        duration,
-        delay,
-        ease: [0.25, 0.1, 0.25, 1], // Smooth ease-in-out
-        opacity: {
-          duration,
-          times: [0, 0.1, 0.7, 0.9, 1], // Gradual fade in/out
-          ease: "easeInOut",
-        },
-      },
-    },
-  };
-
-  const ribbonStyle = {
-    position: "absolute",
-    width: Math.random() * 6 + 3, // 5-11px width
-    height: Math.random() * 14 + 10,
-    background: `linear-gradient(45deg,#FFD700,#FFA500,#FFFF00,#FFD700,#DAA520)`,
-    borderRadius: "2px",
-    boxShadow: "0 0 4px rgba(255,215,0,0.7)",
-  };
-
-  return (
-    <motion.div
-      key={uniqueKey}
-      className="pointer-events-none"
-      style={ribbonStyle}
-      variants={ribbonVariants}
-      initial="initial"
-      animate="animate"
-      exit={{ opacity: 0 }} // Smooth exit animation
-    />
-  );
-};
-
-/* -------------  GoldenConfetti  ------------- */
-const GoldenConfetti = ({ isActive }) => {
-  const [ribbons, setRibbons] = useState([]);
-  const [isStopping, setIsStopping] = useState(false);
-
-  useEffect(() => {
-    if (!isActive) {
-      setIsStopping(true);
-      // Let existing ribbons finish their animation naturally
-      const timer = setTimeout(() => {
-        setRibbons([]);
-        setIsStopping(false);
-      }, 5000); // Wait for all ribbons to finish animating
-      return () => clearTimeout(timer);
-    }
-
-    setIsStopping(false);
-
-    const createRibbons = () => {
-      const newRibbons = [];
-      for (let i = 0; i < 20; i++) {
-        newRibbons.push({
-          id: `ribbon-${Date.now()}-${i}-${Math.random()
-            .toString(36)
-            .substr(2, 9)}`,
-          delay: Math.random() * 2,
-          duration: Math.random() * 1 + 3.5,
-        });
-      }
-      setRibbons(newRibbons);
-    };
-
-    createRibbons();
-
-    const interval = setInterval(() => {
-      if (!isActive || isStopping) return;
-
-      const additional = Array.from({ length: 10 }, (_, i) => ({
-        id: `ribbon-${Date.now()}-${i}-${Math.random()
-          .toString(36)
-          .substr(2, 9)}`,
-        delay: Math.random() * 1.2,
-        duration: Math.random() * 1 + 3.5,
-      }));
-      setRibbons((prev) => {
-        // Keep only the most recent ribbons to prevent memory issues
-        const recentRibbons = prev.slice(-30);
-        return [...recentRibbons, ...additional];
-      });
-    }, 2000);
-
-    return () => clearInterval(interval);
-  }, [isActive, isStopping]);
-
-  if (!isActive && ribbons.length === 0) return null;
-
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none z-10">
-      <AnimatePresence>
-        {ribbons.map((r) => (
-          <GoldenRibbon
-            key={r.id}
-            uniqueKey={r.id}
-            delay={r.delay}
-            duration={r.duration}
-          />
-        ))}
-      </AnimatePresence>
-    </div>
-  );
-};
+import { addWonItemToCart } from "@/redux/slices/cartOrder";
+import GoldenConfetti from "./GoldenConfetti";
 
 export default function SpinningWheel({
   items,
@@ -196,6 +73,7 @@ export default function SpinningWheel({
   const [showResellModal, setShowResellModal] = useState(false);
   const [resellLoading, setResellLoading] = useState(false);
   const dispatch = useDispatch();
+  const router = useRouter();
 
   // Extract seed data from spinResultData
   // const clientSeed = spinResultData?.clientSeed || "";
@@ -599,25 +477,18 @@ export default function SpinningWheel({
     };
   };
 
-  // Helper function to calculate resell amount
-  const calculateResellAmount = (originalValue, resellRule) => {
-    if (!resellRule) return originalValue * 0.8; // Fallback to 80%
+  const handleOrderWonItem = (wonItem, spinData) => {
+    if (wonItem && spinData) {
+      dispatch(
+        addWonItemToCart({
+          item: wonItem,
+          spinData: spinData,
+        })
+      );
 
-    if (resellRule.valueType === "percentage") {
-      return originalValue * (resellRule.value / 100);
+      router.push("/checkout");
     } else {
-      return resellRule.value || 0;
-    }
-  };
-
-  // Helper function to get resell display text
-  const getResellDisplayText = (originalValue, resellRule) => {
-    if (!resellRule) return `Based on 80% resell value of $${originalValue}`;
-
-    if (resellRule.valueType === "percentage") {
-      return `Based on ${resellRule.value}% resell value of $${originalValue}`;
-    } else {
-      return `Fixed resell price of $${resellRule.value || 0}`;
+      toastError("Something went wrong");
     }
   };
 
@@ -830,7 +701,8 @@ export default function SpinningWheel({
             ) : (
               <div className="flex items-center">
                 SPIN FOR
-                <Hexagon className="h-5 w-5 mx-2" />${boxPrice}
+                <Hexagon className="h-5 w-5 ml-3 mr-0.5" />
+                {boxPrice?.toLocaleString()}
               </div>
             )}
           </Button>
@@ -964,7 +836,7 @@ export default function SpinningWheel({
                 </div>
 
                 {/* Conversion Rate Bar */}
-                <div className="w-full max-w-sm bg-gray-200 rounded-full h-2 mb-5 relative overflow-hidden">
+                <div className="w-full max-w-sm bg-gray-200 rounded-full h-3 mb-5 relative overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: "100%" }}
@@ -990,7 +862,9 @@ export default function SpinningWheel({
                   <Button
                     className="w-full h-11 bg-gradient-to-r from-[#11F2EB] to-cyan-600 
                    hover:from-cyan-500 hover:to-[#11F2EB] text-slate-800 font-medium rounded-lg shadow-sm"
-                    onClick={handleModalClose}
+                    onClick={() =>
+                      handleOrderWonItem(winningItem, spinResultData)
+                    }
                   >
                     SHIP ITEM →
                   </Button>

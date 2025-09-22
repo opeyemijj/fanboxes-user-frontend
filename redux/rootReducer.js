@@ -11,6 +11,7 @@ import CategoriesReducer from "./slices/categories";
 import BrandsReducer from "./slices/brands";
 import ShopsReducer from "./slices/shops";
 import AmbassadorsReducer from "./slices/ambassadors";
+import CartOrder from "./slices/cartOrder";
 
 const reducer = combineReducers({
   product: productReducer,
@@ -22,6 +23,7 @@ const reducer = combineReducers({
   brands: BrandsReducer,
   shops: ShopsReducer,
   ambassadors: AmbassadorsReducer,
+  cartOrder: CartOrder,
 });
 
 export { reducer };
