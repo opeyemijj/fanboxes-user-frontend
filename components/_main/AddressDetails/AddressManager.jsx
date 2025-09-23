@@ -236,28 +236,20 @@ const AddressManager = ({ user, showHeader = true, compact = false }) => {
       )}
 
       {hasAddress ? (
-        <div className={compact ? "" : "bg-white rounded-lg shadow-sm p-6"}>
+        <div className={compact ? "" : "bg-white rounded-lg shadow-sm p-9"}>
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-start space-x-3">
-              <MapPin className="text-gray-400 mt-1" size={20} />
-              <div>
-                <h3 className="font-medium text-gray-900">
-                  {user.firstName} {user.lastName}
-                </h3>
-                <p className="text-gray-600 mt-1">
-                  {user.shippingAddress.address}
-                  <br />
-                  {user.shippingAddress.city}, {user.shippingAddress.state}{" "}
-                  {user.shippingAddress.zip}
-                  <br />
-                  {user.shippingAddress.country}
-                </p>
-                {user.email && (
-                  <p className="text-gray-500 text-sm mt-2">{user.email}</p>
-                )}
-                {user.phone && (
-                  <p className="text-gray-500 text-sm">{user.phone}</p>
-                )}
+              {/* <MapPin className="text-gray-400 mt-1" size={20} /> */}
+              <div className="flex items-start mb-3">
+                <div className="w-10 h-10 bg-[#11F2EB]/10 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                  <MapPin className="w-5 h-5 text-[#11F2EB]" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Address</p>
+                  <p className="font-medium text-gray-900">
+                    {user.shippingAddress.address}
+                  </p>
+                </div>
               </div>
             </div>
             <button
@@ -272,6 +264,26 @@ const AddressManager = ({ user, showHeader = true, compact = false }) => {
             </button>
           </div>
 
+          <div>
+            <h3 className="font-medium text-gray-900">
+              {user.firstName} {user.lastName}
+            </h3>
+            <p className="text-gray-600 mt-1">
+              {user.shippingAddress.address}
+              <br />
+              {user.shippingAddress.city}, {user.shippingAddress.state}{" "}
+              {user.shippingAddress.zip}
+              <br />
+              {user.shippingAddress.country}
+            </p>
+            {user.email && (
+              <p className="text-gray-500 text-sm mt-2">{user.email}</p>
+            )}
+            {user.phone && (
+              <p className="text-gray-500 text-sm">{user.phone}</p>
+            )}
+          </div>
+
           {!compact && (
             <div className="mt-4 pt-4 border-t border-gray-200">
               <h4 className="text-sm font-medium text-gray-900 mb-3 flex items-center">
@@ -283,7 +295,7 @@ const AddressManager = ({ user, showHeader = true, compact = false }) => {
                   </span>
                 )}
               </h4>
-              <div className="bg-gray-100 rounded-lg h-48 flex items-center justify-center overflow-hidden">
+              <div className="bg-gray-100 rounded-lg h-52 flex items-center justify-center overflow-hidden">
                 {mapCoordinates ? (
                   <iframe
                     src={`https://www.openstreetmap.org/export/embed.html?bbox=${

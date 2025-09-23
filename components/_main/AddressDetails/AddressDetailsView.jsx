@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { updateMyShippingAddress } from "@/services/profile";
 import { updateShippingAddress } from "@/redux/slices/user";
 import { toastError, toastSuccess, toastWarning, toastInfo } from "@/lib/toast";
+import AddressManager from "./AddressManager";
 
 const AddressDetailsView = ({ user }) => {
   const [showAddModal, setShowAddModal] = useState(false);
@@ -283,9 +284,9 @@ const AddressDetailsView = ({ user }) => {
           </div>
         </div>
 
-        {hasAddress ? (
+        {/* {hasAddress ? (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Address Card */}
+         
             <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-semibold text-gray-900 flex items-center">
@@ -349,7 +350,7 @@ const AddressDetailsView = ({ user }) => {
               </div>
             </div>
 
-            {/* Map Preview */}
+        
             <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                 <Map className="w-5 h-5 text-[#11F2EB] mr-2" />
@@ -400,7 +401,7 @@ const AddressDetailsView = ({ user }) => {
             </div>
           </div>
         ) : (
-          /* Empty State */
+
           <div className="bg-white rounded-xl shadow-sm p-8 border border-gray-100 text-center">
             <div className="w-16 h-16 bg-[#11F2EB]/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <MapPin className="w-8 h-8 text-[#11F2EB]" />
@@ -420,7 +421,10 @@ const AddressDetailsView = ({ user }) => {
               Add Shipping Address
             </button>
           </div>
-        )}
+        )} */}
+        <div className="mt-8">
+          <AddressManager user={user} showHeader={true} compact={false} />
+        </div>
       </div>
 
       {/* Add/Edit Address Modal - Updated to match spin history style */}

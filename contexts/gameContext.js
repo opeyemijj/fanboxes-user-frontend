@@ -1,7 +1,7 @@
 // contexts/GameContext.js
 "use client";
 import { createContext, useContext, useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { usePathname, useRouter } from "next/navigation";
 import { initializeSpin } from "../services/boxes/spin-game/index";
 import { toastError } from "@/lib/toast";
@@ -9,6 +9,7 @@ import {
   getCashToCreditConversionRate,
   getResellPercentage,
 } from "@/services/boxes";
+import { updateUserAvailableBalance } from "@/redux/slices/user";
 
 const GameContext = createContext();
 
@@ -21,9 +22,10 @@ export const useGameContext = () => {
 };
 
 export const GameProvider = ({ children, box }) => {
-  const user = useSelector((state) => state.user);
+  const user = useSelector((state) => state?.user || null);
   const router = useRouter();
   const pathname = usePathname();
+  const dispatch = useDispatch();
 
   // Game States
   const [mounted, setMounted] = useState(false);
@@ -52,11 +54,6 @@ export const GameProvider = ({ children, box }) => {
     generateAndSetClientSeed();
   }, []);
 
-  useEffect(() => {
-    setCurrentBoxConfig(box);
-    setEditableBoxConfig(JSON.stringify(box, null, 2));
-  }, [box]);
-
   async function fetchCashToCreditConversionRate() {
     try {
       const res = await getCashToCreditConversionRate();
@@ -80,6 +77,11 @@ export const GameProvider = ({ children, box }) => {
       console.error("err fetching resell perc:", error);
     }
   }
+
+  useEffect(() => {
+    setCurrentBoxConfig(box);
+    setEditableBoxConfig(JSON.stringify(box, null, 2));
+  }, [box]);
 
   function generateAndSetClientSeed() {
     const initialClientSeed = Math.random().toString(36).substring(2, 15);
@@ -122,8 +124,11 @@ export const GameProvider = ({ children, box }) => {
         }
 
         console.log("result.data", result.data);
+        //update wallet bal
+        const availableBalance = result?.availableBalance;
+        // dispatch(updateUserAvailableBalance(availableBalance));
         setGameState("idle");
-        return result?.data;
+        return { ...result?.data, availableBalance };
       }
 
       setGameState("spinning");

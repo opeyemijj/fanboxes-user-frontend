@@ -298,7 +298,10 @@ export default function SpinningWheel({
     // Call onSpin with true to get the spin result data
     const result = await onSpin(true);
 
-    if (result) onSpin(false, result); //spin directly
+    if (result) {
+      dispatch(updateUserAvailableBalance(result.availableBalance));
+      onSpin(false, result); //spin directly
+    }
     // if (result && result._id) {
     //   setSpinRecordId(result._id);
     // }
@@ -486,7 +489,7 @@ export default function SpinningWheel({
         })
       );
 
-      router.push("/checkout");
+      router.push("/checkout?action=ship");
     } else {
       toastError("Something went wrong");
     }
@@ -709,26 +712,28 @@ export default function SpinningWheel({
         </div>
       </div>
 
-      {/*Client Seed Modal & Seed Verification Modal */}
-      {/* <ClientSeedModal
-        onSpin={onSpin}
-        isWaitingForResult={isWaitingForResult}
-        createSpinApiError={createSpinApiError}
-        setCreateSpinApiError={setCreateSpinApiError}
+      {/*Client Seed Modal & regenerate client seed */}
+      <ClientSeedModal
+        // onSpin={onSpin}
+        // isWaitingForResult={isWaitingForResult}
+        // createSpinApiError={createSpinApiError}
+        // setCreateSpinApiError={setCreateSpinApiError}
+        // showSeedModal={showSeedModal}
+        // setShowSeedModal={setShowSeedModal}
+        // spinResultData={spinResultData}
+        // setSpinResultData={setSpinResultData}
+
+        // spinRecordId={spinRecordId}
+
+        //client seed regeneration modal props
         generateAndSetClientSeed={generateAndSetClientSeed}
-        showSeedModal={showSeedModal}
-        setShowSeedModal={setShowSeedModal}
-        spinResultData={spinResultData}
-        setSpinResultData={setSpinResultData}
         setCopiedField={setCopiedField}
         copiedField={copiedField}
-        spinRecordId={spinRecordId}
-        //client seed regeneration modal
         handleRegenerateClientSeed={handleRegenerateClientSeed}
         setShowClientSeedModal={setShowClientSeedModal}
         showClientSeedModal={showClientSeedModal}
         clientSeed={clientSeed}
-      /> */}
+      />
 
       {/* Winner Modal - HIGH Z-INDEX with Golden Confetti */}
       <AnimatePresence>
