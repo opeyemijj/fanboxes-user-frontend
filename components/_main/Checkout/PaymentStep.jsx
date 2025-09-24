@@ -51,6 +51,28 @@ const PaymentStep = ({
     },
   ];
 
+  const formatPrice = (amount) => {
+    const numAmount =
+      typeof amount === "number" ? amount : parseFloat(amount) || 0;
+
+    // Format number with commas and 2 decimal places
+    const formattedAmount = numAmount.toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+
+    if (paymentMethod === "wallet") {
+      return (
+        <span className="flex items-center">
+          {/* <Hexagon className="w-4 h-4 mr-1 text-[#11F2EB]" /> */}
+          {formattedAmount}
+        </span>
+      );
+    } else {
+      return `$${formattedAmount}`;
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Payment Method Selection */}
@@ -101,7 +123,7 @@ const PaymentStep = ({
                           Available balance:
                           <span className="flex items-center ml-1 font-medium">
                             <Hexagon className="w-4 h-4 mr-1 text-[#11F2EB]" />
-                            {currentBalance.toFixed(2)}
+                            {formatPrice(currentBalance)}
                           </span>
                         </p>
                       ) : (
@@ -136,7 +158,7 @@ const PaymentStep = ({
               <span className="text-sm">Available: </span>
               <span className="font-medium ml-1 flex items-center">
                 <Hexagon className="w-4 h-4 mr-1" />
-                {currentBalance.toFixed(2)}
+                {formatPrice(currentBalance)}
               </span>
             </div>
           </div>
