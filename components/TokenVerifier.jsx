@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { verifyLoggedInUserToken } from "@/services/auth";
 import { Loader } from "lucide-react";
+import { toastError } from "@/lib/toast";
 
 export default function TokenVerifier({
   children,
@@ -21,6 +22,17 @@ export default function TokenVerifier({
     setIsMounted(true);
     verifyToken();
   }, []);
+
+  useEffect(() => {
+    if (
+      verificationResult &&
+      !verificationResult.success &&
+      verificationResult.message
+    ) {
+      toastError(verificationResult.message);
+      setVerificationResult(null);
+    }
+  }, [verificationResult]);
 
   const verifyToken = async () => {
     try {
