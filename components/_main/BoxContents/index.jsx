@@ -5,6 +5,9 @@ import { useState, useEffect } from "react";
 import { X, ShoppingCart, Hexagon, ChevronDown, ChevronUp } from "lucide-react";
 import { useGameContext } from "@/contexts/gameContext";
 import ClientSeedModal from "@/components/_main/BoxSpinner/ClientSeedModal";
+import { useDispatch } from "react-redux";
+import { addItemToCart2 } from "@/redux/slices/cartOrder";
+import { useRouter } from "next/navigation";
 
 export default function BoxContents({ box, loading = false }) {
   const [selectedItem, setSelectedItem] = useState(null);
@@ -15,6 +18,8 @@ export default function BoxContents({ box, loading = false }) {
   const [copiedField, setCopiedField] = useState(null);
   const [spinResultData, setSpinResultData] = useState(null);
   const [showFullDescription, setShowFullDescription] = useState(false);
+  const dispatch = useDispatch();
+  const router = useRouter();
 
   const {
     // States
@@ -87,12 +92,20 @@ export default function BoxContents({ box, loading = false }) {
     return <BoxContentsSkeleton />;
   }
 
+  function handleAddToCart(item) {
+    console.log("add to cart...");
+    const payload = { item, quantity: 1 };
+    dispatch(addItemToCart2(payload));
+    router.push("/cart");
+  }
+
   return (
     <>
       <div className="container mx-auto mb-4 px-5">
         <section className="bg-[#EFEFEF] py-8 rounded-lg">
           <div className="px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl font-bold mb-8">What's in the box...</h2>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-6">
               {box?.prizeItems?.map((item) => (
                 <div
@@ -232,7 +245,10 @@ export default function BoxContents({ box, loading = false }) {
 
                 {/* Action Buttons */}
                 <div className="flex flex-col gap-3">
-                  <Button className="w-full bg-gray-800 hover:bg-black text-white font-semibold py-3.5 text-base rounded-lg flex items-center justify-center gap-2">
+                  <Button
+                    className="w-full bg-gray-800 hover:bg-black text-white font-semibold py-3.5 text-base rounded-lg flex items-center justify-center gap-2"
+                    onClick={() => handleAddToCart(selectedItem)}
+                  >
                     <ShoppingCart className="h-5 w-5" />
                     ADD TO CART
                   </Button>
@@ -324,7 +340,10 @@ export default function BoxContents({ box, loading = false }) {
 
                 {/* Action Buttons */}
                 <div className="flex flex-col gap-3">
-                  <Button className="w-full bg-gray-800 hover:bg-black text-white font-semibold py-3.5 text-base rounded-lg flex items-center justify-center gap-2">
+                  <Button
+                    className="w-full bg-gray-800 hover:bg-black text-white font-semibold py-3.5 text-base rounded-lg flex items-center justify-center gap-2"
+                    onClick={() => handleAddToCart(selectedItem)}
+                  >
                     <ShoppingCart className="h-5 w-5" />
                     ADD TO CART
                   </Button>

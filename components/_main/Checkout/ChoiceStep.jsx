@@ -1,7 +1,9 @@
 import { Package, Truck, Hexagon, RefreshCw, ArrowRight } from "lucide-react";
 
 // Choice Step Component (Ship vs Resell)
-const ChoiceStep = ({ onChoice, cart, resellValue, resellPercentage }) => {
+const ChoiceStep = (props) => {
+  console.log("propsChoicw:::", props);
+  const { onChoice, cart, resellValue, resellPercentage } = props;
   const itemValue = cart.items.reduce(
     (total, item) => total + (item.value || 0),
     0

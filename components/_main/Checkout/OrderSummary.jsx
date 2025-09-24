@@ -1,4 +1,6 @@
+"use client";
 import { Hexagon, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 // Order Summary Component
 const OrderSummary = ({
@@ -12,10 +14,13 @@ const OrderSummary = ({
   cart,
   isPostSpinOrder,
   paymentMethod,
+  resellDataLoading,
 }) => {
   if (isCartEmpty) {
     return null;
   }
+
+  const router = useRouter();
 
   const itemsTotal = cart.items.reduce((total, item) => {
     if (isPostSpinOrder) return 0;
@@ -43,19 +48,32 @@ const OrderSummary = ({
       setShowChoiceStep(true);
       setActiveStep(0);
     }
+
+    if (activeStep === 1 && !isPostSpinOrder) {
+      router.back();
+    }
   };
 
   // Helper function to format price based on payment method
   const formatPrice = (amount) => {
+    const numAmount =
+      typeof amount === "number" ? amount : parseFloat(amount) || 0;
+
+    // Format number with commas and 2 decimal places
+    const formattedAmount = numAmount.toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+
     if (paymentMethod === "wallet") {
       return (
         <span className="flex items-center">
           <Hexagon className="w-4 h-4 mr-1 text-[#11F2EB]" />
-          {amount.toFixed(2)}
+          {formattedAmount}
         </span>
       );
     } else {
-      return `$${amount.toFixed(2)}`;
+      return `$${formattedAmount}`;
     }
   };
 
@@ -174,7 +192,7 @@ const OrderSummary = ({
         {activeStep > 0 && (
           <button
             onClick={handleBack}
-            disabled={isSubmitting}
+            disabled={isSubmitting || resellDataLoading}
             className="w-full border border-gray-300 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
           >
             Back

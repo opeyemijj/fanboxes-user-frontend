@@ -48,6 +48,29 @@ const slice = createSlice({
       state.cart.orderType = "direct";
     },
 
+    addItemToCart2(state, action) {
+      const { item, quantity = 1 } = action.payload;
+
+      const existingItem = state.cart.items.find(
+        (cartItem) => cartItem.slug === item.slug
+      );
+
+      if (existingItem) {
+        existingItem.quantity = (existingItem.quantity || 1) + quantity;
+      } else {
+        //reset entire cart to only contain newly added item
+        state.cart.items = [
+          {
+            ...item,
+            quantity,
+          },
+        ];
+      }
+
+      state.cart.totalAmountPaid = calculateTotal(state.cart);
+      state.cart.orderType = "direct";
+    },
+
     addWonItemToCart(state, action) {
       const { item, spinData } = action.payload;
 
@@ -185,6 +208,7 @@ export default slice.reducer;
 // Actions
 export const {
   addItemToCart,
+  addItemToCart2,
   addWonItemToCart,
   removeItemFromCart,
   updateItemQuantity,
@@ -220,3 +244,5 @@ export const selectCartItemsCount = (state) =>
     (total, item) => total + (item.quantity || 1),
     0
   );
+export const selectDirectBuyItems = (state) =>
+  state.cartOrder.cart.orderType === "direct" ? state.cartOrder.cart.items : [];

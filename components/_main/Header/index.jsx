@@ -15,15 +15,18 @@ import {
   Menu,
   X,
   Receipt,
+  ShoppingCart,
 } from "lucide-react";
 import TopUpPopup from "../TopUpPopup";
 import { useAuth } from "@/components/AuthProvider";
 import { useSelector } from "react-redux";
 import HeaderWalletBalance from "./HeaderWalletBalance";
+import { selectDirectBuyItems } from "@/redux/slices/cartOrder";
 
 function Header() {
   // console.log("header rendered...");
   const userData = useSelector((state) => state.user);
+  const cartItems = useSelector(selectDirectBuyItems);
   const [showTopUpPopup, setShowTopUpPopup] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -32,6 +35,12 @@ function Header() {
 
   const pathname = usePathname();
   const { logout } = useAuth();
+
+  // Calculate total items in cart
+  const totalCartItems = cartItems.reduce(
+    (total, item) => total + (item.quantity || 1),
+    0
+  );
 
   useEffect(() => {
     setUser(userData?.user);
@@ -70,16 +79,17 @@ function Header() {
       <header className="fixed top-0 left-0 right-0 z-[9999] bg-white/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
-            <div className="flex items-center space-x-8">
+            <div className="flex items-center space-x-6 lg:space-x-8">
+              {/* Smaller logo for mobile */}
               <Link href="/" className="flex items-center space-x-2">
                 <Image
                   src="/favicon.png"
                   alt="Logo"
-                  width={32}
-                  height={32}
-                  className="h-8 w-8"
+                  width={28}
+                  height={28}
+                  className="h-7 w-7 lg:h-8 lg:w-8"
                 />
-                <span className="font-bold text-2xl">fanboxes</span>
+                <span className="font-bold text-xl lg:text-2xl">fanboxes</span>
               </Link>
               <nav className="hidden lg:flex items-center space-x-4">
                 <Link href="/mystery-boxes" prefetch={false}>
@@ -111,6 +121,22 @@ function Header() {
 
             {/* Desktop Navigation - Show on large screens only */}
             <div className="hidden lg:flex items-center space-x-4">
+              {/* Cart Icon for Desktop */}
+              {totalCartItems > 0 && (
+                <Link href="/cart" className="relative">
+                  <Button
+                    variant="ghost"
+                    className="relative p-2 text-gray-600 hover:bg-[#EFEFEF] hover:text-[#11F2EB] transition-colors"
+                  >
+                    <ShoppingCart className="h-5 w-5" />
+
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold">
+                      {totalCartItems > 99 ? "99+" : totalCartItems}
+                    </span>
+                  </Button>
+                </Link>
+              )}
+
               {isLoggedIn && user ? (
                 <>
                   <Button
@@ -118,7 +144,6 @@ function Header() {
                     variant="outline"
                     className="flex items-center border-gray-200 bg-transparent hover:bg-[#11F2EB] hover:text-white hover:border-[#11F2EB] transition-colors"
                   >
-                    {/* <span className="font-semibold">x1,200</span> */}
                     <HeaderWalletBalance
                       handleLogout={handleLogout}
                       availableBalance={userData?.user?.availableBalance}
@@ -223,21 +248,38 @@ function Header() {
             </div>
 
             {/* Mobile menu button - Show on medium and small screens */}
-            <div className="lg:hidden flex items-center">
+            <div className="lg:hidden flex items-center space-x-2">
+              {/* Cart Icon for Mobile */}
+              {totalCartItems > 0 && (
+                <Link href="/cart" className="relative">
+                  <Button
+                    variant="ghost"
+                    className="relative p-2 text-gray-600 hover:bg-[#EFEFEF] hover:text-[#11F2EB] transition-colors"
+                  >
+                    <ShoppingCart className="h-5 w-5" />
+
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold">
+                      {totalCartItems > 9 ? "9+" : totalCartItems}
+                    </span>
+                  </Button>
+                </Link>
+              )}
+
               {isLoggedIn && user && (
                 <Button
                   onClick={() => setShowTopUpPopup(true)}
                   variant="outline"
-                  className="mr-4 flex items-center border-gray-200 bg-transparent hover:bg-[#11F2EB] hover:text-white hover:border-[#11F2EB] transition-colors"
+                  className="flex items-center border-gray-200 bg-transparent hover:bg-[#11F2EB] hover:text-white hover:border-[#11F2EB] transition-colors p-2"
                 >
-                  {/* <span className="font-semibold">x1,200</span> */}
                   <HeaderWalletBalance
                     handleLogout={handleLogout}
                     availableBalance={userData?.user?.availableBalance}
+                    isMobile={true}
                   />
-                  <Hexagon className="h-4 w-4 text-gray-500" />
+                  <Hexagon className="h-4 w-4 text-gray-500 ml-1" />
                 </Button>
               )}
+
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="text-gray-600 hover:text-gray-900 p-2 rounded-md"
@@ -280,6 +322,26 @@ function Header() {
                     }`}
                   >
                     OUR AMBASSADORS
+                  </Button>
+                </Link>
+
+                {/* Mobile Cart Link */}
+                <Link href="/cart">
+                  <Button
+                    variant="ghost"
+                    className={`w-full justify-start text-sm font-semibold transition-colors ${
+                      pathname === "/cart"
+                        ? "bg-black text-white hover:bg-black hover:text-[#11F2EB]"
+                        : "bg-[#EFEFEF] text-gray-600 hover:bg-[#11F2EB] hover:text-white"
+                    }`}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <ShoppingCart className="h-4 w-4" />
+                      <span>
+                        My Cart {totalCartItems > 0 && `(${totalCartItems})`}
+                      </span>
+                    </div>
                   </Button>
                 </Link>
 

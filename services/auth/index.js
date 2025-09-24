@@ -30,3 +30,8 @@ export const resetPassword = async ({ newPassword, token }) => {
   });
   return data;
 };
+
+export const verifyLoggedInUserToken = async () => {
+  const { data } = await http.get("/auth/verify-token");
+  return data;
+};
