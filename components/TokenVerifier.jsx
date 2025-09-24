@@ -64,8 +64,7 @@ export default function TokenVerifier({
       console.error("Token verification error:", error);
       setVerificationResult({
         success: false,
-        message:
-          "Network error during verification. Please check your connection.",
+        message: "Session Expired. Please login to continue",
       });
 
       // Route to login with current path as destination
