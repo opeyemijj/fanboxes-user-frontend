@@ -6,6 +6,20 @@ import { updateMyShippingAddress } from "@/services/profile";
 import { updateShippingAddress } from "@/redux/slices/user";
 import { toastError, toastSuccess, toastInfo } from "@/lib/toast";
 
+const InputField = ({ label, ...props }) => (
+  <div>
+    <label className="mb-2 block text-sm font-medium text-gray-700">
+      {label}
+    </label>
+    <input
+      {...props}
+      className="w-full rounded-lg border border-gray-200 px-4 py-3
+                 focus:border-[#11F2EB] focus:ring-2 focus:ring-[#11F2EB]
+                 transition-colors"
+    />
+  </div>
+);
+
 const AddressManager = ({ user, showHeader = true, compact = false }) => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [addressData, setAddressData] = useState({
@@ -195,20 +209,6 @@ const AddressManager = ({ user, showHeader = true, compact = false }) => {
     }
   };
 
-  const InputField = ({ label, ...props }) => (
-    <div>
-      <label className="mb-2 block text-sm font-medium text-gray-700">
-        {label}
-      </label>
-      <input
-        {...props}
-        className="w-full rounded-lg border border-gray-200 px-4 py-3
-                 focus:border-[#11F2EB] focus:ring-2 focus:ring-[#11F2EB]
-                 transition-colors"
-      />
-    </div>
-  );
-
   if (!user) {
     return (
       <div className="bg-white rounded-lg shadow-sm p-6">
@@ -351,7 +351,7 @@ const AddressManager = ({ user, showHeader = true, compact = false }) => {
 
       {/* Add/Edit Address Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[9999]">
           <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden flex flex-col">
             {/* Header */}
             <div className="relative bg-gray-50 px-6 py-4 border-b border-gray-200 flex-shrink-0">
