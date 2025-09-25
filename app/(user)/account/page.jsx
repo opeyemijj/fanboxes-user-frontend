@@ -5,6 +5,7 @@ import Footer from "@/components/_main/Footer";
 import Header from "@/components/_main/Header";
 import SpinListing from "@/components/_main/SpinHistory/SpinListing";
 import AddressDetailsView from "@/components/_main/AddressDetails/AddressDetailsView";
+import OrderListing from "@/components/_main/OrderHistory/OrderListing";
 import { useSelector } from "react-redux";
 
 const Account = () => {
@@ -26,7 +27,7 @@ const Account = () => {
       tabName: "My Orders",
       queryId: "orders",
       activeUrlElement: "/orders",
-      component: null,
+      component: <OrderListing />,
     },
     {
       tabName: "Spin History",
