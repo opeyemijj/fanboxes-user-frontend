@@ -66,16 +66,18 @@ export default function BoxContents({ box, loading = false }) {
   };
 
   const handleSpinForBtnClicked = async () => {
-    setShowPopup(false);
-    // Show seed verification modal
-    setShowSeedModal(true);
+    // setShowPopup(false);
+    // // Show seed verification modal
+    // setShowSeedModal(true);
+    // // Call handleSpin with true to get the spin result data
+    // const result = await handleSpin(true);
+    // if (result && result._id) {
+    //   setSpinRecordId(result._id);
+    // }
+    // setSpinResultData(result);
 
-    // Call handleSpin with true to get the spin result data
-    const result = await handleSpin(true);
-    if (result && result._id) {
-      setSpinRecordId(result._id);
-    }
-    setSpinResultData(result);
+    setShowPopup(false);
+    scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const toggleDescription = () => {
@@ -107,46 +109,49 @@ export default function BoxContents({ box, loading = false }) {
             <h2 className="text-3xl font-bold mb-8">What's in the box...</h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-6">
-              {box?.prizeItems?.map((item) => (
-                <div
-                  key={item._id}
-                  className="group cursor-pointer"
-                  onClick={() => handleItemClick(item)}
-                >
-                  <div className="bg-white rounded-lg overflow-hidden shadow-sm aspect-[4/3] relative flex">
-                    <div className="relative bg-white p-4 flex-1 flex items-center justify-center">
-                      {item.odd && (
-                        <div className="absolute top-2 right-2 bg-black text-white text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-all duration-300 ease-in-out md:opacity-0 md:group-hover:opacity-100">
-                          {item.odd}
+              {box?.prizeItems
+                ?.slice()
+                .sort((a, b) => (b.value || 0) - (a.value || 0))
+                ?.map((item) => (
+                  <div
+                    key={item._id}
+                    className="group cursor-pointer"
+                    onClick={() => handleItemClick(item)}
+                  >
+                    <div className="bg-white rounded-lg overflow-hidden shadow-sm aspect-[4/3] relative flex">
+                      <div className="relative bg-white p-4 flex-1 flex items-center justify-center">
+                        {item.odd && (
+                          <div className="absolute top-2 right-2 bg-black text-white text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-all duration-300 ease-in-out md:opacity-0 md:group-hover:opacity-100">
+                            {item.odd}
+                          </div>
+                        )}
+                        <Image
+                          src={item?.images[0]?.url || "/placeholder.svg"}
+                          alt={item.name}
+                          width={200}
+                          height={150}
+                          className="object-contain max-w-full max-h-full group-hover:scale-105 transition-transform duration-300 ease-in-out"
+                        />
+                        <div className="absolute top-2 left-2 bg-gray-900/50 text-white text-xs font-semibold px-2 py-1 rounded-full transition-all duration-300 ease-in-out group-hover:bg-gray-900/70">
+                          ${item.value?.toLocaleString() || "0"}
                         </div>
-                      )}
-                      <Image
-                        src={item?.images[0]?.url || "/placeholder.svg"}
-                        alt={item.name}
-                        width={200}
-                        height={150}
-                        className="object-contain max-w-full max-h-full group-hover:scale-105 transition-transform duration-300 ease-in-out"
-                      />
-                      <div className="absolute top-2 left-2 bg-gray-900/50 text-white text-xs font-semibold px-2 py-1 rounded-full transition-all duration-300 ease-in-out group-hover:bg-gray-900/70">
-                        ${item.value?.toLocaleString() || "0"}
+                        <Button className="absolute bottom-4 right-4 bg-black/80 text-white rounded-full h-6 w-20 text-xs transition-all duration-300 ease-in-out flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 group-hover:bg-black">
+                          VIEW →
+                        </Button>
                       </div>
-                      <Button className="absolute bottom-4 right-4 bg-black/80 text-white rounded-full h-6 w-20 text-xs transition-all duration-300 ease-in-out flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 group-hover:bg-black">
-                        VIEW →
-                      </Button>
+                    </div>
+                    <div className="mt-2">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-bold text-sm transition-colors duration-300">
+                          {item.name}
+                        </h3>
+                        <p className="text-xs text-gray-500 transition-colors duration-300 group-hover:text-gray-700">
+                          {item.brand}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                  <div className="mt-2">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-bold text-sm transition-colors duration-300">
-                        {item.name}
-                      </h3>
-                      <p className="text-xs text-gray-500 transition-colors duration-300 group-hover:text-gray-700">
-                        {item.brand}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
+                ))}
             </div>
           </div>
         </section>
@@ -257,7 +262,7 @@ export default function BoxContents({ box, loading = false }) {
                     onClick={handleSpinForBtnClicked}
                   >
                     <Hexagon className="h-5 w-5" />
-                    SPIN FOR ×{selectedItem.value?.toLocaleString() || "0"}
+                    SPIN FOR ×{box?.priceSale?.toLocaleString() || "0"}
                   </Button>
                   <button
                     onClick={closePopup}
@@ -352,7 +357,7 @@ export default function BoxContents({ box, loading = false }) {
                     onClick={handleSpinForBtnClicked}
                   >
                     <Hexagon className="h-5 w-5" />
-                    SPIN FOR ×{selectedItem.value?.toLocaleString() || "0"}
+                    SPIN FOR ×{box?.priceSale?.toLocaleString() || "0"}
                   </Button>
                   {/* <button
                     onClick={closePopup}
