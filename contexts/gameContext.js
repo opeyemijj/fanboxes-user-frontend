@@ -165,7 +165,7 @@ export const GameProvider = ({ children, box }) => {
     try {
       const token = user?.user?.token;
       if (!token) {
-        toastError("Please log in to spin the wheel.");
+        toastError("Please log in to spin the box.");
         router.push(`/login?dest=${pathname}`);
         return;
       }
@@ -211,6 +211,13 @@ export const GameProvider = ({ children, box }) => {
       // if (error?.response?.data?.errorCode === "INSUFFICIENT_BALANCE") {
       //   setInSufficientBalError(true);
       // }
+
+      if (error?.response?.status === 401) {
+        toastError("Please log in to spin the box.");
+        router.push(`/login?dest=${pathname}`);
+        return;
+      }
+
       setCreateSpinApiError(
         error?.response?.data?.message ||
           error?.message ||
