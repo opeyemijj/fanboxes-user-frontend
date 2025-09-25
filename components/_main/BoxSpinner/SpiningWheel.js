@@ -90,14 +90,52 @@ export default function SpinningWheel({
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 768) {
-        setRadius(1000);
         setItemSize(140);
+
+        if (items?.length >= 1 && items?.length <= 10) {
+          setRadius(200);
+        } else if (items?.length >= 11 && items?.length <= 20) {
+          setRadius(450);
+        } else if (items?.length >= 21 && items?.length <= 30) {
+          setRadius(800);
+        } else if (items?.length >= 31 && items?.length <= 40) {
+          setRadius(1000);
+        } else if (items?.length >= 41 && items?.length <= 50) {
+          setRadius(1200);
+        } else if (items?.length > 50) {
+          setRadius(1350);
+        }
       } else if (window.innerWidth < 1280) {
-        setRadius(1000);
         setItemSize(150);
+
+        if (items?.length >= 1 && items?.length <= 10) {
+          setRadius(300);
+        } else if (items?.length >= 11 && items?.length <= 20) {
+          setRadius(550);
+        } else if (items?.length >= 21 && items?.length <= 30) {
+          setRadius(900);
+        } else if (items?.length >= 31 && items?.length <= 40) {
+          setRadius(1100);
+        } else if (items?.length >= 41 && items?.length <= 50) {
+          setRadius(1300);
+        } else if (items?.length > 50) {
+          setRadius(1450);
+        }
       } else {
-        setRadius(1150);
         setItemSize(160);
+        if (items?.length >= 1 && items?.length <= 10) {
+          setRadius(400);
+        } else if (items?.length >= 11 && items?.length <= 20) {
+          setRadius(600);
+        } else if (items?.length >= 21 && items?.length <= 30) {
+          setRadius(950);
+        } else if (items?.length >= 31 && items?.length <= 40) {
+          setRadius(1150);
+        } else if (items?.length >= 41 && items?.length <= 50) {
+          setRadius(1350);
+        } else if (items?.length > 50) {
+          setRadius(1500);
+        }
       }
     };
 
@@ -685,7 +723,7 @@ export default function SpinningWheel({
         </div>
 
         {/* Button Container - Responsive Side by Side */}
-        <div className="absolute bottom-4 md:bottom-8 z-20 flex flex-col sm:flex-row gap-2 sm:gap-3 w-full px-4 sm:px-0 sm:w-auto items-center">
+        <div className="absolute bottom-4 md:bottom-8 z-20 flex flex-col-reverse sm:flex-row-reverse gap-2 sm:gap-3 w-full px-4 sm:px-0 sm:w-auto items-center">
           {isSpinning ? (
             // Stop Button - Only shown when spinning
             <Button
@@ -710,9 +748,9 @@ export default function SpinningWheel({
               {/* Demo Spin Button - Free */}
               <Button
                 size="lg"
-                className="h-12 sm:h-12 rounded-full bg-transparent border-2 border-green-500 
-            hover:bg-green-500/10 hover:border-green-400
-            text-green-500 font-bold text-base sm:text-lg transition-all hover:scale-105 active:scale-95 
+                className="h-12 sm:h-12 rounded-full bg-transparent border-2 border-[#11F2EB]
+            hover:bg-cyan-500/10 hover:border-[#11F2EB]
+            text-[#11F2EB] font-bold text-base sm:text-lg transition-all hover:scale-105 active:scale-95 
             disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto min-w-[140px]"
                 onClick={() => {
                   handleDemoSpinClick();
@@ -723,16 +761,16 @@ export default function SpinningWheel({
                   <div className="flex items-center justify-center">
                     <Loader className="h-4 w-4 sm:h-5 sm:w-5 mr-2 animate-spin" />
                     <span className="whitespace-nowrap">LOADING...</span>
-                    <span className="ml-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
+                    {/* <span className="ml-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
                       FREE
-                    </span>
+                    </span> */}
                   </div>
                 ) : (
                   <div className="flex items-center justify-center">
                     <span className="whitespace-nowrap">DEMO SPIN</span>
-                    <span className="ml-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
+                    {/* <span className="ml-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
                       FREE
-                    </span>
+                    </span> */}
                   </div>
                 )}
               </Button>
