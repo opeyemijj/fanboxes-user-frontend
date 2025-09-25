@@ -196,7 +196,7 @@ const CheckoutScreen = () => {
             setActiveStep(1);
           } else if (action === "resell") {
             setUserChoice("resell");
-            setShowChoiceStep(false);
+            setShowChoiceStep(true);
             // Don't show resell modal until data is loaded
             setResellDataLoading(true);
           } else {
@@ -237,7 +237,6 @@ const CheckoutScreen = () => {
     fetchCashToCreditConversionRate,
     fetchCurrentResellPercentage,
     updateResellData,
-    cart.note,
     cart.items,
     isPostSpinOrder,
   ]);
@@ -731,10 +730,11 @@ const CheckoutScreen = () => {
             isOpen={showResellModal}
             onClose={() => {
               setShowResellModal(false);
-              if (!userChoice) {
-                setShowChoiceStep(true);
-                setUserChoice(null);
-              }
+              setShowChoiceStep(true);
+              // if (!userChoice) {
+              //   setShowChoiceStep(true);
+              //   setUserChoice(null);
+              // }
             }}
             onConfirm={handleResellConfirm}
             winningItem={resellData.winningItem || cart.items?.[0]}
@@ -747,11 +747,6 @@ const CheckoutScreen = () => {
 
           {/* Loading Overlay */}
           {isSubmitting && <LoadingOverlay />}
-
-          {/* Address Modal */}
-          {/* {showAddressModal && (
-            <AddressModal onClose={() => setShowAddressModal(false)} />
-          )} */}
         </div>
       </div>
       <Footer />
