@@ -90,14 +90,14 @@ export default function SpinningWheel({
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 768) {
-        setRadius(250);
-        setItemSize(80);
-      } else if (window.innerWidth < 1280) {
-        setRadius(400);
-        setItemSize(120);
-      } else {
-        setRadius(550);
+        setRadius(1000);
         setItemSize(140);
+      } else if (window.innerWidth < 1280) {
+        setRadius(1000);
+        setItemSize(150);
+      } else {
+        setRadius(1150);
+        setItemSize(160);
       }
     };
 
@@ -625,19 +625,22 @@ export default function SpinningWheel({
                   }}
                 >
                   <div
-                    className={`relative w-full h-full rounded-2xl overflow-hidden
-                  bg-gradient-to-r from-gray-800/0 via-gray-800 via-[50%] to-gray-800/0 backdrop-blur-md
-                ${
-                  style.z > 0
-                    ? "shadow-2xl shadow-blue-500/20"
-                    : "shadow-lg shadow-black/20 opacity-30"
-                }
-                ${
-                  style.isWinningItemAtWinningSpot &&
-                  "border-4 border-[#11F2EB] shadow-[#11F2EB]/70 bg-gradient-to-br from-[#11F2EB]/30 to-orange-100/30"
-                }
-                transition-all duration-500
-              `}
+                    className={`
+                      relative w-full h-full rounded-2xl overflow-hidden
+                                            bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm
+
+                      ${
+                        style.z > 0
+                          ? "shadow-2xl shadow-blue-500/20"
+                          : "shadow-lg shadow-black/20"
+                      }
+                      ${
+                        style.isWinningItemAtWinningSpot
+                          ? "border-4 border-[#11F2EB] shadow-[#11F2EB]/70 bg-gradient-to-br from-[#11F2EB]/30 to-orange-100/30"
+                          : "border border-white/20"
+                      }
+                      transition-all duration-500
+                    `}
                   >
                     <img
                       src={item.images[0]?.url || "/placeholder.svg"}
