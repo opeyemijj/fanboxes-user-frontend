@@ -211,7 +211,7 @@ export default function BoxContents({ box, loading = false }) {
                     <span className="bg-blue-100 text-blue-800 text-xs font-medium px-3 py-1.5 rounded-full">
                       IN STOCK
                     </span>
-                    {selectedItem.odd && (
+                    {!box?.isItemOddsHidden && selectedItem.odd && (
                       <span className="bg-purple-100 text-purple-800 text-xs font-medium px-3 py-1.5 rounded-full">
                         {selectedItem.odd} ODDS
                       </span>
@@ -305,7 +305,7 @@ export default function BoxContents({ box, loading = false }) {
                   <span className="bg-blue-100 text-blue-800 text-xs font-medium px-3 py-1.5 rounded-full">
                     IN STOCK
                   </span>
-                  {selectedItem.odd && (
+                  {!box?.isItemOddsHidden && selectedItem.odd && (
                     <span className="bg-purple-100 text-purple-800 text-xs font-medium px-3 py-1.5 rounded-full">
                       {selectedItem.odd} ODDS
                     </span>
