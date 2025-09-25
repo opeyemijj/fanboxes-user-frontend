@@ -6,6 +6,12 @@ export async function initializeSpin(payload) {
   return data;
 }
 
+export async function initializeDemoSpin(payload) {
+  // payload = {clientSeed,nonce,boxId,items};
+  const { data } = await http.post("/user/demo-spin", payload);
+  return data;
+}
+
 export const getSpinsByAdmin = async () => {
   const { data } = await http.get(`admin/spins`);
   return data;

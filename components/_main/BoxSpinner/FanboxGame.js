@@ -39,6 +39,7 @@ export default function FanboxGame({ boxConfig: initialBoxConfig }) {
 
     // Functions
     handleSpin,
+    handleDemoSpin,
     handleSpinComplete,
     generateAndSetClientSeed,
     resetGame,
@@ -132,6 +133,7 @@ export default function FanboxGame({ boxConfig: initialBoxConfig }) {
           items={currentBoxConfig.items} // Use current dynamic config
           onSpinComplete={handleSpinComplete}
           onSpin={handleSpin}
+          onDemoSpin={handleDemoSpin}
           isSpinning={gameState === "spinning"}
           winningItem={spinResult?.winningItem}
           boxPrice={currentBoxConfig?.priceSale || currentBoxConfig?.boxPrice}

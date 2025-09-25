@@ -20,6 +20,7 @@ import {
   Crown,
   Coins,
   Zap,
+  Square,
 } from "lucide-react";
 import {
   Dialog,
@@ -42,6 +43,7 @@ export default function SpinningWheel({
   isSpinning,
   winningItem,
   onSpin,
+  onDemoSpin,
   boxPrice,
   isWaitingForResult,
   createSpinApiError,
@@ -72,6 +74,8 @@ export default function SpinningWheel({
   const [spinRecordId, setSpinRecordId] = useState(null);
   const [showResellModal, setShowResellModal] = useState(false);
   const [resellLoading, setResellLoading] = useState(false);
+  const [isDemoSpin, setIsDemoSpin] = useState(false);
+  const [isStoppingSpin, setIsStoppingSpin] = useState(false);
   const dispatch = useDispatch();
   const router = useRouter();
 
@@ -296,6 +300,8 @@ export default function SpinningWheel({
     // setShowSeedModal(true);
 
     // Call onSpin with true to get the spin result data
+    setIsStoppingSpin(false);
+    setIsDemoSpin(false); // Reset demo flag
     const result = await onSpin(true);
 
     if (result) {
@@ -305,6 +311,18 @@ export default function SpinningWheel({
     // if (result && result._id) {
     //   setSpinRecordId(result._id);
     // }
+    setSpinResultData(result);
+  };
+
+  const handleDemoSpinClick = async () => {
+    setIsStoppingSpin(false);
+    setIsDemoSpin(true); // Mark as demo spin
+    const result = await onDemoSpin(true);
+
+    if (result) {
+      onDemoSpin(false, result); // spin directly
+    }
+
     setSpinResultData(result);
   };
 
@@ -527,6 +545,10 @@ export default function SpinningWheel({
     }
   }
 
+  const handleStopSpin = () => {
+    setIsStoppingSpin(true);
+  };
+
   return (
     <>
       <div className="relative w-full h-[50vh] min-h-[400px] overflow-hidden flex flex-col items-center justify-center rounded-2xl">
@@ -549,8 +571,8 @@ export default function SpinningWheel({
           </div>
         </div>
 
-        {/* FIXED WINNING SPOT INDICATOR - Absolute Center Front */}
-        <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-40 pointer-events-none">
+        {/* FIXED WINNING SPOT INDICATOR - Responsive Positioning */}
+        <div className="absolute bottom-32 sm:bottom-20 left-1/2 -translate-x-1/2 z-40 pointer-events-none">
           <motion.div
             animate={{
               scale: [1, 1.1, 1],
@@ -565,7 +587,7 @@ export default function SpinningWheel({
           >
             {/* Pointer arrow */}
             {isSpinning && (
-              <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[15px] border-r-[15px] border-b-[20px] border-l-transparent border-r-transparent border-b-[#11F2EB]" />
+              <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[15px] border-r-[15px] border-b-[20px] border-l-transparent border-r-transparent border-b-red-800" />
             )}
           </motion.div>
         </div>
@@ -592,10 +614,10 @@ export default function SpinningWheel({
                     left: "50%",
                     top: "50%",
                     transform: `
-                      translate(-50%, -50%) 
-                      translate3d(${style.x}px, 0px, 0px)
-                      scale(${style.scale})
-                    `,
+                translate(-50%, -50%) 
+                translate3d(${style.x}px, 0px, 0px)
+                scale(${style.scale})
+              `,
                     zIndex: style.zIndex,
                     opacity: style.opacity,
                     filter: `blur(${style.blur}px)`,
@@ -603,24 +625,19 @@ export default function SpinningWheel({
                   }}
                 >
                   <div
-                    className={`
-                      relative w-full h-full rounded-2xl overflow-hidden
-bg-gradient-to-r from-gray-800/0 via-gray-800 via-[50%] to-gray-800/0 backdrop-blur-md
-
-                      ${
-                        style.z > 0
-                          ? "shadow-2xl shadow-blue-500/20"
-                          : "shadow-lg shadow-black/20 opacity-30"
-                      }
-                      ${
-                        style.isWinningItemAtWinningSpot &&
-                        "border-4 border-[#11F2EB] shadow-[#11F2EB]/70 bg-gradient-to-br from-[#11F2EB]/30 to-orange-100/30"
-                        // : style.isAtWinningSpot && !isSpinning
-                        // ? "border-2 border-[#11F2EB]/50"
-                        // : "border border-white/20"
-                      }
-                      transition-all duration-500
-                    `}
+                    className={`relative w-full h-full rounded-2xl overflow-hidden
+                  bg-gradient-to-r from-gray-800/0 via-gray-800 via-[50%] to-gray-800/0 backdrop-blur-md
+                ${
+                  style.z > 0
+                    ? "shadow-2xl shadow-blue-500/20"
+                    : "shadow-lg shadow-black/20 opacity-30"
+                }
+                ${
+                  style.isWinningItemAtWinningSpot &&
+                  "border-4 border-[#11F2EB] shadow-[#11F2EB]/70 bg-gradient-to-br from-[#11F2EB]/30 to-orange-100/30"
+                }
+                transition-all duration-500
+              `}
                   >
                     <img
                       src={item.images[0]?.url || "/placeholder.svg"}
@@ -664,52 +681,86 @@ bg-gradient-to-r from-gray-800/0 via-gray-800 via-[50%] to-gray-800/0 backdrop-b
           </div>
         </div>
 
-        {/* Spin Button */}
-        <div className="absolute bottom-8 z-20">
-          <Button
-            size="lg"
-            className="h-14 rounded-full 
-    bg-gradient-to-r from-[#11F2EB] via-cyan-500 to-cyan-600 
-    hover:from-cyan-400 hover:via-[#11F2EB] hover:to-blue-700
-    text-white font-bold text-lg 
-
-    transition-all hover:scale-105 active:scale-95 
-    disabled:opacity-50 disabled:cursor-not-allowed"
-            onClick={handleSpinClick}
-            disabled={isSpinning || isWaitingForResult || items?.length < 1}
-          >
-            {isSpinning ? (
-              <motion.span
-                animate={{ opacity: [0.7, 1, 0.7] }}
-                transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY }}
-                className="flex items-center"
+        {/* Button Container - Responsive Side by Side */}
+        <div className="absolute bottom-4 md:bottom-8 z-20 flex flex-col sm:flex-row gap-2 sm:gap-3 w-full px-4 sm:px-0 sm:w-auto items-center">
+          {isSpinning ? (
+            // Stop Button - Only shown when spinning
+            <Button
+              size="lg"
+              className="h-12 sm:h-12 rounded-full bg-gradient-to-r from-red-500 via-red-600 to-red-700 
+          hover:from-red-600 hover:via-red-700 hover:to-red-800
+          text-white font-bold text-base sm:text-lg transition-all hover:scale-105 active:scale-95 
+          w-full sm:w-auto min-w-[140px]"
+              onClick={handleStopSpin}
+              disabled={isStoppingSpin}
+            >
+              <div className="flex items-center justify-center">
+                <Square className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                <span className="whitespace-nowrap">
+                  {isStoppingSpin ? "STOPPING..." : "STOP SPIN"}
+                </span>
+              </div>
+            </Button>
+          ) : (
+            // Original buttons when not spinning
+            <>
+              {/* Demo Spin Button - Free */}
+              <Button
+                size="lg"
+                className="h-12 sm:h-12 rounded-full bg-transparent border-2 border-green-500 
+            hover:bg-green-500/10 hover:border-green-400
+            text-green-500 font-bold text-base sm:text-lg transition-all hover:scale-105 active:scale-95 
+            disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto min-w-[140px]"
+                onClick={() => {
+                  handleDemoSpinClick();
+                }}
+                disabled={isSpinning || isWaitingForResult || items?.length < 1}
               >
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{
-                    duration: 1,
-                    repeat: Number.POSITIVE_INFINITY,
-                    ease: "linear",
-                  }}
-                  className="mr-2"
-                >
-                  <Hexagon className="h-5 w-5" />
-                </motion.div>
-                SPINNING...
-              </motion.span>
-            ) : isWaitingForResult ? (
-              <div className="flex items-center">
-                <Loader className="h-5 w-5 mr-2 animate-spin" />
-                LOADING...
-              </div>
-            ) : (
-              <div className="flex items-center">
-                SPIN FOR
-                <Hexagon className="h-5 w-5 ml-3 mr-0.5" />
-                {boxPrice?.toLocaleString()}
-              </div>
-            )}
-          </Button>
+                {isWaitingForResult && isDemoSpin ? (
+                  <div className="flex items-center justify-center">
+                    <Loader className="h-4 w-4 sm:h-5 sm:w-5 mr-2 animate-spin" />
+                    <span className="whitespace-nowrap">LOADING...</span>
+                    <span className="ml-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
+                      FREE
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center">
+                    <span className="whitespace-nowrap">DEMO SPIN</span>
+                    <span className="ml-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
+                      FREE
+                    </span>
+                  </div>
+                )}
+              </Button>
+
+              {/* Original Spin Button */}
+              <Button
+                size="lg"
+                className="h-12 sm:h-12 rounded-full bg-gradient-to-r from-[#11F2EB] via-cyan-500 to-cyan-600 
+            hover:from-cyan-400 hover:via-[#11F2EB] hover:to-blue-700
+            text-white font-bold text-base sm:text-lg transition-all hover:scale-105 active:scale-95 
+            disabled:opacity-50 disabled-cursor-not-allowed w-full sm:w-auto min-w-[140px]"
+                onClick={handleSpinClick}
+                disabled={isSpinning || isWaitingForResult || items?.length < 1}
+              >
+                {isWaitingForResult && !isDemoSpin ? (
+                  <div className="flex items-center justify-center">
+                    <Loader className="h-4 w-4 sm:h-5 sm:w-5 mr-2 animate-spin" />
+                    <span className="whitespace-nowrap">LOADING...</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center">
+                    <span className="whitespace-nowrap">SPIN FOR</span>
+                    <Hexagon className="h-4 w-4 sm:h-5 sm:w-5 ml-2 mr-1" />
+                    <span className="whitespace-nowrap">
+                      {boxPrice?.toLocaleString()}
+                    </span>
+                  </div>
+                )}
+              </Button>
+            </>
+          )}
         </div>
       </div>
 
@@ -769,6 +820,12 @@ bg-gradient-to-r from-gray-800/0 via-gray-800 via-[50%] to-gray-800/0 backdrop-b
                   <DialogTitle className="text-2xl font-bold text-center text-gray-800">
                     You've won!
                   </DialogTitle>
+                  {isDemoSpin && (
+                    <div className="mt-2 mb-4 inline-flex items-center justify-center self-center px-2 py-1 rounded-full bg-yellow-400 text-black text-xs font-semibold shadow">
+                      <Zap className="w-3 h-3 mr-1" />
+                      DEMO SPIN
+                    </div>
+                  )}
                 </DialogHeader>
 
                 {/* Item Display */}
@@ -796,7 +853,7 @@ bg-gradient-to-r from-gray-800/0 via-gray-800 via-[50%] to-gray-800/0 backdrop-b
                   <div className="flex flex-col items-center">
                     <div className="bg-gray-800 rounded-lg px-4 py-2 mb-1">
                       <span className="text-white font-semibold">
-                        ${winningItem.value}
+                        ${winningItem.value.toLocaleString()}
                       </span>
                     </div>
                     <span className="text-xs text-gray-600">Cash Value</span>
@@ -834,7 +891,7 @@ bg-gradient-to-r from-gray-800/0 via-gray-800 via-[50%] to-gray-800/0 backdrop-b
                         fill="currentColor"
                       />
                       <span className="text-white font-semibold">
-                        {winningItem.value}
+                        {winningItem.value.toLocaleString()}
                       </span>
                     </div>
                     <span className="text-xs text-gray-600">Credit Value</span>
@@ -858,27 +915,30 @@ bg-gradient-to-r from-gray-800/0 via-gray-800 via-[50%] to-gray-800/0 backdrop-b
                 </div>
 
                 {/* Action Buttons */}
-                <div className="grid grid-cols-2 gap-3 w-full max-w-sm">
-                  <Button
-                    className="w-full h-11 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium rounded-lg transition-colors"
-                    onClick={() => setShowResellModal(true)} // Open resell confirmation modal
-                  >
-                    CLAIM TOKENS
-                  </Button>
-                  <Button
-                    className="w-full h-11 bg-gradient-to-r from-[#11F2EB] to-cyan-600 
-                   hover:from-cyan-500 hover:to-[#11F2EB] text-slate-800 font-medium rounded-lg shadow-sm"
-                    onClick={() =>
-                      handleOrderWonItem(winningItem, spinResultData)
-                    }
-                  >
-                    SHIP ITEM →
-                  </Button>
-                </div>
+
+                {!isDemoSpin && (
+                  <div className="grid grid-cols-2 gap-3 w-full max-w-sm">
+                    <Button
+                      className="w-full h-11 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium rounded-lg transition-colors"
+                      onClick={() => setShowResellModal(true)}
+                    >
+                      CLAIM TOKENS
+                    </Button>
+                    <Button
+                      className="w-full h-11 bg-gradient-to-r from-[#11F2EB] to-cyan-600 
+       hover:from-cyan-500 hover:to-[#11F2EB] text-slate-800 font-medium rounded-lg shadow-sm"
+                      onClick={() =>
+                        handleOrderWonItem(winningItem, spinResultData)
+                      }
+                    >
+                      SHIP ITEM →
+                    </Button>
+                  </div>
+                )}
               </div>
 
               {/* Verification link */}
-              {spinResultData && (
+              {spinResultData && !isDemoSpin && (
                 <div className="px-6 pb-3 pt-2 border-t border-gray-200 relative z-10">
                   <button
                     onClick={() => {

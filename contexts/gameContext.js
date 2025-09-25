@@ -3,7 +3,10 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { usePathname, useRouter } from "next/navigation";
-import { initializeSpin } from "../services/boxes/spin-game/index";
+import {
+  initializeDemoSpin,
+  initializeSpin,
+} from "../services/boxes/spin-game/index";
 import { toastError } from "@/lib/toast";
 import {
   getCashToCreditConversionRate,
@@ -155,6 +158,72 @@ export const GameProvider = ({ children, box }) => {
     }
   };
 
+  const handleDemoSpin = async (resultsOnly = true, reusableResult) => {
+    console.log("🚀 Starting demo spin process...");
+    console.log("📦 Using current box config:", currentBoxConfig);
+
+    try {
+      const token = user?.user?.token;
+      if (!token) {
+        toastError("Please log in to spin the wheel.");
+        router.push(`/login?dest=${pathname}`);
+        return;
+      }
+
+      setGameState("waiting");
+      setInSufficientBalError(false);
+      setCreateSpinApiError("");
+
+      if (resultsOnly) {
+        // Call the spin API with current box configuration
+        const result = await initializeDemoSpin({
+          clientSeed,
+          nonce,
+          boxId: currentBoxConfig._id,
+          items: currentBoxConfig.items,
+        });
+
+        console.log("📡 Received demo spin result from API:", result);
+
+        if (!result?.success) {
+          setGameState("idle");
+          setCreateSpinApiError(result?.message);
+          toastError(result?.message);
+          return null;
+        }
+
+        console.log("demo-result.data", result.data);
+        //update wallet bal
+        const availableBalance = result?.availableBalance;
+        // dispatch(updateUserAvailableBalance(availableBalance));
+        setGameState("idle");
+        return { ...result?.data, availableBalance };
+      }
+
+      setGameState("spinning");
+      setSpinResult(reusableResult);
+      setServerSeedHash(reusableResult?.serverSeedHash);
+      setNonce((prev) => prev + 1);
+    } catch (error) {
+      console.error("❌ Error during demo spin:", error);
+      setGameState("idle");
+
+      // if (error?.response?.data?.errorCode === "INSUFFICIENT_BALANCE") {
+      //   setInSufficientBalError(true);
+      // }
+      setCreateSpinApiError(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Internal server error"
+      );
+      toastError(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Internal server error"
+      );
+    }
+  };
+
   const handleSpinComplete = () => {
     console.log("🎊 Spin animation completed");
     setGameState("completed");
@@ -197,6 +266,7 @@ export const GameProvider = ({ children, box }) => {
 
     // Functions
     handleSpin,
+    handleDemoSpin,
     handleSpinComplete,
     generateAndSetClientSeed,
     resetGame,
