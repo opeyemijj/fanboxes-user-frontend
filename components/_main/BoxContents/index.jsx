@@ -120,8 +120,8 @@ export default function BoxContents({ box, loading = false }) {
                   >
                     <div className="bg-white rounded-lg overflow-hidden shadow-sm aspect-[4/3] relative flex">
                       <div className="relative bg-white p-4 flex-1 flex items-center justify-center">
-                        {item.odd && (
-                          <div className="absolute top-2 right-2 bg-black text-white text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-all duration-300 ease-in-out md:opacity-0 md:group-hover:opacity-100">
+                        {!box?.isItemOddsHidden && item.odd && (
+                          <div className="absolute top-2 right-2 bg-black text-white text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-all duration-300 ease-in-out md:opacity-0 md:group-hover:opacity-100 z-50">
                             {item.odd}
                           </div>
                         )}
