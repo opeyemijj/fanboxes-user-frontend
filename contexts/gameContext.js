@@ -164,11 +164,11 @@ export const GameProvider = ({ children, box }) => {
 
     try {
       const token = user?.user?.token;
-      if (!token) {
-        toastError("Please log in to spin the box.");
-        router.push(`/login?dest=${pathname}`);
-        return;
-      }
+      // if (!token) {
+      //   toastError("Please log in to spin the box.");
+      //   router.push(`/login?dest=${pathname}`);
+      //   return;
+      // }
 
       setGameState("waiting");
       setInSufficientBalError(false);
