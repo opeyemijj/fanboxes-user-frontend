@@ -981,7 +981,7 @@ export default function SpinningWheel({
               {/* Verification link */}
               {spinResultData && !isDemoSpin && (
                 <div className="px-6 pb-3 pt-2 border-t border-gray-200 relative z-10">
-                  <button
+                  {/* <button
                     onClick={() => {
                       const queryParams = new URLSearchParams({
                         clientSeed: spinResultData?.clientSeed || "",
@@ -1015,7 +1015,7 @@ export default function SpinningWheel({
                       <line x1="10" y1="14" x2="21" y2="3"></line>
                     </svg>
                     Verify spin integrity
-                  </button>
+                  </button> */}
                 </div>
               )}
             </DialogContent>

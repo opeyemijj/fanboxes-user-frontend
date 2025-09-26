@@ -441,7 +441,7 @@ const OrderDetailsModal = ({
             )}
 
             {/* Spin Data (if applicable) */}
-            {order.spinData && (
+            {/* {order.spinData && (
               <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg p-4 border border-amber-100">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
@@ -505,7 +505,7 @@ const OrderDetailsModal = ({
                   </div>
                 )}
               </div>
-            )}
+            )} */}
           </div>
         </div>
 

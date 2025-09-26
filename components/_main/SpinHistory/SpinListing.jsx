@@ -349,7 +349,7 @@ const SpinDetailsModal = ({
             </div>
 
             {/* Verification Details */}
-            <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-4 border border-purple-100">
+            {/* <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-4 border border-purple-100">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
                   <CheckCircle className="w-4 h-4 text-purple-600" />
@@ -387,7 +387,7 @@ const SpinDetailsModal = ({
                   </p>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
 
