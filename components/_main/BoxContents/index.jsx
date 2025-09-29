@@ -257,13 +257,15 @@ export default function BoxContents({ box, loading = false }) {
                     <ShoppingCart className="h-5 w-5" />
                     ADD TO CART
                   </Button>
-                  <Button
-                    className="w-full bg-[#11F2EB] hover:bg-[#0EDFD9] text-black font-semibold py-3.5 text-base rounded-lg flex items-center justify-center gap-2"
-                    onClick={handleSpinForBtnClicked}
-                  >
-                    <Hexagon className="h-5 w-5" />
-                    SPIN FOR ×{box?.priceSale?.toLocaleString() || "0"}
-                  </Button>
+                  {selectedItem?.value >= box?.priceSale && (
+                    <Button
+                      className="w-full bg-[#11F2EB] hover:bg-[#0EDFD9] text-black font-semibold py-3.5 text-base rounded-lg flex items-center justify-center gap-2"
+                      onClick={handleSpinForBtnClicked}
+                    >
+                      <Hexagon className="h-5 w-5" />
+                      SPIN FOR ×{box?.priceSale?.toLocaleString() || "0"}
+                    </Button>
+                  )}
                   <button
                     onClick={closePopup}
                     className="w-full text-gray-600 font-medium py-2.5 text-base hover:text-gray-800 transition-colors"
@@ -352,13 +354,15 @@ export default function BoxContents({ box, loading = false }) {
                     <ShoppingCart className="h-5 w-5" />
                     ADD TO CART
                   </Button>
-                  <Button
-                    className="w-full bg-[#11F2EB] hover:bg-[#0EDFD9] text-black font-semibold py-3.5 text-base rounded-lg flex items-center justify-center gap-2"
-                    onClick={handleSpinForBtnClicked}
-                  >
-                    <Hexagon className="h-5 w-5" />
-                    SPIN FOR ×{box?.priceSale?.toLocaleString() || "0"}
-                  </Button>
+                  {selectedItem?.value >= box?.priceSale && (
+                    <Button
+                      className="w-full bg-[#11F2EB] hover:bg-[#0EDFD9] text-black font-semibold py-3.5 text-base rounded-lg flex items-center justify-center gap-2"
+                      onClick={handleSpinForBtnClicked}
+                    >
+                      <Hexagon className="h-5 w-5" />
+                      SPIN FOR ×{box?.priceSale?.toLocaleString() || "0"}
+                    </Button>
+                  )}
                   {/* <button
                     onClick={closePopup}
                     className="w-full text-gray-600 font-medium py-2.5 text-base hover:text-gray-800 transition-colors"
