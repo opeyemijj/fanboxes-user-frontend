@@ -6,6 +6,8 @@ import Header from "@/components/_main/Header";
 import SpinListing from "@/components/_main/SpinHistory/SpinListing";
 import AddressDetailsView from "@/components/_main/AddressDetails/AddressDetailsView";
 import OrderListing from "@/components/_main/OrderHistory/OrderListing";
+import Profile from "@/components/_main/Profile";
+import AccountSettings from "@/components/_main/AccountSettings";
 import { useSelector } from "react-redux";
 
 const Account = () => {
@@ -15,7 +17,7 @@ const Account = () => {
       tabName: "Profile",
       queryId: "profile",
       activeUrlElement: "/profile",
-      component: null,
+      component: <Profile user={user} />,
     },
     {
       tabName: "Address Details",
@@ -45,7 +47,7 @@ const Account = () => {
       tabName: "Account Settings",
       queryId: "settings",
       activeUrlElement: "/settings",
-      component: null,
+      component: <AccountSettings user={user} />,
     },
   ];
 

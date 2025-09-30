@@ -17,7 +17,8 @@ export default function SignupPage() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState("");
+  const [acceptedTerms, setAcceptedTerms] = useState(false); // New state for terms acceptance
   const router = useRouter();
   const { login, signup } = useAuth();
 
@@ -28,17 +29,10 @@ export default function SignupPage() {
     });
   };
 
-  // const handleSignup = async (e) => {
-  //   e.preventDefault()
-  //   setIsLoading(true)
+  const handleTermsChange = (e) => {
+    setAcceptedTerms(e.target.checked);
+  };
 
-  //   // Simulate signup process
-  //   setTimeout(() => {
-  //     login()
-  //     setIsLoading(false)
-  //     router.push("/")
-  //   }, 1000)
-  // }
   const handleSignup = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -91,7 +85,7 @@ export default function SignupPage() {
             {/* Google Signup Button */}
             <Button
               onClick={handleGoogleSignup}
-              disabled={isLoading}
+              disabled
               className="w-full mb-6 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-center space-x-3 py-3 rounded-xl"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -237,7 +231,9 @@ export default function SignupPage() {
                   id="terms"
                   type="checkbox"
                   required
-                  className="h-4 w-4 text-[#11F2EB] focus:ring-[#11F2EB] border-gray-300 rounded"
+                  checked={acceptedTerms}
+                  onChange={handleTermsChange}
+                  className="h-4 w-4 text-[#11F2EB] focus:ring-[#11F2EB] border-gray-300 rounded accent-[#11F2EB]"
                 />
                 <label
                   htmlFor="terms"
@@ -262,8 +258,8 @@ export default function SignupPage() {
 
               <Button
                 type="submit"
-                disabled={isLoading}
-                className="w-full bg-[#11F2EB] hover:bg-[#0DD4C7] text-white font-semibold py-3 rounded-xl transition-colors"
+                disabled={isLoading || !acceptedTerms}
+                className="w-full bg-[#11F2EB] hover:bg-[#0DD4C7] text-white font-semibold py-3 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? "Creating account..." : "Create account"}
               </Button>

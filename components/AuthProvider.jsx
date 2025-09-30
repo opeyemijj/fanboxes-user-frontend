@@ -39,8 +39,14 @@ export function AuthProvider({ children }) {
 
       const data = await res.json();
       // console.log("dispatching...");
-      // console.log("dataToDispatch", data);
-      dispatch(setLogin({ token: data.token, ...data.user }));
+      console.log("dataToDispatch", data);
+      dispatch(
+        setLogin({
+          token: data.token,
+          ...data.user,
+          availableBalance: data.user?.currentBalance || 0,
+        })
+      );
       return { success: data?.success || false, message: data?.message || "" };
     } catch (error) {
       return { success: false, error: error.message };

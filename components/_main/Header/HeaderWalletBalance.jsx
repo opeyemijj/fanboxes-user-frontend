@@ -63,7 +63,7 @@ const HeaderWalletBalance = ({ handleLogout, availableBalance }) => {
   return (
     <div className="pr-1">
       <span className="font-semibold">
-        {availableBalance ? availableBalance?.toLocaleString() : ""}
+        {availableBalance?.toLocaleString()}
       </span>
     </div>
   );

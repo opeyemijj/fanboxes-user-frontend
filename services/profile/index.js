@@ -1,7 +1,9 @@
 import http from "../http";
 
 export const updateProfile = async ({ ...payload }) => {
-  const { data } = await http.put(`/users/profile`, payload);
+  const { data } = await http.put(`/users/profile`, payload).catch((e) => {
+    throw e;
+  });
   return data;
 };
 export const changePassword = async ({ ...payload }) => {
@@ -88,5 +90,12 @@ export const getTransactionByRefId = async (ref) => {
     .catch((err) => {
       throw err;
     });
+  return data;
+};
+
+export const deleteMyAccount = async ({ ...payload }) => {
+  const { data } = await http.post(`/users/account`, payload).catch((e) => {
+    throw e;
+  });
   return data;
 };

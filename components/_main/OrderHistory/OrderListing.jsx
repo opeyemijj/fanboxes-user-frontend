@@ -913,9 +913,9 @@ const OrderListing = () => {
       <main className="container mx-auto pt-0 pb-16 flex-grow">
         {/* Header Section */}
         <div className="mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+          {/* <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
             Order History
-          </h1>
+          </h1> */}
           <p className="text-sm sm:text-base text-gray-600">
             View your order history and tracking information
           </p>

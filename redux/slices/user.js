@@ -60,6 +60,14 @@ const slice = createSlice({
         state.followingShops = [...state.followingShops, action.payload];
       }
     },
+    updateUserData(state, action) {
+      const token = state.user?.token || null;
+      state.user = {
+        ...action.payload,
+        availableBalance: action.payload?.currentBalance,
+        token,
+      };
+    },
   },
 });
 
@@ -78,6 +86,7 @@ export const {
   updateFollowShop,
   updateShippingAddress,
   updateUserAvailableBalance,
+  updateUserData,
 } = slice.actions;
 
 // ----------------------------------------------------------------------
