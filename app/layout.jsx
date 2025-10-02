@@ -8,7 +8,7 @@ import { ToastProvider } from "@/components/ToastProvider";
 export const metadata = {
   title: "Fanboxes - Mystery Boxes",
   description: "Every box is a new adventure",
-  generator: "v0.app",
+  // generator: "v0.app",
   icons: {
     icon: "/favicon.png", // standard favicon
     shortcut: "/favicon.png", // for legacy browsers

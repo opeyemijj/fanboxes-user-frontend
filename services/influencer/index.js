@@ -69,3 +69,10 @@ export const incrementVisitCount = async (slug) => {
   const { data } = await http.patch(`/influencer/${slug}/visit`);
   return data;
 };
+
+export const followInfluencer = async (shopId) => {
+  const { data } = await http.put(`/shops/${shopId}/follow`).catch((err) => {
+    throw err;
+  });
+  return data;
+};
