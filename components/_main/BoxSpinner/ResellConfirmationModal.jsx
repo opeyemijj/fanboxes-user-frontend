@@ -54,6 +54,13 @@ const ResellConfirmationModal = ({
     }
   };
 
+  // Handle backdrop click
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget && !isLoading && !isProcessing) {
+      onClose();
+    }
+  };
+
   if (!winningItem) return null;
 
   const originalValue = winningItem.value;
@@ -63,7 +70,7 @@ const ResellConfirmationModal = ({
   const displayText = getResellDisplayText(originalValue, resellRule);
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleBackdropClick}>
       <DialogContent className="sm:max-w-[500px] max-w-[95vw] bg-white z-[10000] fixed p-0 overflow-hidden rounded-2xl shadow-xl top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
         <div className="px-6 py-16">
           {/* Close Button - Disabled during loading */}

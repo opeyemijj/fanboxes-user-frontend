@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { getMyOrderHistory } from "@/services/order";
-import { useRouter } from "next/navigation";
+import { getMyOrderHistory, getOrderById } from "@/services/order";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toastError } from "@/lib/toast";
 import {
   Calendar,
@@ -441,7 +441,7 @@ const OrderDetailsModal = ({
             )}
 
             {/* Spin Data (if applicable) */}
-            {/* {order.spinData && (
+            {order.spinData && (
               <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg p-4 border border-amber-100">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
@@ -505,7 +505,7 @@ const OrderDetailsModal = ({
                   </div>
                 )}
               </div>
-            )} */}
+            )}
           </div>
         </div>
 
@@ -612,6 +612,7 @@ const OrderListSkeletonLoader = () => {
 // Main Component
 const OrderListing = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [orderHistory, setOrderHistory] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -627,7 +628,46 @@ const OrderListing = () => {
   const [page, setPage] = useState(1);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [shouldRefetch, setShouldRefetch] = useState(false);
+  const [loadingSpecificOrder, setLoadingSpecificOrder] = useState(false);
   const ordersRef = useRef(null);
+  // Check for order query parameter
+  const orderId = searchParams?.get("order");
+
+  // const fetchOrderHistory = useCallback(async () => {
+  //   try {
+  //     setLoading(true);
+  //     const params = { limit, page };
+
+  //     // Add date range filters if they exist
+  //     if (dateRange.from) {
+  //       params.fromDate = dateRange.from.toISOString();
+  //     }
+  //     if (dateRange.to) {
+  //       params.toDate = dateRange.to.toISOString();
+  //     }
+
+  //     const response = await getMyOrderHistory(params);
+
+  //     if (!response.success) {
+  //       throw new Error("Failed to fetch order history");
+  //     }
+
+  //     setOrderHistory(response);
+  //   } catch (err) {
+  //     setError("Error fetching order history");
+  //     if (err?.response && err.response.status === 401) {
+  //       toastError(
+  //         err.response?.data?.message ||
+  //           "Session Expired. Please login to continue"
+  //       );
+  //       router.replace("/login");
+  //     }
+  //   } finally {
+  //     setLoading(false);
+  //     setLoadingHistory(false);
+  //     setShouldRefetch(false);
+  //   }
+  // }, [limit, page, dateRange]);
 
   const fetchOrderHistory = useCallback(async () => {
     try {
@@ -649,6 +689,22 @@ const OrderListing = () => {
       }
 
       setOrderHistory(response);
+
+      // After loading orders, check if we need to open a specific order
+      if (orderId) {
+        // First check if it's in the current list
+        const orderInList = response.data?.find(
+          (order) => order._id === orderId || order.orderNo === orderId
+        );
+
+        if (orderInList) {
+          setSelectedOrder(orderInList);
+          setShowDetailsModal(true);
+        } else {
+          // If not in current list, fetch it separately
+          fetchSpecificOrder(orderId);
+        }
+      }
     } catch (err) {
       setError("Error fetching order history");
       if (err?.response && err.response.status === 401) {
@@ -663,7 +719,34 @@ const OrderListing = () => {
       setLoadingHistory(false);
       setShouldRefetch(false);
     }
-  }, [limit, page, dateRange]);
+  }, [limit, page, dateRange, orderId, router]);
+
+  // Function to fetch specific order
+  const fetchSpecificOrder = async (orderId) => {
+    try {
+      setLoadingSpecificOrder(true);
+      const response = await getOrderById(orderId);
+
+      if (response.success) {
+        setSelectedOrder(response.data);
+        setShowDetailsModal(true);
+      } else {
+        toastError("Order not found");
+        // Remove the order parameter from URL if order not found
+        const newParams = new URLSearchParams(searchParams.toString());
+        newParams.delete("order");
+        router.replace(`/account?tab=orders&${newParams.toString()}`);
+      }
+    } catch (err) {
+      toastError("Error loading order details");
+      // Remove the order parameter from URL on error
+      const newParams = new URLSearchParams(searchParams.toString());
+      newParams.delete("order");
+      router.replace(`/account?tab=orders&${newParams.toString()}`);
+    } finally {
+      setLoadingSpecificOrder(false);
+    }
+  };
 
   useEffect(() => {
     fetchOrderHistory();
@@ -778,6 +861,13 @@ const OrderListing = () => {
   const closeModal = () => {
     setShowDetailsModal(false);
     setSelectedOrder(null);
+
+    // Remove the order parameter from URL when modal is closed
+    if (orderId) {
+      const newParams = new URLSearchParams(searchParams.toString());
+      newParams.delete("order");
+      router.replace(`/account?tab=orders&${newParams.toString()}`);
+    }
   };
 
   const handlePredefinedDateRange = (from, to) => {
@@ -913,9 +1003,6 @@ const OrderListing = () => {
       <main className="container mx-auto pt-0 pb-16 flex-grow">
         {/* Header Section */}
         <div className="mb-6">
-          {/* <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
-            Order History
-          </h1> */}
           <p className="text-sm sm:text-base text-gray-600">
             View your order history and tracking information
           </p>
@@ -1292,6 +1379,18 @@ const OrderListing = () => {
           formatTime={formatTime}
           formatAmount={formatAmount}
         />
+      )}
+
+      {/* Loading overlay for specific order */}
+      {loadingSpecificOrder && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 shadow-lg">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#11F2EB] mx-auto"></div>
+            <p className="mt-3 text-sm text-gray-600">
+              Loading requested order details...
+            </p>
+          </div>
+        </div>
       )}
     </div>
   );

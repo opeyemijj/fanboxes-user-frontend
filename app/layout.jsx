@@ -4,6 +4,7 @@ import { LoadingProvider } from "@/components/LoadingProvider";
 import ReduxProvider from "@/components/ReduxProvider";
 import NextTopLoader from "nextjs-toploader";
 import { ToastProvider } from "@/components/ToastProvider";
+import AgeVerificationModal from "@/components/AgeVerificationModal";
 
 export const metadata = {
   title: "Fanboxes - Mystery Boxes",
@@ -34,6 +35,7 @@ export default function RootLayout({ children }) {
         <ReduxProvider>
           <AuthProvider>
             <LoadingProvider>
+              <AgeVerificationModal />
               {children} <ToastProvider />
             </LoadingProvider>
           </AuthProvider>

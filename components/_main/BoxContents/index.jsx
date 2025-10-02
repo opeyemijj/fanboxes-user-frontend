@@ -95,7 +95,7 @@ export default function BoxContents({ box, loading = false }) {
   }
 
   function handleAddToCart(item) {
-    console.log("add to cart...");
+    console.log("add to cart...", item);
     const payload = { item, quantity: 1 };
     dispatch(addItemToCart2(payload));
     router.push("/cart");

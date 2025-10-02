@@ -9,6 +9,17 @@ import OrderListing from "@/components/_main/OrderHistory/OrderListing";
 import Profile from "@/components/_main/Profile";
 import AccountSettings from "@/components/_main/AccountSettings";
 import { useSelector } from "react-redux";
+import { GameProvider, useGameContext } from "@/contexts/gameContext";
+
+const SpinListingGameWrapper = () => {
+  const { resellRule, cashToCreditConvRate } = useGameContext();
+  return (
+    <SpinListing
+      resellRule={resellRule}
+      cashToCreditConvRate={cashToCreditConvRate}
+    />
+  );
+};
 
 const Account = () => {
   const user = useSelector((state) => state?.user?.user || null);
@@ -35,7 +46,7 @@ const Account = () => {
       tabName: "Spin History",
       queryId: "spins",
       activeUrlElement: "/spins",
-      component: <SpinListing />,
+      component: <SpinListingGameWrapper />,
     },
     {
       tabName: "Transaction History",
@@ -52,15 +63,17 @@ const Account = () => {
   ];
 
   return (
-    <div>
-      <Header />
-      <div className="bg-gray-50 min-h-screen mt-10 py-10">
-        <div className="container mx-auto px-3 sm:px-6 lg:px-8 pt-6 pb-16">
-          <ModernTabs tabList={tabList} />
+    <GameProvider>
+      <div>
+        <Header />
+        <div className="bg-gray-50 min-h-screen mt-10 py-10">
+          <div className="container mx-auto px-3 sm:px-6 lg:px-8 pt-6 pb-16">
+            <ModernTabs tabList={tabList} />
+          </div>
         </div>
+        <Footer />
       </div>
-      <Footer />
-    </div>
+    </GameProvider>
   );
 };
 

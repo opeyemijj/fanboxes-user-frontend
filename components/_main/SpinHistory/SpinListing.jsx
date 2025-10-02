@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { getMySpinHistory } from "@/services/boxes/spin-game";
 import { useRouter } from "next/navigation";
-import { toastError } from "@/lib/toast";
+import { toastError, toastSuccess } from "@/lib/toast";
 import {
   Calendar,
   X,
@@ -18,7 +18,15 @@ import {
   Zap,
   TrendingUp,
   DollarSign,
+  Truck,
+  Package,
+  CreditCard,
 } from "lucide-react";
+import { addItemToCart2, addWonItemToCart } from "@/redux/slices/cartOrder";
+import { useDispatch } from "react-redux";
+import ResellConfirmationModal from "../BoxSpinner/ResellConfirmationModal";
+import { resellSpinForCredits } from "@/services/boxes";
+import { updateUserAvailableBalance } from "@/redux/slices/user";
 
 // Pagination Component
 const SpinPagination = ({ page, limit, loading, pagination, onPageChange }) => {
@@ -91,6 +99,69 @@ const SpinPagination = ({ page, limit, loading, pagination, onPageChange }) => {
   );
 };
 
+// Action Buttons Component for Modal
+const SpinActionButtons = ({
+  spin,
+  onActionComplete,
+  dispatch,
+  router,
+  onShowResellModal,
+}) => {
+  const [loading, setLoading] = useState({ ship: false });
+
+  function handleAddToCart() {
+    setLoading((prev) => ({ ...prev, ship: true }));
+    const item = spin?.winningItem;
+    if (!item) {
+      toastError("Oops, Something Went Wrong");
+      return;
+    }
+
+    console.log("add to cart...", item);
+    const payload = { item, quantity: 1, spinData: spin };
+    dispatch(addWonItemToCart(payload));
+    setLoading((prev) => ({ ...prev, ship: false }));
+    router.push("/checkout?action=ship");
+
+    // Notify parent that action was completed
+    if (onActionComplete) onActionComplete();
+  }
+
+  // Don't show buttons if item is already processed
+  if (spin.processedForResell || spin.processedForShipping) {
+    return null;
+  }
+
+  return (
+    <div className="bg-gradient-to-br from-slate-50 to-gray-50 rounded-xl p-5 border border-gray-200">
+      <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+        <Package className="w-4 h-4 text-[#11F2EB]" />
+        Available Actions
+      </h3>
+      <div className="flex flex-col sm:flex-row gap-3">
+        <button
+          onClick={handleAddToCart}
+          disabled={loading.ship}
+          className="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-gradient-to-r from-[#11F2EB] to-[#0ED9D3] text-slate-800 font-semibold rounded-xl hover:from-[#0ED9D3] hover:to-[#0BC5BF] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm"
+        >
+          <Truck className="w-4 h-4" />
+          {loading.ship ? "Processing..." : "Ship to Me"}
+        </button>
+        <button
+          onClick={onShowResellModal}
+          className="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-semibold rounded-xl hover:from-amber-600 hover:to-amber-700 transition-all duration-200 shadow-sm"
+        >
+          <CreditCard className="w-4 h-4" />
+          Resell for Credits
+        </button>
+      </div>
+      <p className="text-xs text-gray-500 mt-3 text-center">
+        Choose to have your item shipped or convert it to credits
+      </p>
+    </div>
+  );
+};
+
 // Details Modal Component
 const SpinDetailsModal = ({
   isOpen,
@@ -99,6 +170,10 @@ const SpinDetailsModal = ({
   formatDate,
   formatTime,
   formatAmount,
+  onActionComplete,
+  dispatch,
+  router,
+  onShowResellModal,
 }) => {
   if (!isOpen || !spin) return null;
 
@@ -161,6 +236,17 @@ const SpinDetailsModal = ({
               </div>
             </div>
 
+            {/* Action Buttons for Unprocessed Items */}
+            {!spin.processedForResell && !spin.processedForShipping && (
+              <SpinActionButtons
+                spin={spin}
+                onActionComplete={onActionComplete}
+                dispatch={dispatch}
+                router={router}
+                onShowResellModal={onShowResellModal}
+              />
+            )}
+
             {/* Resell Information Card */}
             {spin.processedForResell && (
               <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-4 border border-green-100">
@@ -190,6 +276,42 @@ const SpinDetailsModal = ({
                       Transaction Ref:{" "}
                       <span className="font-mono bg-white px-2 py-1 rounded text-xs">
                         {spin.resellTransactionRef}
+                      </span>
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Shipping Information Card */}
+            {spin.processedForShipping && (
+              <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg p-4 border border-blue-100">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Truck className="w-4 h-4 text-blue-600" />
+                    <h3 className="text-sm font-semibold text-gray-900">
+                      Item Shipped
+                    </h3>
+                  </div>
+                  {spin.orderId && (
+                    <a
+                      href={`/account?tab=orders&order=${spin.orderId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 font-medium"
+                    >
+                      Track Order
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  )}
+                </div>
+                <div className="text-sm text-gray-700">
+                  <p>This item is being shipped to your address.</p>
+                  {spin.orderId && (
+                    <p className="mt-1 text-xs">
+                      Order ID:{" "}
+                      <span className="font-mono bg-white px-2 py-1 rounded text-xs">
+                        {spin.orderId}
                       </span>
                     </p>
                   )}
@@ -349,7 +471,7 @@ const SpinDetailsModal = ({
             </div>
 
             {/* Verification Details */}
-            {/* <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-4 border border-purple-100">
+            <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-4 border border-purple-100">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
                   <CheckCircle className="w-4 h-4 text-purple-600" />
@@ -387,7 +509,7 @@ const SpinDetailsModal = ({
                   </p>
                 </div>
               </div>
-            </div> */}
+            </div>
           </div>
         </div>
 
@@ -395,7 +517,7 @@ const SpinDetailsModal = ({
         <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex-shrink-0">
           <button
             onClick={onClose}
-            className="w-full py-3 bg-gradient-to-r from-[#11F2EB] to-[#0ED9D3] text-slate-800 font-semibold rounded-xl hover:from-[#0ED9D3] hover:to-[#0BC5BF] transition-all duration-200 shadow-sm"
+            className="w-full py-3 bg-transparent text-gray-600 font-medium rounded-xl border border-gray-200 hover:bg-gray-100 hover:text-gray-700 transition-all duration-200"
           >
             Close Details
           </button>
@@ -493,8 +615,9 @@ const SpinListSkeletonLoader = () => {
 };
 
 // Main Component
-const SpinListing = () => {
+const SpinListing = ({ cashToCreditConvRate, resellRule }) => {
   const router = useRouter();
+  const dispatch = useDispatch();
   const [spinHistory, setSpinHistory] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -510,6 +633,8 @@ const SpinListing = () => {
   const [page, setPage] = useState(1);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [shouldRefetch, setShouldRefetch] = useState(false);
+  const [showResellModal, setShowResellModal] = useState(false);
+  const [resellLoading, setResellLoading] = useState(false);
   const spinsRef = useRef(null);
 
   const fetchSpinHistory = useCallback(async () => {
@@ -567,6 +692,41 @@ const SpinListing = () => {
     setPendingDateRange(dateRange);
   }, [dateRange]);
 
+  async function handleClaimTokenFromSpinReward() {
+    if (!selectedSpin) return;
+
+    try {
+      setResellLoading(true);
+      // TODO: Implement actual resell API call
+      console.log("Reselling spin:", selectedSpin._id);
+      const res = await resellSpinForCredits({ spinId: selectedSpin._id });
+
+      if (res?.success) {
+        // update balance in redux if needed
+        dispatch(
+          updateUserAvailableBalance(res?.data?.transaction.availableBalance)
+        );
+        toastSuccess("You have been credited successfully");
+      } else {
+        toastError("Failed to process resell request");
+      }
+
+      setResellLoading(false);
+      setShowResellModal(false);
+      handleActionComplete(); // Refresh the data
+    } catch (error) {
+      console.log("Resell error:", error);
+      setResellLoading(false);
+      setShowResellModal(false);
+      toastError(
+        `${
+          error.response?.data?.message ||
+          "An unexpected error occurred. Please try again later."
+        }`
+      );
+    }
+  }
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
@@ -593,8 +753,8 @@ const SpinListing = () => {
 
   const getSpinIcon = (spin) => {
     return (
-      <div className="w-10 h-10 bg-purple-50 rounded-full flex items-center justify-center">
-        <Trophy className="w-5 h-5 text-purple-600" />
+      <div className="w-10 h-10 bg-[#11F2EB]/20 rounded-full flex items-center justify-center">
+        <Trophy className="w-5 h-5 text-[#11F2EB]" />
       </div>
     );
   };
@@ -611,13 +771,26 @@ const SpinListing = () => {
     return null;
   };
 
+  const getShippingStatusBadge = (spin) => {
+    if (spin.processedForShipping) {
+      return (
+        <span className="px-2.5 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-600 flex items-center gap-1">
+          <Truck className="w-3 h-3" />
+          Shipped
+        </span>
+      );
+    }
+    return null;
+  };
+
   const getStatusBadge = (spin) => {
     return (
       <>
-        <span className="px-2.5 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+        <span className="px-2.5 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
           Won
         </span>
         {getResellStatusBadge(spin)}
+        {getShippingStatusBadge(spin)}
       </>
     );
   };
@@ -630,6 +803,12 @@ const SpinListing = () => {
   const closeModal = () => {
     setShowDetailsModal(false);
     setSelectedSpin(null);
+  };
+
+  const handleActionComplete = () => {
+    // Refresh the data when an action is completed
+    setShouldRefetch(true);
+    closeModal();
   };
 
   const handlePredefinedDateRange = (from, to) => {
@@ -710,6 +889,8 @@ const SpinListing = () => {
   const totalSpins = spinHistory?.pagination?.total || 0;
   const resoldSpins =
     spinHistory?.data?.filter((spin) => spin.processedForResell).length || 0;
+  const shippedSpins =
+    spinHistory?.data?.filter((spin) => spin.processedForShipping).length || 0;
   const rarestWin = spinHistory?.data?.reduce((rarest, spin) => {
     if (!rarest || spin.winningItem?.odd < rarest.winningItem?.odd) {
       return spin;
@@ -817,22 +998,20 @@ const SpinListing = () => {
                 </p>
               </div>
 
-              {/* Rarest Win */}
+              {/* Items Shipped */}
               <div className="bg-black/20 backdrop-blur-sm rounded-xl p-4 border border-white/10">
                 <div className="flex items-center mb-3">
                   <div className="w-8 h-8 bg-[#11F2EB]/20 rounded-lg flex items-center justify-center mr-3">
-                    <TrendingUp className="w-4 h-4 text-[#11F2EB]" />
+                    <Truck className="w-4 h-4 text-[#11F2EB]" />
                   </div>
-                  <h3 className="text-white text-sm font-medium">Rarest Win</h3>
+                  <h3 className="text-white text-sm font-medium">
+                    Items Shipped
+                  </h3>
                 </div>
                 <div className="text-2xl font-bold text-white">
-                  {rarestWin
-                    ? `${(rarestWin.winningItem?.odd * 100).toFixed(4)}%`
-                    : "N/A"}
+                  {shippedSpins}
                 </div>
-                <p className="text-white/60 text-xs mt-1">
-                  Lowest probability win
-                </p>
+                <p className="text-white/60 text-xs mt-1">Shipped to address</p>
               </div>
             </div>
           </div>
@@ -1121,6 +1300,23 @@ const SpinListing = () => {
           formatDate={formatDate}
           formatTime={formatTime}
           formatAmount={formatAmount}
+          onActionComplete={handleActionComplete}
+          dispatch={dispatch}
+          router={router}
+          onShowResellModal={() => setShowResellModal(true)}
+        />
+      )}
+
+      {/* Resell Confirmation Modal */}
+      {showResellModal && selectedSpin && (
+        <ResellConfirmationModal
+          isOpen={showResellModal}
+          onClose={() => setShowResellModal(false)}
+          onConfirm={handleClaimTokenFromSpinReward}
+          winningItem={selectedSpin.winningItem}
+          isLoading={resellLoading}
+          resellRule={resellRule}
+          cashToCreditConvRate={cashToCreditConvRate}
         />
       )}
     </div>

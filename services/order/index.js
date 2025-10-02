@@ -16,6 +16,13 @@ export const createOrder = async (payload) => {
   return data;
 };
 
+export const getOrderById = async (id) => {
+  const { data } = await http.get(`/orders/${id}`).catch((e) => {
+    throw e;
+  });
+  return data;
+};
+
 export const getMyOrderHistory = async (payload = {}) => {
   const { page = 1, limit = 20, fromDate, toDate } = payload;
 
