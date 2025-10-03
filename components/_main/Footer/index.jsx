@@ -19,7 +19,7 @@ export default function Footer() {
                       href="/mystery-boxes"
                       className="hover:text-[#11F2EB] transition-colors"
                     >
-                      boxes
+                      Boxes
                     </Link>
                   </li>
                   <li>
