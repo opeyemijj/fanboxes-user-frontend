@@ -10,9 +10,11 @@
 // import { fetchShops } from "@/redux/slices/shops";
 // import { fetchCategories } from "@/redux/slices/categories";
 // import { fetchProducts } from "@/redux/slices/product";
+// import { useSearchParams } from "next/navigation";
 
 // export default function AmbassadorsPage() {
 //   const dispatch = useDispatch();
+//   const searchParams = useSearchParams();
 
 //   // Add hydration state to prevent mismatches
 //   const [isHydrated, setIsHydrated] = useState(false);
@@ -36,23 +38,6 @@
 //     error: shopError,
 //   } = useSelector((state) => state.shops);
 
-//   // Get products and categories loading states
-//   // const {
-//   //   products,
-//   //   loading: productsLoading,
-//   //   error: productsError,
-//   // } = useSelector((state) => state.product);
-
-//   // const {
-//   //   categories,
-//   //   loading: categoriesLoading,
-//   //   error: categoriesError,
-//   // } = useSelector((state) => state.categories);
-
-//   // useEffect(() => {
-//   //   console.log("shps changed::", shops);
-//   // }, [shops]);
-
 //   // Fetch data on component mount
 //   useEffect(() => {
 //     dispatch(fetchShops());
@@ -60,10 +45,38 @@
 //     dispatch(fetchProducts());
 //   }, [dispatch]);
 
-//   // Handle hydration
+//   // Handle hydration and query parameters
 //   useEffect(() => {
 //     setIsHydrated(true);
-//   }, []);
+
+//     // Check for category in query string
+//     const categoryFromQuery = searchParams.get("category");
+//     if (categoryFromQuery) {
+//       // Find the category ID by matching name or slug from categoryDetails
+//       const matchingShop = shops.find(
+//         (shop) =>
+//           shop.categoryDetails?.name?.toLowerCase() ===
+//             categoryFromQuery.toLowerCase() ||
+//           shop.categoryDetails?.slug?.toLowerCase() ===
+//             categoryFromQuery.toLowerCase()
+//       );
+
+//       if (matchingShop) {
+//         setSelectedCategory(matchingShop.category);
+//       } else {
+//         // If no match found, try to find in reduxCategories
+//         const matchingCategory = reduxCategories.find(
+//           (cat) =>
+//             cat.name?.toLowerCase() === categoryFromQuery.toLowerCase() ||
+//             cat.slug?.toLowerCase() === categoryFromQuery.toLowerCase()
+//         );
+
+//         if (matchingCategory) {
+//           setSelectedCategory(matchingCategory._id);
+//         }
+//       }
+//     }
+//   }, [searchParams, shops, reduxCategories]);
 
 //   // Smart scroll to ambassadors section
 //   const scrollToAmbassadorsSection = () => {
@@ -92,13 +105,9 @@
 
 //     let filtered = [...shops];
 
-//     // Apply category filter - simple implementation for Redux data
+//     // Apply category filter - using shop.category (which is the ID)
 //     if (selectedCategory !== "all") {
-//       // console.log("shop::", shops);
-//       filtered = filtered.filter(
-//         (shop) =>
-//           shop.category?.toLowerCase() === selectedCategory.toLowerCase()
-//       );
+//       filtered = filtered.filter((shop) => shop.category === selectedCategory);
 //     }
 
 //     // Apply search filter - simple implementation for Redux data
@@ -108,7 +117,7 @@
 //         (shop) =>
 //           shop?.title?.toLowerCase().includes(query) ||
 //           shop?.slug?.toLowerCase().includes(query) ||
-//           shop?.category?.toLowerCase().includes(query) ||
+//           shop?.categoryDetails?.name?.toLowerCase().includes(query) ||
 //           shop?.description?.toLowerCase().includes(query)
 //       );
 //     }
@@ -353,9 +362,8 @@
 //     </div>
 //   );
 // }
-
 "use client";
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef, Suspense } from "react";
 import Header from "@/components/_main/Header";
 import AmbassadorCategories from "@/components/_main/AmbassadorCategories";
 import AmbassadorGrid from "@/components/_main/AmbassadorGrid";
@@ -368,7 +376,8 @@ import { fetchCategories } from "@/redux/slices/categories";
 import { fetchProducts } from "@/redux/slices/product";
 import { useSearchParams } from "next/navigation";
 
-export default function AmbassadorsPage() {
+// Main content component that uses useSearchParams
+function AmbassadorsContent() {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
 
@@ -716,5 +725,35 @@ export default function AmbassadorsPage() {
       </main>
       <Footer />
     </div>
+  );
+}
+
+// Loading component for Suspense fallback
+function AmbassadorsLoading() {
+  return (
+    <div className="bg-white text-black">
+      <Header />
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24">
+        <div className="flex items-center justify-center h-64">
+          <div className="flex flex-col items-center">
+            <div
+              className="animate-spin rounded-full h-12 w-12 border-b-2"
+              style={{ borderColor: "#11F2EB" }}
+            ></div>
+            <p className="mt-4 text-lg">Loading ambassadors...</p>
+          </div>
+        </div>
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
+// Main component with Suspense boundary
+export default function AmbassadorsPage() {
+  return (
+    <Suspense fallback={<AmbassadorsLoading />}>
+      <AmbassadorsContent />
+    </Suspense>
   );
 }
