@@ -19,7 +19,20 @@ export default function AmbassadorProfile({ ambassador, userId }) {
   const [isFollowing, setIsFollowing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showShareDropdown, setShowShareDropdown] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const router = useRouter();
+
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   // Update isFollowing state when ambassador or userId changes
   useEffect(() => {
@@ -65,8 +78,8 @@ export default function AmbassadorProfile({ ambassador, userId }) {
       ambassador.description || ""
     }`;
 
-    // Use native share on mobile if available (except for "copy")
-    if (platform !== "copy" && navigator.share) {
+    // Use native share on mobile ONLY if available
+    if (isMobile && platform !== "copy" && navigator.share) {
       try {
         await navigator.share({
           title: `${ambassador.title}'s Profile | FanBox`,
@@ -141,7 +154,7 @@ export default function AmbassadorProfile({ ambassador, userId }) {
   );
 
   const ShareDropdown = () => (
-    <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 z-10 overflow-hidden backdrop-blur-sm bg-white/95">
+    <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 z-10 overflow-hidden backdrop-blur-sm bg-white/95">
       <div className="p-3 border-b border-gray-100">
         <h3 className="text-sm font-semibold text-gray-900">
           Share this profile
@@ -205,8 +218,8 @@ export default function AmbassadorProfile({ ambassador, userId }) {
 
   return (
     <div className="bg-white rounded-lg p-6 mb-8 shadow-sm">
-      <div className="md:flex items-start space-x-6">
-        <div className="relative">
+      <div className="md:flex items-start space-x-0 md:space-x-6">
+        <div className="relative mb-4 md:mb-0 flex justify-center md:justify-start">
           <Image
             src={ambassador?.logo?.url || "/placeholder.svg"}
             alt={ambassador?.title}
@@ -221,9 +234,12 @@ export default function AmbassadorProfile({ ambassador, userId }) {
           <p className="text-gray-600 mb-4">
             {ambassador.description || "New box opening coming soon"}
           </p>
-          <div className="flex items-center space-x-3">
+
+          {/* Button Container with responsive layout */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            {/* Get Updates Button - Full width on mobile */}
             <Button
-              className={`rounded-full px-6 ${
+              className={`rounded-full px-6 w-full sm:w-auto ${
                 isFollowing ? "bg-gray-600 text-white" : "bg-black text-white"
               }`}
               onClick={handleFollowClick}
@@ -242,50 +258,53 @@ export default function AmbassadorProfile({ ambassador, userId }) {
               )}
             </Button>
 
-            {/* Instagram Button */}
-            <Button
-              variant="outline"
-              size="icon"
-              className="rounded-full bg-transparent"
-              onClick={() => handleSocialClick(ambassador?.instagramLink)}
-              disabled={!ambassador?.instagramLink}
-            >
-              <Instagram className="h-4 w-4" />
-            </Button>
-
-            {/* TikTok Button */}
-            <Button
-              variant="outline"
-              size="icon"
-              className="rounded-full bg-transparent"
-              onClick={() => handleSocialClick(ambassador?.tiktokLink)}
-              disabled={!ambassador?.tiktokLink}
-            >
-              <TikTokIcon />
-            </Button>
-
-            {/* Facebook Button */}
-            <Button
-              variant="outline"
-              size="icon"
-              className="rounded-full bg-transparent"
-              onClick={() => handleSocialClick(ambassador?.facebookLink)}
-              disabled={!ambassador?.facebookLink}
-            >
-              <span className="text-sm font-bold">f</span>
-            </Button>
-
-            {/* Share Button with Dropdown */}
-            <div className="relative">
+            {/* Social Icons - Stack below on mobile, inline on desktop */}
+            <div className="flex items-center space-x-3 justify-center sm:justify-start">
+              {/* Instagram Button */}
               <Button
                 variant="outline"
                 size="icon"
-                className="rounded-full bg-transparent hover:bg-gray-50 transition-colors"
-                onClick={() => setShowShareDropdown(!showShareDropdown)}
+                className="rounded-full bg-transparent"
+                onClick={() => handleSocialClick(ambassador?.instagramLink)}
+                disabled={!ambassador?.instagramLink}
               >
-                <Share2 className="h-4 w-4" />
+                <Instagram className="h-4 w-4" />
               </Button>
-              {showShareDropdown && <ShareDropdown />}
+
+              {/* TikTok Button */}
+              <Button
+                variant="outline"
+                size="icon"
+                className="rounded-full bg-transparent"
+                onClick={() => handleSocialClick(ambassador?.tiktokLink)}
+                disabled={!ambassador?.tiktokLink}
+              >
+                <TikTokIcon />
+              </Button>
+
+              {/* Facebook Button */}
+              <Button
+                variant="outline"
+                size="icon"
+                className="rounded-full bg-transparent"
+                onClick={() => handleSocialClick(ambassador?.facebookLink)}
+                disabled={!ambassador?.facebookLink}
+              >
+                <span className="text-sm font-bold">f</span>
+              </Button>
+
+              {/* Share Button with Dropdown */}
+              <div className="relative">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="rounded-full bg-transparent hover:bg-gray-50 transition-colors"
+                  onClick={() => setShowShareDropdown(!showShareDropdown)}
+                >
+                  <Share2 className="h-4 w-4" />
+                </Button>
+                {showShareDropdown && <ShareDropdown />}
+              </div>
             </div>
           </div>
         </div>
