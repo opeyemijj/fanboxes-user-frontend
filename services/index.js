@@ -416,7 +416,9 @@ export const getAllCategoriesByUser = async () => {
 };
 
 export const getCurrencies = async () => {
-  const { data } = await http.get(`/currencies`);
+  const { data } = await http.get(`/currencies`).catch((e) => {
+    throw e;
+  });
   return data;
 };
 export const getCategoryTitle = async (category) => {

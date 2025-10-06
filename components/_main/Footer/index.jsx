@@ -32,7 +32,7 @@ export default function Footer() {
                   </li>
                   <li>
                     <Link
-                      href="#"
+                      href="/terms-and-conditions"
                       className="hover:text-[#11F2EB] transition-colors"
                     >
                       How it works
@@ -40,7 +40,7 @@ export default function Footer() {
                   </li>
                   <li>
                     <Link
-                      href="#"
+                      href="/privacy-policy"
                       className="hover:text-[#11F2EB] transition-colors"
                     >
                       Our policy
@@ -56,7 +56,7 @@ export default function Footer() {
                   </li>
                   <li>
                     <Link
-                      href="#"
+                      href="/faqs"
                       className="hover:text-[#11F2EB] transition-colors"
                     >
                       FAQ

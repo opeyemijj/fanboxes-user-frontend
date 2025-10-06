@@ -5,7 +5,7 @@ import Header from "@/components/_main/Header";
 import Footer from "@/components/_main/Footer";
 import { Loader, AlertCircle } from "lucide-react";
 
-export default function PrivacyPolicy() {
+export default function TermsAndConditions() {
   const [policyData, setPolicyData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -20,18 +20,18 @@ export default function PrivacyPolicy() {
       setError(null);
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/user/static-pages/our_policy_nr9mf7`
+        `${process.env.NEXT_PUBLIC_API_URL}/user/static-pages/terms_and_conditions_n4z33f`
       );
       const result = await response.json();
 
       if (result.success) {
         setPolicyData(result.data);
       } else {
-        setError(result.message || "Failed to load policy");
+        setError(result.message || "Failed to load terms and conditions");
       }
     } catch (err) {
-      console.error("Error fetching policy:", err);
-      setError("Failed to load policy. Please try again later.");
+      console.error("Error fetching terms and conditions:", err);
+      setError("Failed to load terms and conditions. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -53,7 +53,7 @@ export default function PrivacyPolicy() {
         <main className="flex-1 pt-32 pb-16 flex items-center justify-center">
           <div className="text-center">
             <Loader className="w-8 h-8 animate-spin text-[#11F2EB] mx-auto mb-4" />
-            <p className="text-gray-600">Loading policy...</p>
+            <p className="text-gray-600">Loading terms and conditions...</p>
           </div>
         </main>
         <Footer />
@@ -94,7 +94,7 @@ export default function PrivacyPolicy() {
           {/* Header Section */}
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-gray-900 mb-4">
-              {policyData?.title || "Privacy Policy"}
+              {policyData?.title || "Terms and Conditions"}
             </h1>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Last updated:{" "}
@@ -113,13 +113,19 @@ export default function PrivacyPolicy() {
             <div className="w-24 h-1 bg-gradient-to-r from-[#11F2EB] to-[#0ED9D3] mx-auto mt-6 rounded-full"></div>
           </div>
 
-          {/* Main Policy Content */}
+          {/* Main Content */}
           <div className="bg-white rounded-2xl shadow-sm p-8 mb-8 border border-gray-100">
             {policyData?.htmlContent ? (
               <HtmlContent content={policyData.htmlContent} />
             ) : (
               <div className="text-center text-gray-500 py-8">
-                No policy content available.
+                <p className="text-lg mb-4">
+                  No terms and conditions content available.
+                </p>
+                <p className="text-sm text-gray-400">
+                  Please check back later or contact support if you need
+                  immediate assistance.
+                </p>
               </div>
             )}
           </div>
@@ -130,15 +136,15 @@ export default function PrivacyPolicy() {
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <p className="text-slate-300 mb-2">
-                  For policy-related inquiries:
+                  For terms-related inquiries:
                 </p>
                 <p className="font-medium">
                   Email:{" "}
                   <a
-                    href="mailto:privacy@fanboxes.com"
+                    href="mailto:legal@fanboxes.com"
                     className="text-[#11F2EB] hover:text-[#0ED9D3] transition-colors"
                   >
-                    privacy@fanboxes.com
+                    legal@fanboxes.com
                   </a>
                 </p>
               </div>
@@ -167,11 +173,11 @@ export default function PrivacyPolicy() {
               </h3>
               <div className="flex flex-wrap justify-center gap-6">
                 <Link
-                  href="/terms-and-conditions"
+                  href="/privacy-policy"
                   className="text-[#0DD4C7] hover:text-[#11F2EB] font-medium transition-colors flex items-center group"
                 >
                   <span className="w-2 h-2 bg-[#0DD4C7] rounded-full mr-2 group-hover:bg-[#11F2EB] transition-colors"></span>
-                  Terms of Service
+                  Privacy Policy
                 </Link>
                 <Link
                   href="/faqs"

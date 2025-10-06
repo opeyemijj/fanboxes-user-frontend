@@ -8,6 +8,8 @@ import ClientSeedModal from "@/components/_main/BoxSpinner/ClientSeedModal";
 import { useDispatch } from "react-redux";
 import { addItemToCart2 } from "@/redux/slices/cartOrder";
 import { useRouter } from "next/navigation";
+import { useCurrencyConvert } from "@/hooks/convertCurrency";
+import { useCurrencyFormatter } from "@/hooks/formatCurrency";
 
 export default function BoxContents({ box, loading = false }) {
   const [selectedItem, setSelectedItem] = useState(null);
@@ -20,6 +22,8 @@ export default function BoxContents({ box, loading = false }) {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const dispatch = useDispatch();
   const router = useRouter();
+  const cCurrency = useCurrencyConvert();
+  const fCurrency = useCurrencyFormatter();
 
   const {
     // States
@@ -133,7 +137,8 @@ export default function BoxContents({ box, loading = false }) {
                           className="object-contain max-w-full max-h-full group-hover:scale-105 transition-transform duration-300 ease-in-out"
                         />
                         <div className="absolute top-2 left-2 bg-gray-900/50 text-white text-xs font-semibold px-2 py-1 rounded-full transition-all duration-300 ease-in-out group-hover:bg-gray-900/70">
-                          ${item.value?.toLocaleString() || "0"}
+                          {/* ✅ UPDATED: Item value in grid */}
+                          {fCurrency(cCurrency(item?.value)) || "$0"}
                         </div>
                         <Button className="absolute bottom-4 right-4 bg-black/80 text-white rounded-full h-6 w-20 text-xs transition-all duration-300 ease-in-out flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 group-hover:bg-black">
                           VIEW →
@@ -199,10 +204,10 @@ export default function BoxContents({ box, loading = false }) {
                   )}
                 </div>
 
-                {/* Price and Status in a row */}
+                {/* ✅ UPDATED: Price and Status in a row */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
                   <p className="text-xl font-bold text-gray-900">
-                    ${selectedItem.value?.toLocaleString() || "0"}
+                    {fCurrency(cCurrency(selectedItem?.value)) || "$0"}
                   </p>
                   <div className="flex flex-wrap gap-2">
                     <span className="bg-green-100 text-green-800 text-xs font-medium px-3 py-1.5 rounded-full">
@@ -263,7 +268,7 @@ export default function BoxContents({ box, loading = false }) {
                       onClick={handleSpinForBtnClicked}
                     >
                       <Hexagon className="h-5 w-5" />
-                      SPIN FOR ×{box?.priceSale?.toLocaleString() || "0"}
+                      SPIN FOR {box?.priceSale?.toLocaleString() || "0"}
                     </Button>
                   )}
                   <button
@@ -292,10 +297,10 @@ export default function BoxContents({ box, loading = false }) {
                   )}
                 </div>
 
-                {/* Price */}
+                {/* ✅ UPDATED: Price */}
                 <div className="mb-5">
                   <p className="text-2xl font-bold text-gray-900">
-                    ${selectedItem.value?.toLocaleString() || "0"}
+                    {fCurrency(cCurrency(selectedItem?.value)) || "$0"}
                   </p>
                 </div>
 
@@ -360,15 +365,9 @@ export default function BoxContents({ box, loading = false }) {
                       onClick={handleSpinForBtnClicked}
                     >
                       <Hexagon className="h-5 w-5" />
-                      SPIN FOR ×{box?.priceSale?.toLocaleString() || "0"}
+                      SPIN FOR {box?.priceSale?.toLocaleString() || "0"}
                     </Button>
                   )}
-                  {/* <button
-                    onClick={closePopup}
-                    className="w-full text-gray-600 font-medium py-2.5 text-base hover:text-gray-800 transition-colors"
-                  >
-                    CLOSE
-                  </button> */}
                 </div>
               </div>
 

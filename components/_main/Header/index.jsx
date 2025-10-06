@@ -22,6 +22,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { useSelector } from "react-redux";
 import HeaderWalletBalance from "./HeaderWalletBalance";
 import { selectDirectBuyItems } from "@/redux/slices/cartOrder";
+import CurrencySelect from "./LanguageSelect";
 
 function Header() {
   // console.log("header rendered...");
@@ -121,6 +122,9 @@ function Header() {
 
             {/* Desktop Navigation - Show on large screens only */}
             <div className="hidden lg:flex items-center space-x-4">
+              {/* Currency Selector */}
+              <CurrencySelect />
+
               {/* Cart Icon for Desktop */}
               {totalCartItems > 0 && (
                 <Link href="/cart" className="relative">
@@ -249,6 +253,9 @@ function Header() {
 
             {/* Mobile menu button - Show on medium and small screens */}
             <div className="lg:hidden flex items-center space-x-2">
+              {/* Currency Selector for Mobile */}
+              <CurrencySelect />
+
               {/* Cart Icon for Mobile */}
               {totalCartItems > 0 && (
                 <Link href="/cart" className="relative">
