@@ -5,8 +5,8 @@ import Link from "next/link";
 import { Button } from "@/components/Button";
 import { Eye, EyeOff, X } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
-import Header from "@/components/_main/Header";
-import Footer from "@/components/_main/Footer";
+// import Header from "@/components/_main/Header";
+// import Footer from "@/components/_main/Footer";
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -67,7 +67,7 @@ export default function SignupPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex flex-col">
-      <Header />
+      {/* <Header /> */}
 
       <main className="flex-1 flex items-center justify-center p-4 pt-32 pb-16">
         <div className="w-full max-w-md">
@@ -281,7 +281,7 @@ export default function SignupPage() {
         </div>
       </main>
 
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 }

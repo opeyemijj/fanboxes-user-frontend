@@ -1,9 +1,9 @@
 "use client";
-import Header from "@/components/_main/Header";
+// import Header from "@/components/_main/Header";
 import BoxSpinner from "@/components/_main/BoxSpinner";
 import BoxContents from "@/components/_main/BoxContents";
 import YouMightLike from "@/components/_main/YouMightLike";
-import Footer from "@/components/_main/Footer";
+// import Footer from "@/components/_main/Footer";
 import { getProductDetails } from "@/services/boxes";
 import { useEffect, useState } from "react";
 import BoxSpinnerSkeleton from "@/components/_main/BoxSpinner/BoxSpinnerSkeleton";
@@ -19,7 +19,7 @@ function BoxSpinContent({ box }) {
 
   return (
     <>
-      <Header />
+      {/* <Header /> */}
       {box && (
         <main className="pt-20 mb-40">
           <BoxSpinner box={box} />
@@ -27,7 +27,7 @@ function BoxSpinContent({ box }) {
           <YouMightLike />
         </main>
       )}
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 }
@@ -55,11 +55,11 @@ export default function BoxSpinPage({ params }) {
   if (apiLoading) {
     return (
       <div className="bg-white text-black min-h-screen">
-        <Header />
+        {/* <Header /> */}
         <main className="pt-20">
           <BoxSpinnerSkeleton />
         </main>
-        <Footer />
+        {/* <Footer /> */}
       </div>
     );
   }

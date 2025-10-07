@@ -3,7 +3,7 @@ import { selectCart, selectIsPostSpinOrder } from "@/redux/slices/cartOrder";
 import { Package } from "lucide-react";
 
 // Review Step Component
-const ReviewStep = () => {
+const ReviewStep = ({ cCurrency, fCurrency }) => {
   const cart = useSelector(selectCart);
   const isPostSpinOrder = useSelector(selectIsPostSpinOrder);
 
@@ -87,7 +87,8 @@ const ReviewStep = () => {
                 <div className="flex items-center gap-4">
                   {!isPostSpinOrder ? (
                     <span className="font-bold text-gray-900 text-lg">
-                      ${item.value?.toFixed(2) || "0.00"}
+                      {/* ${item.value?.toFixed(2) || "0.00"} */}
+                      {fCurrency(cCurrency(item?.value || 0))}
                     </span>
                   ) : (
                     <span className="bg-[#11F2EB] bg-opacity-10 text-[#11F2EB] px-3 py-1 rounded-full text-xs md:text-sm font-medium">
@@ -108,7 +109,10 @@ const ReviewStep = () => {
                   <div className="text-right">
                     <span className="text-sm text-gray-500">Total: </span>
                     <span className="font-semibold text-gray-900">
-                      ${((item.value || 0) * (item.quantity || 1)).toFixed(2)}
+                      {/* ${((item.value || 0) * (item.quantity || 1)).toFixed(2)} */}
+                      {fCurrency(
+                        cCurrency((item.value || 0) * (item.quantity || 1))
+                      )}
                     </span>
                   </div>
                 )}
@@ -126,14 +130,23 @@ const ReviewStep = () => {
               Items total ({cart.items.length})
             </span>
             <span className="font-semibold text-gray-900">
-              $
+              {/* $
               {cart.items
                 .reduce(
                   (total, item) =>
                     total + (item.value || 0) * (item.quantity || 1),
                   0
                 )
-                .toFixed(2)}
+                .toFixed(2)} */}
+              {fCurrency(
+                cCurrency(
+                  cart.items.reduce(
+                    (total, item) =>
+                      total + (item.value || 0) * (item.quantity || 1),
+                    0
+                  )
+                )
+              )}
             </span>
           </div>
         </div>

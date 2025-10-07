@@ -3,6 +3,8 @@ import { Loader2 } from "lucide-react";
 
 // Shipping Step Component
 const ShippingStep = ({
+  cCurrency,
+  fCurrency,
   onShowAddressModal,
   shippingLoading,
   userData,
@@ -23,7 +25,8 @@ const ShippingStep = ({
             </div>
           ) : (
             <span className="font-medium text-gray-900">
-              ${cart.shippingFee?.toFixed(2)}
+              {/* ${cart.shippingFee?.toFixed(2)} */}
+              {fCurrency(cCurrency(cart.shippingFee || 0))}
             </span>
           )}
         </div>

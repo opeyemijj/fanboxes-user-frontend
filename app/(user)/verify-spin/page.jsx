@@ -2,8 +2,8 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import Header from "@/components/_main/Header";
-import Footer from "@/components/_main/Footer";
+// import Header from "@/components/_main/Header";
+// import Footer from "@/components/_main/Footer";
 import { toastError } from "@/lib/toast";
 import { getProductDetails } from "@/services/boxes";
 import { getSpinWinningItem } from "@/services/boxes/spin-game/index";
@@ -22,11 +22,11 @@ import {
 function VerifySpinLoading() {
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      {/* <Header /> */}
       <main className="flex-grow flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#11F2EB]"></div>
       </main>
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 }
@@ -578,13 +578,13 @@ function VerifySpinContent() {
 export default function VerifySpinPage() {
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      {/* <Header /> */}
       <main className="flex-grow">
         <Suspense fallback={<VerifySpinLoading />}>
           <VerifySpinContent />
         </Suspense>
       </main>
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 }

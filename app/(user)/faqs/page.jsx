@@ -1,8 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import Header from "@/components/_main/Header";
-import Footer from "@/components/_main/Footer";
+// import Header from "@/components/_main/Header";
+// import Footer from "@/components/_main/Footer";
 import {
   ChevronDown,
   ChevronUp,
@@ -239,14 +239,14 @@ export default function FAQs() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex flex-col">
-        <Header />
+        {/* <Header /> */}
         <main className="flex-1 pt-32 pb-16 flex items-center justify-center">
           <div className="text-center">
             <Loader className="w-8 h-8 animate-spin text-[#11F2EB] mx-auto mb-4" />
             <p className="text-gray-600">Loading FAQs...</p>
           </div>
         </main>
-        <Footer />
+        {/* <Footer /> */}
       </div>
     );
   }
@@ -270,7 +270,7 @@ export default function FAQs() {
             </button>
           </div>
         </main>
-        <Footer />
+        {/* <Footer /> */}
       </div>
     );
   }
@@ -280,7 +280,7 @@ export default function FAQs() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex flex-col">
-      <Header />
+      {/* <Header /> */}
 
       <main className="flex-1 pt-32 pb-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
@@ -601,7 +601,7 @@ export default function FAQs() {
         }
       `}</style>
 
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 }

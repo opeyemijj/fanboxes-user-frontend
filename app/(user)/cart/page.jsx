@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Image from "next/image";
-import Header from "@/components/_main/Header";
-import Footer from "@/components/_main/Footer";
+// import Header from "@/components/_main/Header";
+// import Footer from "@/components/_main/Footer";
 import {
   ShoppingCart,
   Plus,
@@ -29,6 +29,8 @@ import {
 import { useRouter } from "next/navigation";
 import { getShippingFeePercentage } from "@/services/order";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useCurrencyConvert } from "@/hooks/convertCurrency";
+import { useCurrencyFormatter } from "@/hooks/formatCurrency";
 
 const CartPage = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -41,6 +43,9 @@ const CartPage = () => {
   const cartTotal = useSelector(selectCartTotal);
   const shippingFee = useSelector(selectShippingFee);
   const discountApplied = useSelector(selectDiscountApplied);
+
+  const cCurrency = useCurrencyConvert();
+  const fCurrency = useCurrencyFormatter();
 
   // Count unique items, not total quantities
   const uniqueItemCount = cartItems.length;
@@ -128,7 +133,7 @@ const CartPage = () => {
   if (!isMounted) {
     return (
       <>
-        <Header />
+        {/* <Header /> */}
         <div className="min-h-screen bg-gray-50 py-8 mt-20">
           <div className="container mx-auto px-4 max-w-6xl">
             {/* Header Skeleton */}
@@ -179,7 +184,7 @@ const CartPage = () => {
             </div>
           </div>
         </div>
-        <Footer />
+        {/* <Footer /> */}
       </>
     );
   }
@@ -188,7 +193,7 @@ const CartPage = () => {
   if (cartItems.length === 0) {
     return (
       <>
-        <Header />
+        {/* <Header /> */}
         <div className="min-h-screen bg-gray-50 py-8 mt-20">
           <div className="container mx-auto px-4 max-w-4xl">
             <div className="bg-white rounded-2xl shadow-sm p-8 text-center">
@@ -211,14 +216,14 @@ const CartPage = () => {
             </div>
           </div>
         </div>
-        <Footer />
+        {/* <Footer /> */}
       </>
     );
   }
 
   return (
     <>
-      <Header />
+      {/* <Header /> */}
       <div className="min-h-screen bg-gray-50 py-8 mt-20">
         <div className="container mx-auto px-4 max-w-6xl">
           {/* Header */}
@@ -282,7 +287,8 @@ const CartPage = () => {
                               )}
                               <div className="flex items-center gap-3 mt-2">
                                 <span className="font-bold text-gray-900">
-                                  ${item.value?.toLocaleString() || "0"}
+                                  {/* ${item.value?.toLocaleString() || "0"} */}
+                                  {fCurrency(cCurrency(item?.value))}
                                 </span>
                                 {item.weight && (
                                   <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
@@ -334,10 +340,13 @@ const CartPage = () => {
 
                             <div className="text-right">
                               <p className="font-bold text-gray-900">
-                                $
+                                {/* $
                                 {(
                                   (item.value || 0) * item.quantity
-                                ).toLocaleString()}
+                                ).toLocaleString()} */}
+                                {fCurrency(
+                                  cCurrency((item.value || 0) * item.quantity)
+                                )}
                               </p>
                             </div>
                           </div>
@@ -359,7 +368,10 @@ const CartPage = () => {
                 <div className="space-y-3 mb-6">
                   <div className="flex justify-between text-gray-600">
                     <span>Subtotal ({uniqueItemCount} items)</span>
-                    <span>${subtotal.toLocaleString()}</span>
+                    <span>
+                      {/* ${subtotal.toLocaleString()} */}
+                      {fCurrency(cCurrency(subtotal))}
+                    </span>
                   </div>
 
                   <div className="flex justify-between text-gray-600">
@@ -368,7 +380,7 @@ const CartPage = () => {
                       {shippingLoading ? (
                         <Loader className="w-4 h-4 animate-spin text-gray-400" />
                       ) : shippingFee > 0 ? (
-                        `$${shippingFee.toLocaleString()}`
+                        `${fCurrency(cCurrency(shippingFee))}`
                       ) : (
                         "Calculated at checkout"
                       )}
@@ -387,11 +399,13 @@ const CartPage = () => {
                       <span>
                         -$
                         {discountApplied.type === "percentage-off"
-                          ? (
-                              ((subtotal + shippingFee) *
-                                discountApplied.amount) /
-                              100
-                            ).toLocaleString()
+                          ? fCurrency(
+                              cCurrency(
+                                ((subtotal + shippingFee) *
+                                  discountApplied.amount) /
+                                  100
+                              )
+                            )
                           : discountApplied.amount.toLocaleString()}
                       </span>
                     </div>
@@ -403,7 +417,8 @@ const CartPage = () => {
                         Total
                       </span>
                       <span className="text-lg font-bold text-gray-900">
-                        ${cartTotal.toLocaleString()}
+                        {/* ${cartTotal.toLocaleString()} */}
+                        {fCurrency(cCurrency(cartTotal))}
                       </span>
                     </div>
                   </div>
@@ -461,7 +476,7 @@ const CartPage = () => {
           </div>
         </div>
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 };

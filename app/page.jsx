@@ -166,7 +166,7 @@ export default function HomePage() {
   if (typeof window === "undefined" || !isClient) {
     return (
       <div className="bg-white text-black">
-        <Header />
+        {/* <Header /> */}
         <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24">
           <div className="flex items-center justify-center h-64">
             <div className="flex flex-col items-center">
@@ -175,14 +175,14 @@ export default function HomePage() {
             </div>
           </div>
         </main>
-        <Footer />
+        {/* <Footer /> */}
       </div>
     );
   }
 
   return (
     <div className="bg-white text-black">
-      <Header />
+      {/* <Header /> */}
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24">
         {dataLoading && (
@@ -241,7 +241,7 @@ export default function HomePage() {
           </div>
         </div>
       </main>
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 }

@@ -13,6 +13,7 @@ import {
   getResellPercentage,
 } from "@/services/boxes";
 import { updateUserAvailableBalance } from "@/redux/slices/user";
+import { createDemoSpinFrontend } from "@/utils/demo-spin/demoSpin";
 
 const GameContext = createContext();
 
@@ -163,7 +164,8 @@ export const GameProvider = ({ children, box }) => {
     console.log("📦 Using current box config:", currentBoxConfig);
 
     try {
-      const token = user?.user?.token;
+      // const token = user?.user?.token;
+
       // if (!token) {
       //   toastError("Please log in to spin the box.");
       //   router.push(`/login?dest=${pathname}`);
@@ -176,12 +178,21 @@ export const GameProvider = ({ children, box }) => {
 
       if (resultsOnly) {
         // Call the spin API with current box configuration
-        const result = await initializeDemoSpin({
-          clientSeed,
-          nonce,
-          boxId: currentBoxConfig._id,
-          items: currentBoxConfig.items,
-        });
+        // const result = await initializeDemoSpin({
+        //   clientSeed,
+        //   nonce,
+        //   boxId: currentBoxConfig._id,
+        //   items: currentBoxConfig.items,
+        // });
+
+        const result = await createDemoSpinFrontend(
+          currentBoxConfig,
+          user, // current Optional
+          {
+            boxId: currentBoxConfig._id, // Optional
+            clientSeed, // Optional
+          }
+        );
 
         console.log("📡 Received demo spin result from API:", result);
 

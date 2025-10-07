@@ -8,13 +8,13 @@ import Footer from "@/components/_main/Footer";
 export default function InfluencerPage() {
   return (
     <div className="bg-white text-black">
-      <Header />
+      {/* <Header /> */}
       <main className="pt-24">
         <SpinHeroSection />
         <WhatsInTheBox />
         <YouMightLike />
       </main>
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 }

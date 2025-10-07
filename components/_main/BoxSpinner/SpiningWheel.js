@@ -36,6 +36,8 @@ import { updateUserAvailableBalance } from "@/redux/slices/user";
 import ResellConfirmationModal from "./ResellConfirmationModal";
 import { addWonItemToCart } from "@/redux/slices/cartOrder";
 import GoldenConfetti from "./GoldenConfetti";
+import { useCurrencyConvert } from "@/hooks/convertCurrency";
+import { useCurrencyFormatter } from "@/hooks/formatCurrency";
 
 export default function SpinningWheel({
   items,
@@ -78,6 +80,8 @@ export default function SpinningWheel({
   const [isStoppingSpin, setIsStoppingSpin] = useState(false);
   const dispatch = useDispatch();
   const router = useRouter();
+  const cCurrency = useCurrencyConvert();
+  const fCurrency = useCurrencyFormatter();
 
   // Extract seed data from spinResultData
   // const clientSeed = spinResultData?.clientSeed || "";
@@ -688,7 +692,8 @@ export default function SpinningWheel({
                       className="object-contain w-full h-full p-3"
                     />
                     <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-                      ${item.value}
+                      {/* ${item.value} */}
+                      {fCurrency(cCurrency(item?.value))}
                     </div>
 
                     {/* Winner effects */}
@@ -894,7 +899,8 @@ export default function SpinningWheel({
                   <div className="flex flex-col items-center">
                     <div className="bg-gray-800 rounded-lg px-4 py-2 mb-1">
                       <span className="text-white font-semibold">
-                        ${winningItem.value.toLocaleString()}
+                        {/* ${winningItem.value.toLocaleString()} */}
+                        {fCurrency(cCurrency(winningItem?.value))}
                       </span>
                     </div>
                     <span className="text-xs text-gray-600">Cash Value</span>
@@ -940,20 +946,22 @@ export default function SpinningWheel({
                 </div>
 
                 {/* Conversion Rate Bar */}
-                <div className="w-full max-w-sm bg-gray-200 rounded-full h-3 mb-5 relative overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: "100%" }}
-                    transition={{ delay: 0.5, duration: 1, ease: "easeOut" }}
-                    className="absolute left-0 top-0 h-full bg-gradient-to-r from-blue-500 to-amber-500 py-1"
-                  />
-                  <div className="p-0.5 absolute left-0 top-0 w-full h-full flex items-center justify-center">
-                    <span className="text-xs font-medium text-gray-700 bg-white/80 px-2 rounded-full">
-                      Conversion Rate: 1 Credit = $
-                      {cashToCreditConvRate?.value || 1} USD
-                    </span>
+                {!isDemoSpin && (
+                  <div className="w-full max-w-sm bg-gray-200 rounded-full h-3 mb-5 relative overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: "100%" }}
+                      transition={{ delay: 0.5, duration: 1, ease: "easeOut" }}
+                      className="absolute left-0 top-0 h-full bg-gradient-to-r from-blue-500 to-amber-500 py-1"
+                    />
+                    <div className="p-0.5 absolute left-0 top-0 w-full h-full flex items-center justify-center">
+                      <span className="text-xs font-medium text-gray-700 bg-white/80 px-2 rounded-full">
+                        Conversion Rate: 1 Credit = $
+                        {cashToCreditConvRate?.value || 1} USD
+                      </span>
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Action Buttons */}
 

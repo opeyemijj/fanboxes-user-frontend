@@ -129,11 +129,15 @@ export default function CurrencySelect() {
         onClose={handleClose}
         maxWidth="md"
         fullWidth
+        sx={{
+          zIndex: 9999,
+        }}
         PaperProps={{
           sx: {
             borderRadius: "16px",
             boxShadow: "0 24px 48px rgba(0,0,0,0.12)",
             overflow: "hidden",
+            zIndex: 9999,
           },
         }}
       >

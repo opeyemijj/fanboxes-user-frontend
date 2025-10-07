@@ -115,11 +115,11 @@ export default function MysteryBoxesPage() {
           "Failed to fetch admin products or invalid data format:",
           response
         );
-        setError("Failed to load mystery boxes. Please reload the page.");
+        setError("Failed to load boxes. Please reload the page.");
       }
     } catch (err) {
       console.error("Error fetching admin products:", err);
-      setError("Failed to load mystery boxes. Please reload the page.");
+      setError("Failed to load boxes. Please reload the page.");
     }
 
     // console.log("Setting loading to false");
@@ -178,12 +178,12 @@ export default function MysteryBoxesPage() {
       <div className="flex flex-col items-center text-center">
         <div className="text-gray-400 text-6xl mb-4">📦</div>
         <h2 className="text-2xl font-bold text-gray-600 mb-2">
-          No mystery boxes found
+          No boxes found
         </h2>
         <p className="text-lg text-gray-500 mb-4">
           {selectedCategory !== "all" || searchTerm
             ? "Try adjusting your filters or search terms"
-            : "There are currently no mystery boxes available."}
+            : "There are currently no boxes available."}
         </p>
         <button
           onClick={() => fetchAdminProducts(1, true)}
@@ -277,11 +277,11 @@ export default function MysteryBoxesPage() {
   if (!isClient) {
     return (
       <div className="bg-white text-black">
-        <Header />
+        {/* <Header /> */}
         <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24">
           <SkeletonLoader />
         </main>
-        <Footer />
+        {/* <Footer /> */}
       </div>
     );
   }
@@ -290,7 +290,7 @@ export default function MysteryBoxesPage() {
   if (error) {
     return (
       <div className="bg-white text-black">
-        <Header />
+        {/* <Header /> */}
         <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24">
           <div className="flex items-center justify-center h-64">
             <div className="flex flex-col items-center text-center">
@@ -308,20 +308,20 @@ export default function MysteryBoxesPage() {
             </div>
           </div>
         </main>
-        <Footer />
+        {/* <Footer /> */}
       </div>
     );
   }
 
   return (
     <div className="bg-white text-black">
-      <Header />
+      {/* <Header /> */}
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24">
         <div className="flex flex-col lg:flex-row gap-8 mt-8">
           <div className="w-full lg:w-3/3 xl:w-4/4">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
               <h1 className="text-2xl sm:text-3xl lg:text-5xl font-bold">
-                Mystery boxes
+                Boxes
               </h1>
               <div className="text-sm text-gray-500">
                 {totalItems} box
@@ -376,7 +376,7 @@ export default function MysteryBoxesPage() {
           </div>
         </div>
       </main>
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 }
