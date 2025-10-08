@@ -13,6 +13,7 @@ const persistConfig = {
     "user",
     "ambassadors",
     "cartOrder",
+    "settings",
   ], // Only persist these slices
 };
 
