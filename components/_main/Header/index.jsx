@@ -25,7 +25,6 @@ import { selectDirectBuyItems } from "@/redux/slices/cartOrder";
 import CurrencySelect from "./LanguageSelect";
 
 function Header() {
-  // console.log("header rendered...");
   const userData = useSelector((state) => state.user);
   const cartItems = useSelector(selectDirectBuyItems);
   const [showTopUpPopup, setShowTopUpPopup] = useState(false);
@@ -33,6 +32,7 @@ function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   const pathname = usePathname();
   const { logout } = useAuth();
@@ -42,6 +42,11 @@ function Header() {
     (total, item) => total + (item.quantity || 1),
     0
   );
+
+  // Set mounted flag on client only
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     setUser(userData?.user);
@@ -75,13 +80,74 @@ function Header() {
     setMobileMenuOpen(false);
   }, [pathname]);
 
+  // Full header skeleton
+  const HeaderSkeleton = () => (
+    <header className="fixed top-0 left-0 right-0 z-[9999] bg-white/80 backdrop-blur-sm">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-20">
+          {/* Logo - No skeleton needed */}
+          <div className="flex items-center space-x-6 lg:space-x-8">
+            <Link href="/" className="flex items-center space-x-2">
+              <Image
+                src="/favicon.png"
+                alt="Logo"
+                width={28}
+                height={28}
+                className="h-7 w-7 lg:h-8 lg:w-8"
+              />
+              <span className="font-bold text-xl lg:text-2xl">fanboxes</span>
+            </Link>
+            {/* Desktop nav skeleton */}
+            <nav className="hidden lg:flex items-center space-x-4">
+              <div className="w-20 h-9 bg-gray-200 rounded animate-pulse"></div>
+              <div className="w-32 h-9 bg-gray-200 rounded animate-pulse"></div>
+            </nav>
+          </div>
+
+          {/* Desktop right section skeleton */}
+          <div className="hidden lg:flex items-center space-x-4">
+            {/* Currency selector skeleton */}
+            <div className="w-24 h-9 bg-gray-200 rounded-lg animate-pulse"></div>
+
+            {/* Cart skeleton */}
+            <div className="w-9 h-9 bg-gray-200 rounded animate-pulse"></div>
+
+            {/* Wallet balance skeleton */}
+            <div className="w-20 h-9 bg-gray-200 rounded animate-pulse"></div>
+
+            {/* User profile skeleton */}
+            <div className="flex items-center space-x-2">
+              <div className="w-16 h-4 bg-gray-200 rounded animate-pulse"></div>
+              <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
+              <div className="w-4 h-4 bg-gray-200 rounded animate-pulse"></div>
+            </div>
+          </div>
+
+          {/* Mobile right section skeleton */}
+          <div className="lg:hidden flex items-center space-x-2">
+            <div className="w-9 h-9 bg-gray-200 rounded-lg animate-pulse"></div>
+            <div className="w-9 h-9 bg-gray-200 rounded animate-pulse"></div>
+            <div className="w-16 h-9 bg-gray-200 rounded animate-pulse"></div>
+            <div className="w-9 h-9 bg-gray-200 rounded animate-pulse"></div>
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+
+  // Show skeleton until mounted
+  if (!isMounted) {
+    return <HeaderSkeleton />;
+  }
+
+  // Render actual header after mounting
   return (
     <>
       <header className="fixed top-0 left-0 right-0 z-[9999] bg-white/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             <div className="flex items-center space-x-6 lg:space-x-8">
-              {/* Smaller logo for mobile */}
+              {/* Logo */}
               <Link href="/" className="flex items-center space-x-2">
                 <Image
                   src="/favicon.png"

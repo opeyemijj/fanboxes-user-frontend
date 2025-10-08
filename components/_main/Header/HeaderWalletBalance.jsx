@@ -1,19 +1,21 @@
 "use client";
 import { useState, useEffect } from "react";
 import { fetchWalletBalanceAndHistory } from "@/services/profile";
-import { useRouter } from "next/navigation";
-import { toastError, toastWarning } from "@/lib/toast";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { updateUserAvailableBalance } from "@/redux/slices/user";
 
 const HeaderWalletBalance = ({ handleLogout, availableBalance }) => {
-  const [balanceData, setBalanceData] = useState(availableBalance || null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const router = useRouter();
+  const [isMounted, setIsMounted] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted) return;
+
     const fetchBalance = async () => {
       try {
         const response = await fetchWalletBalanceAndHistory();
@@ -42,7 +44,7 @@ const HeaderWalletBalance = ({ handleLogout, availableBalance }) => {
     };
 
     fetchBalance();
-  }, []);
+  }, [isMounted]);
 
   if (loading) {
     return (
@@ -51,14 +53,6 @@ const HeaderWalletBalance = ({ handleLogout, availableBalance }) => {
       </div>
     );
   }
-
-  // if (error) {
-  //   return (
-  //     <div className="pr-1 text-red-500">
-  //       <span className="font-medium">{error}</span>
-  //     </div>
-  //   );
-  // }
 
   return (
     <div className="pr-1">
