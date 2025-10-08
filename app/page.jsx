@@ -185,14 +185,14 @@ export default function HomePage() {
       {/* <Header /> */}
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24">
-        {dataLoading && (
+        {/* {dataLoading && (
           <div className="text-center py-8">
             <div className="flex justify-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#11F2EB]"></div>
             </div>
             <p className="mt-2">Loading...</p>
           </div>
-        )}
+        )} */}
 
         {hasError && (
           <div className="text-center py-8 text-red-600">
