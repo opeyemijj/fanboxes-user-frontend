@@ -1603,13 +1603,11 @@ export default function SpinningWheel({
     setIsStoppingSpin(true);
   };
 
-  // Show loading state until component is mounted - THIS IS THE KEY FIX
   if (!isMounted) {
     return (
       <div className="relative w-full h-[50vh] min-h-[400px] overflow-hidden flex flex-col items-center justify-center rounded-2xl bg-gray-100">
         <div className="flex flex-col items-center justify-center space-y-4">
           <div className="w-8 h-8 border-4 border-cyan-600 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-gray-600">Loading spinning wheel...</p>
         </div>
       </div>
     );

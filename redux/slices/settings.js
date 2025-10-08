@@ -1,3 +1,4 @@
+// settingsSlice.js
 import { createSlice } from "@reduxjs/toolkit";
 
 // ----------------------------------------------------------------------
@@ -8,6 +9,7 @@ const initialState = {
   openSidebar: false,
   currency: process.env.BASE_CURRENCY || "USD",
   rate: 1,
+  userCurrencyPreference: null, // Track if user manually selected currency
 };
 
 // slice
@@ -25,6 +27,12 @@ const slice = createSlice({
       state.currency = action.payload.currency;
       state.rate = action.payload.rate;
     },
+    setUserCurrencyPreference(state, action) {
+      state.userCurrencyPreference = action.payload;
+    },
+    clearUserCurrencyPreference(state) {
+      state.userCurrencyPreference = null;
+    },
   },
 });
 
@@ -32,7 +40,12 @@ const slice = createSlice({
 export default slice.reducer;
 
 // Actions
-export const { setThemeMode, toggleSidebar, handleChangeCurrency } =
-  slice.actions;
+export const {
+  setThemeMode,
+  toggleSidebar,
+  handleChangeCurrency,
+  setUserCurrencyPreference,
+  clearUserCurrencyPreference,
+} = slice.actions;
 
 // ----------------------------------------------------------------------
