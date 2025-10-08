@@ -1,3 +1,4 @@
+"use client";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { handleChangeCurrency } from "@/redux/slices/settings";
@@ -24,10 +25,18 @@ export default function CurrencySelect() {
   const [currencies, setCurrencies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isMounted, setIsMounted] = useState(false);
 
   const hasRunRef = useRef(false);
 
+  // Set mounted flag on client only
   useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted) return;
+
     const fetchCurrencies = async () => {
       try {
         setLoading(true);
@@ -48,9 +57,10 @@ export default function CurrencySelect() {
     };
 
     fetchCurrencies();
-  }, []);
+  }, [isMounted]);
 
   useEffect(() => {
+    if (!isMounted) return;
     if (currencies?.length && !hasRunRef.current) {
       const detectAndSetCurrency = async () => {
         try {
@@ -76,7 +86,7 @@ export default function CurrencySelect() {
 
       detectAndSetCurrency();
     }
-  }, [dispatch, currencies]);
+  }, [dispatch, currencies, isMounted]);
 
   const handleClickOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -107,6 +117,24 @@ export default function CurrencySelect() {
       return currencies?.find((cur) => cur.code === "USD");
     }
   };
+
+  // Show simple button until mounted
+  if (!isMounted) {
+    return (
+      <div className="currency-selector">
+        <button
+          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-gray-200 transition-all duration-200 shadow-sm"
+          aria-label="Select currency"
+        >
+          <span className="text-lg leading-none">🌐</span>
+          <span className="text-sm font-semibold text-gray-900 currency-code">
+            {currency || "USD"}
+          </span>
+          <ChevronDown className="h-3.5 w-3.5 text-gray-500" />
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="currency-selector">

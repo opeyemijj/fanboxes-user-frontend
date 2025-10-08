@@ -78,9 +78,9 @@ export class ProvablyFair {
   //   };
   // }
   static async generateDemoSpinResult(serverSeed, clientSeed, nonce, items) {
-    console.log(
-      "🎲 Generating demo spin result (provably fair hash generated but not used)"
-    );
+    // console.log(
+    //   "🎲 Generating demo spin result (provably fair hash generated but not used)"
+    // );
 
     if (!items || items.length === 0) {
       throw new Error("No items available for demo spin");
@@ -116,24 +116,24 @@ export class ProvablyFair {
       return valueB - valueA; // Descending order
     });
 
-    // Take top 5 (or all if less than 5 items)
-    const topItems = sortedItems.slice(0, 5);
+    // Take top 7 (or all if less than 7 items)
+    const topItems = sortedItems.slice(0, 7);
 
     // Pick randomly from top 5
     const randomIndex = Math.floor(Math.random() * topItems.length);
     const winningItem = topItems[randomIndex];
 
-    console.log(
-      "🏆 Demo Winning item (from top 5 most valuable):",
-      winningItem?.name
-    );
-    console.log(
-      "💰 Top 5 items considered:",
-      topItems.map((item) => ({
-        name: item.name,
-        value: item.value,
-      }))
-    );
+    // console.log(
+    //   "🏆 Demo Winning item (from top 7 most valuable):",
+    //   winningItem?.name
+    // );
+    // console.log(
+    //   "💰 Top7 items considered:",
+    //   topItems.map((item) => ({
+    //     name: item.name,
+    //     value: item.value,
+    //   }))
+    // );
 
     return {
       oddsMap,
