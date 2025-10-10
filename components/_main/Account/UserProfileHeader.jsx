@@ -62,9 +62,9 @@ const UserProfileHeader = () => {
       <div className="flex items-center">
         {/* User Avatar */}
         <div className="flex-shrink-0 mr-4">
-          {user.profileImage ? (
+          {user?.cover?.url ? (
             <img
-              src={user.profileImage}
+              src={user?.cover?.url}
               alt={getFullName()}
               className="w-14 h-14 rounded-full object-cover border-2 border-[#0A3432]/10"
             />
