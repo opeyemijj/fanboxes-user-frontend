@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -37,6 +37,9 @@ function Header() {
   const pathname = usePathname();
   const { logout } = useAuth();
 
+  // Ref for the profile dropdown container
+  const dropdownRef = useRef(null);
+
   // Calculate total items in cart
   const totalCartItems = cartItems.reduce(
     (total, item) => total + (item.quantity || 1),
@@ -52,6 +55,25 @@ function Header() {
     setUser(userData?.user);
     setIsLoggedIn(userData?.isAuthenticated && userData?.user?.token);
   }, [userData]);
+
+  // Handle click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowProfileDropdown(false);
+      }
+    };
+
+    // Add event listener when dropdown is open
+    if (showProfileDropdown) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    // Cleanup
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showProfileDropdown]);
 
   const handleLogout = () => {
     logout();
@@ -220,7 +242,7 @@ function Header() {
                     />
                     <Hexagon className="h-4 w-4 text-gray-500" />
                   </Button>
-                  <div className="relative">
+                  <div className="relative" ref={dropdownRef}>
                     <button
                       onClick={() =>
                         setShowProfileDropdown(!showProfileDropdown)
