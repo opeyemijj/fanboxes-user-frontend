@@ -27,8 +27,16 @@ function getTokenFromRedux() {
   return state.user?.user?.token || "";
 }
 
+// ✅ new function to get frontend domain
+function getFrontendDomain() {
+  if (typeof window !== "undefined") {
+    return window.location.origin;
+  }
+  return process.env.NEXT_PUBLIC_FRONTEND_URL || "";
+}
+
 const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.BASE_URL;
-// console.log(baseURL);
+
 const http = axios.create({
   baseURL: baseURL + `/api`,
   timeout: 30000,
@@ -37,10 +45,17 @@ const http = axios.create({
 http.interceptors.request.use(
   (config) => {
     const token = getTokenFromRedux() || getToken();
+    const frontendDomain = getFrontendDomain();
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
+    // Add frontend domain to headers
+    if (frontendDomain) {
+      config.headers["X-Frontend-Domain"] = frontendDomain;
+    }
+
     return config;
   },
   (error) => {

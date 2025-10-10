@@ -3,23 +3,51 @@ import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/Button";
 import { ArrowLeft, Mail } from "lucide-react";
-// import Header from "@/components/_main/Header"
-// import Footer from "@/components/_main/Footer"
+import { forgetPassword } from "@/services/auth";
+import { toastError, toastSuccess } from "@/lib/toast";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setError("");
 
-    // Simulate password reset email sending
-    setTimeout(() => {
+    try {
+      // Make the actual API call
+      const payload = { email };
+      const response = await forgetPassword(payload);
+      // console.log("Forgot password response:", response);
+
+      // If we get here, the API call was successful
+      if (response.success) {
+        setIsLoading(false);
+        setIsSubmitted(true);
+        toastSuccess("Password reset link sent successfully!");
+      }
+    } catch (err) {
       setIsLoading(false);
-      setIsSubmitted(true);
-    }, 1000);
+      console.error("Forgot password error:", err);
+
+      // Handle different error scenarios
+      const errorMessage =
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to send reset link. Please try again.";
+
+      setError(errorMessage);
+      toastError(errorMessage);
+    }
+  };
+
+  const handleSendAnother = () => {
+    setIsSubmitted(false);
+    setEmail("");
+    setError("");
   };
 
   if (isSubmitted) {
@@ -44,7 +72,7 @@ export default function ForgotPasswordPage() {
 
               <div className="space-y-4">
                 <Button
-                  onClick={() => setIsSubmitted(false)}
+                  onClick={handleSendAnother}
                   className="w-full bg-[#11F2EB] hover:bg-[#0DD4C7] text-white font-semibold py-3 rounded-xl transition-colors"
                 >
                   Send another email
@@ -53,7 +81,7 @@ export default function ForgotPasswordPage() {
                 <Link href="/login">
                   <Button
                     variant="ghost"
-                    className="w-full text-gray-600 hover:text-gray-800 transition-colors"
+                    className="mt-2 w-full text-gray-600 hover:text-gray-800 hover:bg-transparent transition-colors"
                   >
                     Back to login
                   </Button>
@@ -115,10 +143,17 @@ export default function ForgotPasswordPage() {
                 />
               </div>
 
+              {/* Error Message */}
+              {error && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-xl">
+                  <p className="text-red-700 text-sm text-center">{error}</p>
+                </div>
+              )}
+
               <Button
                 type="submit"
-                disabled={isLoading}
-                className="w-full bg-[#11F2EB] hover:bg-[#0DD4C7] text-white font-semibold py-3 rounded-xl transition-colors"
+                disabled={isLoading || !email}
+                className="w-full bg-[#11F2EB] hover:bg-[#0DD4C7] disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition-colors"
               >
                 {isLoading ? "Sending reset link..." : "Send reset link"}
               </Button>

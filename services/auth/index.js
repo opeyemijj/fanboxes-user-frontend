@@ -5,11 +5,15 @@ export const register = async (payload) => {
   return data;
 };
 export const verifyOTP = async (payload) => {
-  const { data } = await http.post(`/auth/verify-otp`, payload);
+  const { data } = await http.post(`/auth/verify-otp`, payload).catch((e) => {
+    throw e;
+  });
   return data;
 };
 export const resendOTP = async (payload) => {
-  const { data } = await http.post(`/auth/resend-otp`, payload);
+  const { data } = await http.post(`/auth/resend-otp`, payload).catch((e) => {
+    throw e;
+  });
   return data;
 };
 
@@ -19,15 +23,23 @@ export const login = async (payload) => {
 };
 
 export const forgetPassword = async (payload) => {
-  const { data } = await http.post("/auth/forget-password", payload);
+  const { data } = await http
+    .post("/auth/forget-password", payload)
+    .catch((e) => {
+      throw e;
+    });
   return data;
 };
 
 export const resetPassword = async ({ newPassword, token }) => {
-  const { data } = await http.post("/auth/reset-password", {
-    newPassword: newPassword,
-    token: token,
-  });
+  const { data } = await http
+    .post("/auth/reset-password", {
+      newPassword: newPassword,
+      token: token,
+    })
+    .catch((e) => {
+      throw e;
+    });
   return data;
 };
 

@@ -423,7 +423,7 @@ export default function CurrencySelect() {
         setError(null);
         const response = await getCurrencies();
         if (response?.success) {
-          console.log("cRes::", response.data);
+          // console.log("cRes::", response.data);
           setCurrencies(response.data || []);
         } else {
           throw new Error("Failed to fetch currencies");
