@@ -16,9 +16,9 @@
 //   const [showPassword, setShowPassword] = useState(false);
 //   const [isLoading, setIsLoading] = useState(false);
 //   const [error, setError] = useState("");
-//   const [acceptedTerms, setAcceptedTerms] = useState(false); // New state for terms acceptance
+//   const [acceptedTerms, setAcceptedTerms] = useState(false);
 //   const router = useRouter();
-//   const { login, signup } = useAuth();
+//   const { signup } = useAuth();
 
 //   const handleInputChange = (e) => {
 //     setFormData({
@@ -38,7 +38,7 @@
 
 //     const { success, message } = await signup(formData);
 //     if (!success) {
-//       setError(message || "signup failed");
+//       setError(message || "Signup failed");
 //       setIsLoading(false);
 //       return;
 //     }
@@ -50,14 +50,14 @@
 //       password: "",
 //     });
 //     setIsLoading(false);
-//     router.push("/");
+//     // Redirect to verification page instead of home
+//     router.push("/verify-email");
 //   };
 
 //   const handleGoogleSignup = () => {
 //     setIsLoading(true);
 //     // Simulate Google signup
 //     setTimeout(() => {
-//       login();
 //       setIsLoading(false);
 //       router.push("/");
 //     }, 1000);
@@ -65,8 +65,6 @@
 
 //   return (
 //     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex flex-col">
-//       {/* <Header /> */}
-
 //       <main className="flex-1 flex items-center justify-center p-4 pt-32 pb-16">
 //         <div className="w-full max-w-md">
 //           {/* Signup Card */}
@@ -278,8 +276,6 @@
 //           </div>
 //         </div>
 //       </main>
-
-//       {/* <Footer /> */}
 //     </div>
 //   );
 // }
@@ -289,8 +285,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/Button";
-import { Eye, EyeOff, X } from "lucide-react";
+import { Eye, EyeOff, X, Loader2 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
+import TurnstileWidget from "@/components/TurnstileWidget";
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -303,6 +300,8 @@ export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileLoading, setTurnstileLoading] = useState(true);
   const router = useRouter();
   const { signup } = useAuth();
 
@@ -319,13 +318,28 @@ export default function SignupPage() {
 
   const handleSignup = async (e) => {
     e.preventDefault();
+
+    if (!turnstileToken) {
+      setError("Please complete the security verification");
+      return;
+    }
+
     setIsLoading(true);
     setError("");
 
-    const { success, message } = await signup(formData);
+    // Include turnstile token in your signup request
+    console.log("Turnstile Token:", turnstileToken);
+    const { success, message } = await signup({ ...formData, turnstileToken });
+
     if (!success) {
       setError(message || "Signup failed");
       setIsLoading(false);
+      // Reset turnstile on failed signup
+      if (window.turnstile) {
+        // The TurnstileWidget component handles reset internally via the expired-callback
+        setTurnstileToken("");
+        setTurnstileLoading(true);
+      }
       return;
     }
 
@@ -538,12 +552,33 @@ export default function SignupPage() {
                 </label>
               </div>
 
+              {/* Cloudflare Turnstile Widget - Full width and no label */}
+              <TurnstileWidget
+                onTokenChange={setTurnstileToken}
+                loading={turnstileLoading}
+                setLoading={setTurnstileLoading}
+              />
+
               <Button
                 type="submit"
-                disabled={isLoading || !acceptedTerms}
+                disabled={
+                  isLoading ||
+                  !acceptedTerms ||
+                  turnstileLoading ||
+                  !turnstileToken
+                }
                 className="w-full bg-[#11F2EB] hover:bg-[#0DD4C7] text-white font-semibold py-3 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? "Creating account..." : "Create account"}
+                {isLoading ? (
+                  <span className="flex items-center justify-center">
+                    <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                    Creating account...
+                  </span>
+                ) : turnstileLoading ? (
+                  "Waiting for security check..."
+                ) : (
+                  "Create account"
+                )}
               </Button>
             </form>
 

@@ -1,12 +1,11 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import TurnstileWidget from "@/components/TurnstileWidget";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/Button";
-import { Eye, EyeOff, X } from "lucide-react";
+import { Eye, EyeOff, X, Shield, Loader2 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
-// import Header from "@/components/_main/Header";
-// import Footer from "@/components/_main/Footer";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -14,18 +13,36 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileLoading, setTurnstileLoading] = useState(true);
   const router = useRouter();
   const { login } = useAuth();
+  const widgetIdRef = useRef(null);
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    if (!turnstileToken) {
+      setError("Please complete the security verification");
+      return;
+    }
+
     setIsLoading(true);
     setError("");
 
-    const { success, message } = await login(email, password);
+    // Include turnstile token in your login request
+    console.log("Turnstile Token:", turnstileToken);
+    const { success, message } = await login(email, password, turnstileToken);
+
     if (!success) {
       setError(message || "Login failed");
       setIsLoading(false);
+      // Reset turnstile on failed login
+      if (window.turnstile && widgetIdRef.current) {
+        window.turnstile.reset(widgetIdRef.current);
+        setTurnstileToken("");
+        setTurnstileLoading(true);
+      }
       return;
     }
 
@@ -51,8 +68,6 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex flex-col">
-      {/* <Header /> */}
-
       <main className="flex-1 flex items-center justify-center p-4 pt-32 pb-16">
         <div className="w-full max-w-md">
           {/* Login Card */}
@@ -67,7 +82,6 @@ export default function LoginPage() {
             {/* Google Login Button */}
             <Button
               onClick={handleGoogleLogin}
-              // disabled={isLoading}
               disabled={true}
               className="w-full mb-6 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-center space-x-3 py-3 rounded-xl"
             >
@@ -191,12 +205,28 @@ export default function LoginPage() {
                 </Link>
               </div>
 
+              {/* Cloudflare Turnstile Widget - Full width and no label */}
+              <TurnstileWidget
+                onTokenChange={setTurnstileToken}
+                loading={turnstileLoading}
+                setLoading={setTurnstileLoading}
+              />
+
               <Button
                 type="submit"
-                disabled={isLoading}
-                className="w-full bg-[#0DD4C7] hover:bg-[#11F2EB] text-white font-semibold py-3 rounded-xl transition-colors"
+                disabled={isLoading || turnstileLoading || !turnstileToken}
+                className="w-full bg-[#0DD4C7] hover:bg-[#11F2EB] text-white font-semibold py-3 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? "Signing in..." : "Sign in"}
+                {isLoading ? (
+                  <span className="flex items-center justify-center">
+                    <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                    Signing in...
+                  </span>
+                ) : turnstileLoading ? (
+                  "Waiting for security check..."
+                ) : (
+                  "Sign in"
+                )}
               </Button>
             </form>
 
@@ -215,8 +245,6 @@ export default function LoginPage() {
           </div>
         </div>
       </main>
-
-      {/* <Footer /> */}
     </div>
   );
 }

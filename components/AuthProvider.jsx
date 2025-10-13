@@ -53,7 +53,7 @@ export function AuthProvider({ children }) {
     }
   }
 
-  async function login(email, password) {
+  async function login(email, password, turnstileToken) {
     try {
       // console.log("login called ffrom auth prov...");
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
@@ -61,7 +61,12 @@ export function AuthProvider({ children }) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({
+          email,
+          password,
+          turnstileToken,
+          source: "web-user",
+        }),
       });
 
       // Handle response
