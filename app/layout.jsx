@@ -3,6 +3,7 @@ import { AuthProvider } from "@/components/AuthProvider";
 import { LoadingProvider } from "@/components/LoadingProvider";
 import ReduxProvider from "@/components/ReduxProvider";
 import NextTopLoader from "nextjs-toploader";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import { ToastProvider } from "@/components/ToastProvider";
 import AgeVerificationModal from "@/components/AgeVerificationModal";
 import Header from "@/components/_main/Header";
@@ -20,6 +21,7 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+  const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
   return (
     <html lang="en">
       <body>
@@ -38,9 +40,11 @@ export default function RootLayout({ children }) {
           <AuthProvider>
             <LoadingProvider>
               <AgeVerificationModal />
-              <Header />
-              {children}
-              <Footer />
+              <GoogleOAuthProvider clientId={clientId}>
+                <Header />
+                {children}
+                <Footer />
+              </GoogleOAuthProvider>
               <ToastProvider />
             </LoadingProvider>
           </AuthProvider>

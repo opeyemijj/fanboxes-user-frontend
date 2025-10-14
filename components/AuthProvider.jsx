@@ -84,6 +84,49 @@ export function AuthProvider({ children }) {
     }
   }
 
+  const googleLogin = async (googleToken) => {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/google`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ authToken: googleToken }),
+        }
+      );
+
+      // Handle response
+      if (!res.ok) {
+        const errorData = await res.json();
+        return errorData;
+      }
+
+      const data = await res.json();
+      console.log("Google login data to dispatch:", data);
+
+      // Dispatch login with the same structure as regular login
+      dispatch(
+        setLogin({
+          token: data.token,
+          ...data.user,
+        })
+      );
+
+      return {
+        success: data?.success || false,
+        message: data?.message || "",
+      };
+    } catch (error) {
+      console.error("Google login error:", error);
+      return {
+        success: false,
+        message: "Google Sign-In failed",
+      };
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem("isAuthenticated");
     localStorage.removeItem("user");
@@ -98,6 +141,7 @@ export function AuthProvider({ children }) {
     login,
     logout,
     signup,
+    googleLogin,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
