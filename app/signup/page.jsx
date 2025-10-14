@@ -287,7 +287,7 @@ import Link from "next/link";
 import { Button } from "@/components/Button";
 import { Eye, EyeOff, X, Loader2 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
-import TurnstileWidget from "@/components/TurnstileWidget";
+import TurnstileWidget2 from "@/components/TurnstileWidget2";
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -553,7 +553,7 @@ export default function SignupPage() {
               </div>
 
               {/* Cloudflare Turnstile Widget - Full width and no label */}
-              <TurnstileWidget
+              <TurnstileWidget2
                 onTokenChange={setTurnstileToken}
                 loading={turnstileLoading}
                 setLoading={setTurnstileLoading}

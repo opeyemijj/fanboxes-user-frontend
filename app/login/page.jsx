@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import TurnstileWidget from "@/components/TurnstileWidget";
+import TurnstileWidget2 from "@/components/TurnstileWidget2";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/Button";
@@ -205,8 +205,7 @@ export default function LoginPage() {
                 </Link>
               </div>
 
-              {/* Cloudflare Turnstile Widget - Full width and no label */}
-              <TurnstileWidget
+              <TurnstileWidget2
                 onTokenChange={setTurnstileToken}
                 loading={turnstileLoading}
                 setLoading={setTurnstileLoading}
