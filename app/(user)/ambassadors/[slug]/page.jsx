@@ -5,7 +5,12 @@ import { notFound } from "next/navigation";
 // Helper function to fetch ambassador data on server
 async function getAmbassadorData(slug) {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL;
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.BASE_URL;
+
+    // Debug logging
+    console.log("API_URL:", process.env.API_URL);
+    console.log("NEXT_PUBLIC_API_URL:", process.env.NEXT_PUBLIC_API_URL);
+    console.log("Final API URL:", apiUrl);
 
     // Remove trailing slash if present
     const baseUrl = apiUrl.endsWith("/") ? apiUrl.slice(0, -1) : apiUrl;
