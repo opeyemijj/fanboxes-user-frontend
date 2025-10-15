@@ -9,11 +9,8 @@ export default function GoogleSignInButton({ onSuccess, onError }) {
   const handleGoogleSuccess = async (credentialResponse) => {
     setLoading(true);
     try {
-      // credentialResponse.credential is the ID token
-      //   console.log("Google credential response:", credentialResponse);
       const idToken = credentialResponse.credential;
 
-      // Send ID token to your backend
       if (idToken) {
         onSuccess(idToken);
       } else {
@@ -40,16 +37,18 @@ export default function GoogleSignInButton({ onSuccess, onError }) {
           <span className="font-medium">Signing in...</span>
         </div>
       ) : (
-        <GoogleLogin
-          onSuccess={handleGoogleSuccess}
-          onError={handleGoogleError}
-          useOneTap
-          theme="outline"
-          size="large"
-          text="continue_with"
-          shape="rectangular"
-          width="100%"
-        />
+        <div className="w-full flex justify-center [&>div]:w-full [&_iframe]:w-full [&_iframe]:min-w-full">
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={handleGoogleError}
+            useOneTap
+            theme="outline"
+            size="large"
+            text="continue_with"
+            shape="rectangular"
+            width="100%"
+          />
+        </div>
       )}
     </div>
   );
