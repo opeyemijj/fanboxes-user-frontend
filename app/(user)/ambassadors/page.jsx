@@ -31,7 +31,7 @@ function AmbassadorsContent() {
 
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState("most-popular");
+  const [sortBy, setSortBy] = useState("newest");
   const [currentPage, setCurrentPage] = useState(1);
   const [hasProcessedQuery, setHasProcessedQuery] = useState(false);
   const [isClient, setIsClient] = useState(false);
@@ -343,7 +343,7 @@ function AmbassadorsContent() {
                         onChange={(e) => handleSortChange(e.target.value)}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#11F2EB] focus:border-transparent"
                       >
-                        <option value="most-popular">Most Popular</option>
+                        {/* <option value="most-popular">Most Popular</option> */}
                         <option value="newest">Newest</option>
                         <option value="alphabetical">Alphabetical</option>
                         <option value="most-visited">Most Visited</option>
