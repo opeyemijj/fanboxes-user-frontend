@@ -4,11 +4,7 @@ import { recommendedBoxes } from "@/lib/data";
 import { useSelector } from "react-redux";
 
 export default function YouMightLike() {
-  const {
-    products = [],
-    loading: productsLoading,
-    error,
-  } = useSelector((state) => state.product);
+  const products = useSelector((state) => state?.product?.products || []);
 
   return (
     <div className="container mx-auto px-5">

@@ -26,9 +26,10 @@ export default function AmbassadorPageClient({ params, initialAmbassador }) {
 
   const { shops, loading: shopsLoading } = useSelector((state) => state.shops);
   const user = useSelector((state) => state?.user?.user || null);
-  const { products, loading: productsLoading } = useSelector(
-    (state) => state.product
-  );
+  const products = useSelector((state) => state.product?.products || []);
+  // const { products, loading: productsLoading } = useSelector(
+  //   (state) => state.product
+  // );
 
   useEffect(() => {
     setIsClient(true);

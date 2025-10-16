@@ -9,11 +9,21 @@ import {
 } from "react";
 import AmbassadorCategories from "@/components/_main/AmbassadorCategories";
 import AmbassadorGrid from "@/components/_main/AmbassadorGrid";
-import AmbassadorFilterSidebar from "@/components/_main/AmbassadorFilterSidebar";
-import { useSelector } from "react-redux";
+// import AmbassadorFilterSidebar from "@/components/_main/AmbassadorFilterSidebar";
+// import { useSelector } from "react-redux";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useInitialDataFetch } from "@/hooks/useInitialDataFetch";
 import { useSearchParams } from "next/navigation";
+
+// Fisher-Yates shuffle algorithm
+const shuffleArray = (array) => {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+};
 
 // Main content component that uses useSearchParams
 function AmbassadorsContent() {
@@ -25,6 +35,7 @@ function AmbassadorsContent() {
   const [currentPage, setCurrentPage] = useState(1);
   const [hasProcessedQuery, setHasProcessedQuery] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  const [hasRandomized, setHasRandomized] = useState(false);
   const itemsPerPage = 12;
 
   const ambassadorsSectionRef = useRef(null);
@@ -43,18 +54,38 @@ function AmbassadorsContent() {
   const shopError = shops?.error || null;
   const reduxCategories = categories?.categories || [];
 
+  // Filter popular influencers
+  const popularInfluencers = shopsData?.filter((shop) => shop.isPopular) || [];
+
+  const scrollToAmbassadorsSection = useCallback(() => {
+    if (ambassadorsSectionRef.current) {
+      const sectionTop = ambassadorsSectionRef.current.offsetTop;
+      // Account for sticky nav height (approx 120px) + some padding
+      const stickyNavHeight = 120;
+      const headerOffset = window.innerWidth < 768 ? 210 : 80;
+      const scrollPosition = Math.max(
+        0,
+        sectionTop - stickyNavHeight - headerOffset
+      );
+      window.scrollTo({ top: scrollPosition, behavior: "smooth" });
+    }
+  }, []);
+
+  // Memoized randomized popular ambassadors - computed once
+  const randomizedPopularAmbassadors = useMemo(() => {
+    if (isClient && popularInfluencers.length > 0 && !hasRandomized) {
+      console.log("🎲 Randomizing popular ambassadors...");
+      const shuffled = shuffleArray(popularInfluencers);
+      setHasRandomized(true); // Mark as randomized to prevent re-computation
+      return shuffled;
+    }
+    return popularInfluencers; // Return original if not ready to randomize
+  }, [isClient, popularInfluencers, hasRandomized]);
+
   // Handle client-side hydration
   useEffect(() => {
     setIsClient(true);
   }, []);
-
-  console.log("🔍 Component state:", {
-    isClient,
-    shopsCount: shopsData.length,
-    shopsLoading,
-    dataLoading,
-    hasError,
-  });
 
   // Handle query parameters - only on client side after hydration
   useEffect(() => {
@@ -69,10 +100,8 @@ function AmbassadorsContent() {
 
     console.log("🔍 Processing query parameters");
     const categoryFromQuery = searchParams.get("category");
-    console.log("rawS::", shopsData);
 
     if (categoryFromQuery) {
-      // ✅ FIX: Decode the URL parameter to handle spaces and special characters
       const decodedCategory = decodeURIComponent(categoryFromQuery);
       console.log("📋 Category from query (decoded):", decodedCategory);
 
@@ -90,6 +119,8 @@ function AmbassadorsContent() {
           matchingShop.category
         );
         setSelectedCategory(matchingShop.category);
+        // Auto-scroll when category is set from query
+        setTimeout(scrollToAmbassadorsSection, 300);
       } else {
         const matchingCategory = reduxCategories.find(
           (cat) =>
@@ -103,6 +134,8 @@ function AmbassadorsContent() {
             matchingCategory._id
           );
           setSelectedCategory(matchingCategory._id);
+          // Auto-scroll when category is set from query
+          setTimeout(scrollToAmbassadorsSection, 300);
         } else {
           console.log("❌ No matching category found for:", decodedCategory);
         }
@@ -117,6 +150,7 @@ function AmbassadorsContent() {
     shopsData,
     reduxCategories,
     hasProcessedQuery,
+    scrollToAmbassadorsSection, // Added dependency
   ]);
 
   // Filter and sort ambassadors
@@ -176,14 +210,6 @@ function AmbassadorsContent() {
   );
 
   // Handlers
-  const scrollToAmbassadorsSection = useCallback(() => {
-    if (ambassadorsSectionRef.current) {
-      const sectionTop = ambassadorsSectionRef.current.offsetTop;
-      const headerOffset = window.innerWidth < 768 ? 100 : 50;
-      const scrollPosition = Math.max(0, sectionTop - headerOffset);
-      window.scrollTo({ top: scrollPosition, behavior: "smooth" });
-    }
-  }, []);
 
   const handleCategoryChange = useCallback(
     (categoryId) => {
@@ -194,15 +220,30 @@ function AmbassadorsContent() {
     [scrollToAmbassadorsSection]
   );
 
-  const handleSearchChange = useCallback((value) => {
-    setCurrentPage(1);
-    setSearchTerm(value);
-  }, []);
+  const handleSearchChange = useCallback(
+    (value) => {
+      setCurrentPage(1);
+      setSearchTerm(value);
 
-  const handleSortChange = useCallback((value) => {
-    setCurrentPage(1);
-    setSortBy(value);
-  }, []);
+      // Auto-scroll to results when searching
+      if (value?.trim()) {
+        setTimeout(() => {
+          scrollToAmbassadorsSection();
+        }, 300);
+      }
+    },
+    [scrollToAmbassadorsSection]
+  );
+
+  const handleSortChange = useCallback(
+    (value) => {
+      setCurrentPage(1);
+      setSortBy(value);
+      // Auto-scroll when sort is changed
+      setTimeout(scrollToAmbassadorsSection, 100);
+    },
+    [scrollToAmbassadorsSection]
+  );
 
   const handlePageChange = useCallback(
     (newPage) => {
@@ -233,7 +274,6 @@ function AmbassadorsContent() {
 
   // Show error state
   if (hasError || shopError) {
-    console.error("❌ Error state:", { hasError, shopError });
     return (
       <div className="bg-white text-black">
         <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24">
@@ -262,43 +302,108 @@ function AmbassadorsContent() {
   return (
     <div className="bg-white text-black">
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24">
-        <div className="flex flex-col lg:flex-row gap-8 mt-8">
-          <div className="w-full">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-              <h1 className="text-2xl sm:text-3xl lg:text-5xl font-bold">
-                Our ambassadors
-              </h1>
-              <div className="text-sm text-gray-500">
-                {filteredAmbassadors.length} ambassador
-                {filteredAmbassadors.length !== 1 ? "s" : ""} found
-                {filteredAmbassadors.length > itemsPerPage && (
-                  <span className="ml-2">
-                    (Page {currentPage} of {totalPages})
+        <div className="flex flex-col gap-8">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <h1 className="text-2xl sm:text-3xl lg:text-5xl font-bold">
+              Ambassadors
+            </h1>
+          </div>
+
+          {/* Sticky Navigation Bar - Categories + Filters */}
+          <div className="sticky top-16 z-40 bg-white py-4 shadow-sm -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto">
+              <div className="flex flex-col lg:flex-row gap-4 lg:gap-8 items-start lg:items-center">
+                {/* Categories - Left Side */}
+                <div className="w-full lg:flex-1">
+                  <AmbassadorCategories
+                    categories={reduxCategories}
+                    selectedCategory={selectedCategory}
+                    onCategoryChange={handleCategoryChange}
+                  />
+                </div>
+
+                {/* Search and Sort - Right Side  */}
+                <div className="w-full lg:w-auto">
+                  <div className="flex flex-col gap-4">
+                    {/* Search Input */}
+                    <div className="w-full lg:w-80">
+                      <input
+                        type="text"
+                        placeholder="Search ambassadors..."
+                        value={searchTerm}
+                        onChange={(e) => handleSearchChange(e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#11F2EB] focus:border-transparent"
+                      />
+                    </div>
+                    {/* Sort Select */}
+                    <div className="w-full lg:w-80">
+                      <select
+                        value={sortBy}
+                        onChange={(e) => handleSortChange(e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#11F2EB] focus:border-transparent"
+                      >
+                        <option value="most-popular">Most Popular</option>
+                        <option value="newest">Newest</option>
+                        <option value="alphabetical">Alphabetical</option>
+                        <option value="most-visited">Most Visited</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Results Counter */}
+              {searchTerm && (
+                <div className="mt-3 text-sm text-gray-600">
+                  <span className="bg-[#11F2EB] bg-opacity-20 px-3 py-1 rounded-full">
+                    {filteredAmbassadors.length} results found for "{searchTerm}
+                    "
                   </span>
-                )}
-              </div>
+                </div>
+              )}
             </div>
+          </div>
 
-            <div className="mb-8 flex flex-col lg:flex-row gap-8">
-              <div className="w-full lg:w-2/3 xl:w-3/4">
-                <AmbassadorCategories
-                  categories={reduxCategories}
-                  selectedCategory={selectedCategory}
-                  onCategoryChange={handleCategoryChange}
-                />
-              </div>
-              <div className="w-full lg:w-1/3 xl:w-1/4">
-                <AmbassadorFilterSidebar
-                  searchTerm={searchTerm}
-                  onSearchChange={handleSearchChange}
-                  sortBy={sortBy}
-                  onSortChange={handleSortChange}
-                />
-              </div>
-            </div>
+          {/* Content Area */}
+          <div className="flex flex-col gap-8 mt-4">
+            {/* Popular Ambassadors Section */}
+            {randomizedPopularAmbassadors.length > 0 && (
+              <section>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                    Popular Ambassadors
+                  </h2>
+                  <span className="text-sm text-gray-500">
+                    {randomizedPopularAmbassadors.length} popular
+                  </span>
+                </div>
+                <div className="p-5 rounded-lg bg-[#EFEFEF]">
+                  <AmbassadorGrid
+                    ambassadors={randomizedPopularAmbassadors}
+                    key={`popular-ambassadors-${randomizedPopularAmbassadors.length}`}
+                  />
+                </div>
+              </section>
+            )}
 
+            {/* Main Ambassadors Section */}
             <div ref={ambassadorsSectionRef}>
-              <div className="p-5 rounded-lg mb-4 bg-[#EFEFEF]">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                  Our Ambassadors
+                </h2>
+                <div className="text-sm text-gray-500">
+                  {filteredAmbassadors.length} ambassador
+                  {filteredAmbassadors.length !== 1 ? "s" : ""} found
+                  {filteredAmbassadors.length > itemsPerPage && (
+                    <span className="ml-2">
+                      (Page {currentPage} of {totalPages})
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="p-5 rounded-lg bg-[#EFEFEF]">
                 {paginatedAmbassadors.length > 0 ? (
                   <AmbassadorGrid
                     ambassadors={paginatedAmbassadors}
