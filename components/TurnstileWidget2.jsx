@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Turnstile } from "@marsidev/react-turnstile";
-import { Shield, AlertCircle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 
 export default function TurnstileWidget({
   siteKey,
@@ -123,13 +123,6 @@ export default function TurnstileWidget({
           />
         </div>
       )}
-
-      {/* {token && !loading && !error && (
-        <div className="flex items-center text-green-600 text-sm mt-2">
-          <Shield className="h-4 w-4 mr-1" />
-          <span>Verification complete</span>
-        </div>
-      )} */}
     </div>
   );
 }

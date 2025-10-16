@@ -23,6 +23,7 @@ export default function AmbassadorGrid({ ambassadors }) {
         {ambassadors.map((ambassador) => (
           <AmbassadorCard
             key={ambassador._id || ambassador?.slug}
+            keyVal={ambassador._id || ambassador?.slug}
             ambassador={ambassador}
           />
         ))}

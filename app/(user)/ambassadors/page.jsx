@@ -1,117 +1,134 @@
 "use client";
-import { useState, useMemo, useEffect, useRef, Suspense } from "react";
-// import Header from "@/components/_main/Header";
+import {
+  useState,
+  useMemo,
+  useEffect,
+  useRef,
+  Suspense,
+  useCallback,
+} from "react";
 import AmbassadorCategories from "@/components/_main/AmbassadorCategories";
 import AmbassadorGrid from "@/components/_main/AmbassadorGrid";
 import AmbassadorFilterSidebar from "@/components/_main/AmbassadorFilterSidebar";
-// import Footer from "@/components/_main/Footer";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { fetchShops } from "@/redux/slices/shops";
-import { fetchCategories } from "@/redux/slices/categories";
-import { fetchProducts } from "@/redux/slices/product";
+import { useInitialDataFetch } from "@/hooks/useInitialDataFetch";
 import { useSearchParams } from "next/navigation";
 
 // Main content component that uses useSearchParams
 function AmbassadorsContent() {
-  const dispatch = useDispatch();
   const searchParams = useSearchParams();
 
-  // Add hydration state to prevent mismatches
-  const [isHydrated, setIsHydrated] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("most-popular");
   const [currentPage, setCurrentPage] = useState(1);
+  const [hasProcessedQuery, setHasProcessedQuery] = useState(false);
+  const [isClient, setIsClient] = useState(false);
   const itemsPerPage = 12;
 
-  // Create a ref for the ambassadors section
   const ambassadorsSectionRef = useRef(null);
 
-  const reduxCategories = useSelector(
-    (state) => state?.categories?.categories || []
-  );
-
-  // Get shops data from Redux
+  // Use the proven hook that works in other components
   const {
     shops,
-    loading: shopsLoading,
-    error: shopError,
-  } = useSelector((state) => state.shops);
+    categories,
+    isLoading: dataLoading,
+    hasError,
+  } = useInitialDataFetch();
 
-  // Fetch data on component mount
+  // Extract shops data from the hook response
+  const shopsData = shops?.shops || [];
+  const shopsLoading = shops?.loading ?? true;
+  const shopError = shops?.error || null;
+  const reduxCategories = categories?.categories || [];
+
+  // Handle client-side hydration
   useEffect(() => {
-    dispatch(fetchShops());
-    dispatch(fetchCategories());
-    dispatch(fetchProducts());
-  }, [dispatch]);
+    setIsClient(true);
+  }, []);
 
-  // Handle hydration and query parameters
+  console.log("🔍 Component state:", {
+    isClient,
+    shopsCount: shopsData.length,
+    shopsLoading,
+    dataLoading,
+    hasError,
+  });
+
+  // Handle query parameters - only on client side after hydration
   useEffect(() => {
-    setIsHydrated(true);
+    if (
+      !isClient ||
+      shopsLoading ||
+      hasProcessedQuery ||
+      shopsData.length === 0
+    ) {
+      return;
+    }
 
-    // Check for category in query string
+    console.log("🔍 Processing query parameters");
     const categoryFromQuery = searchParams.get("category");
+    console.log("rawS::", shopsData);
+
     if (categoryFromQuery) {
-      // Find the category ID by matching name or slug from categoryDetails
-      const matchingShop = shops.find(
+      // ✅ FIX: Decode the URL parameter to handle spaces and special characters
+      const decodedCategory = decodeURIComponent(categoryFromQuery);
+      console.log("📋 Category from query (decoded):", decodedCategory);
+
+      const matchingShop = shopsData.find(
         (shop) =>
           shop.categoryDetails?.name?.toLowerCase() ===
-            categoryFromQuery.toLowerCase() ||
+            decodedCategory.toLowerCase() ||
           shop.categoryDetails?.slug?.toLowerCase() ===
-            categoryFromQuery.toLowerCase()
+            decodedCategory.toLowerCase()
       );
 
       if (matchingShop) {
+        console.log(
+          "✅ Found matching shop, setting category:",
+          matchingShop.category
+        );
         setSelectedCategory(matchingShop.category);
       } else {
-        // If no match found, try to find in reduxCategories
         const matchingCategory = reduxCategories.find(
           (cat) =>
-            cat.name?.toLowerCase() === categoryFromQuery.toLowerCase() ||
-            cat.slug?.toLowerCase() === categoryFromQuery.toLowerCase()
+            cat.name?.toLowerCase() === decodedCategory.toLowerCase() ||
+            cat.slug?.toLowerCase() === decodedCategory.toLowerCase()
         );
 
         if (matchingCategory) {
+          console.log(
+            "✅ Found matching category, setting:",
+            matchingCategory._id
+          );
           setSelectedCategory(matchingCategory._id);
+        } else {
+          console.log("❌ No matching category found for:", decodedCategory);
         }
       }
     }
-  }, [searchParams, shops, reduxCategories]);
 
-  // Smart scroll to ambassadors section
-  const scrollToAmbassadorsSection = () => {
-    if (ambassadorsSectionRef.current) {
-      const sectionTop = ambassadorsSectionRef.current.offsetTop;
-      const headerOffset = window.innerWidth < 768 ? 100 : 50; // More offset on mobile
+    setHasProcessedQuery(true);
+  }, [
+    searchParams,
+    isClient,
+    shopsLoading,
+    shopsData,
+    reduxCategories,
+    hasProcessedQuery,
+  ]);
 
-      const scrollPosition = Math.max(0, sectionTop - headerOffset);
-
-      window.scrollTo({
-        top: scrollPosition,
-        behavior: "smooth",
-      });
-    } else {
-      // Fallback to top of page
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      });
-    }
-  };
-
-  // Filter and sort ambassadors using Redux data only
+  // Filter and sort ambassadors
   const filteredAmbassadors = useMemo(() => {
-    if (!shops || shops.length === 0) return [];
+    if (!shopsData || shopsData.length === 0) return [];
 
-    let filtered = [...shops];
+    let filtered = shopsData.filter((shop) => shop && shop.title);
 
-    // Apply category filter - using shop.category (which is the ID)
     if (selectedCategory !== "all") {
       filtered = filtered.filter((shop) => shop.category === selectedCategory);
     }
 
-    // Apply search filter - simple implementation for Redux data
     if (searchTerm.trim()) {
       const query = searchTerm.toLowerCase();
       filtered = filtered.filter(
@@ -123,7 +140,7 @@ function AmbassadorsContent() {
       );
     }
 
-    // Apply sorting
+    // Sorting logic
     switch (sortBy) {
       case "newest":
         filtered.sort(
@@ -138,24 +155,19 @@ function AmbassadorsContent() {
         break;
       case "most-popular":
       default:
-        // Sort by isFeatured first, then by visitedCount
         filtered.sort((a, b) => {
           const aFeatured = a.isFeatured || false;
           const bFeatured = b.isFeatured || false;
-
-          if (aFeatured !== bFeatured) {
-            return bFeatured - aFeatured;
-          }
-
+          if (aFeatured !== bFeatured) return bFeatured - aFeatured;
           return (b.visitedCount || 0) - (a.visitedCount || 0);
         });
         break;
     }
 
     return filtered;
-  }, [shops, selectedCategory, searchTerm, sortBy]);
+  }, [shopsData, selectedCategory, searchTerm, sortBy]);
 
-  // Pagination calculations - will update automatically when filteredAmbassadors changes
+  // Pagination
   const totalPages = Math.ceil(filteredAmbassadors.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedAmbassadors = filteredAmbassadors.slice(
@@ -163,131 +175,67 @@ function AmbassadorsContent() {
     startIndex + itemsPerPage
   );
 
-  // Reset to first page when filters change
-  const handleFiltersChange = (callback) => {
-    return (...args) => {
+  // Handlers
+  const scrollToAmbassadorsSection = useCallback(() => {
+    if (ambassadorsSectionRef.current) {
+      const sectionTop = ambassadorsSectionRef.current.offsetTop;
+      const headerOffset = window.innerWidth < 768 ? 100 : 50;
+      const scrollPosition = Math.max(0, sectionTop - headerOffset);
+      window.scrollTo({ top: scrollPosition, behavior: "smooth" });
+    }
+  }, []);
+
+  const handleCategoryChange = useCallback(
+    (categoryId) => {
       setCurrentPage(1);
-      callback(...args);
-    };
-  };
+      setSelectedCategory((prev) => (prev === categoryId ? "all" : categoryId));
+      setTimeout(scrollToAmbassadorsSection, 100);
+    },
+    [scrollToAmbassadorsSection]
+  );
 
-  const handleCategoryChange = (categoryId) => {
+  const handleSearchChange = useCallback((value) => {
     setCurrentPage(1);
-    // Toggle selection: if same category is clicked again, set to "all"
-    setSelectedCategory((prevCategory) =>
-      prevCategory === categoryId ? "all" : categoryId
-    );
-    scrollToAmbassadorsSection();
-  };
+    setSearchTerm(value);
+  }, []);
 
-  // Handle pagination with smart scroll
-  const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);
-    scrollToAmbassadorsSection();
-  };
+  const handleSortChange = useCallback((value) => {
+    setCurrentPage(1);
+    setSortBy(value);
+  }, []);
 
-  // Pagination component
-  const Pagination = () => {
-    if (totalPages <= 1) return null;
+  const handlePageChange = useCallback(
+    (newPage) => {
+      setCurrentPage(newPage);
+      setTimeout(scrollToAmbassadorsSection, 100);
+    },
+    [scrollToAmbassadorsSection]
+  );
 
-    const getVisiblePages = () => {
-      const delta = 2;
-      const range = [];
-      const rangeWithDots = [];
-
-      for (
-        let i = Math.max(2, currentPage - delta);
-        i <= Math.min(totalPages - 1, currentPage + delta);
-        i++
-      ) {
-        range.push(i);
-      }
-
-      if (currentPage - delta > 2) {
-        rangeWithDots.push(1, "...");
-      } else {
-        rangeWithDots.push(1);
-      }
-
-      rangeWithDots.push(...range);
-
-      if (currentPage + delta < totalPages - 1) {
-        rangeWithDots.push("...", totalPages);
-      } else {
-        rangeWithDots.push(totalPages);
-      }
-
-      return rangeWithDots;
-    };
-
-    return (
-      <div className="flex items-center justify-center gap-2 mt-8">
-        <button
-          onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-          disabled={currentPage === 1}
-          className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-        >
-          <ChevronLeft className="w-4 h-4" />
-          Previous
-        </button>
-
-        {getVisiblePages().map((page, index) => (
-          <button
-            key={index}
-            onClick={() => typeof page === "number" && handlePageChange(page)}
-            disabled={page === "..."}
-            className={`px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
-              page === currentPage
-                ? "bg-gray-800 text-white shadow-sm"
-                : page === "..."
-                ? "text-gray-400 cursor-default"
-                : "text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 hover:border-gray-400"
-            }`}
-          >
-            {page}
-          </button>
-        ))}
-
-        <button
-          onClick={() =>
-            handlePageChange(Math.min(totalPages, currentPage + 1))
-          }
-          disabled={currentPage === totalPages}
-          className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-        >
-          Next
-          <ChevronRight className="w-4 h-4" />
-        </button>
-      </div>
-    );
-  };
-
-  // Show loading only if hydration hasn't occurred AND there's no shops data AND it's loading
-  if (!isHydrated || (!shops?.length && shopsLoading)) {
+  // ✅ FIXED: Show loading until client hydration AND data is loaded
+  if (!isClient || dataLoading || shopsLoading) {
     return (
       <div className="bg-white text-black">
-        {/* <Header /> */}
         <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24">
           <div className="flex items-center justify-center h-64">
             <div className="flex flex-col items-center">
-              <div
-                className="animate-spin rounded-full h-12 w-12 border-b-2"
-                style={{ borderColor: "#11F2EB" }}
-              ></div>
-              <p className="mt-4 text-lg">Please wait...</p>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#11F2EB]"></div>
+              <p className="mt-4 text-lg">Loading ambassadors...</p>
+              <p className="mt-2 text-sm text-gray-500">
+                {!isClient ? "Hydrating..." : "Fetching data..."}
+              </p>
             </div>
           </div>
         </main>
-        {/* <Footer /> */}
       </div>
     );
   }
 
   // Show error state
-  if (shopError) {
+  if (hasError || shopError) {
+    console.error("❌ Error state:", { hasError, shopError });
     return (
       <div className="bg-white text-black">
-        {/* <Header /> */}
         <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24">
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
@@ -295,21 +243,27 @@ function AmbassadorsContent() {
               <h3 className="text-xl font-semibold text-gray-600 mb-2">
                 Error loading ambassadors
               </h3>
-              <p className="text-gray-500">Please try again later</p>
+              <p className="text-gray-500 mb-4">
+                {shopError || hasError || "Unknown error occurred"}
+              </p>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-[#11F2EB] text-white rounded hover:bg-cyan-500"
+              >
+                Retry
+              </button>
             </div>
           </div>
         </main>
-        {/* <Footer /> */}
       </div>
     );
   }
 
   return (
     <div className="bg-white text-black">
-      {/* <Header /> */}
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24">
         <div className="flex flex-col lg:flex-row gap-8 mt-8">
-          <div className="w-full lg:w-3/3 xl:w-4/4">
+          <div className="w-full">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
               <h1 className="text-2xl sm:text-3xl lg:text-5xl font-bold">
                 Our ambassadors
@@ -333,33 +287,90 @@ function AmbassadorsContent() {
                   onCategoryChange={handleCategoryChange}
                 />
               </div>
-
               <div className="w-full lg:w-1/3 xl:w-1/4">
                 <AmbassadorFilterSidebar
                   searchTerm={searchTerm}
-                  onSearchChange={handleFiltersChange(setSearchTerm)}
+                  onSearchChange={handleSearchChange}
                   sortBy={sortBy}
-                  onSortChange={handleFiltersChange(setSortBy)}
+                  onSortChange={handleSortChange}
                 />
               </div>
             </div>
 
-            {/* Add ref to the ambassadors section */}
             <div ref={ambassadorsSectionRef}>
-              <div
-                className="p-5 rounded-lg mb-4"
-                style={{ backgroundColor: "#EFEFEF" }}
-              >
-                <AmbassadorGrid ambassadors={paginatedAmbassadors} />
+              <div className="p-5 rounded-lg mb-4 bg-[#EFEFEF]">
+                {paginatedAmbassadors.length > 0 ? (
+                  <AmbassadorGrid
+                    ambassadors={paginatedAmbassadors}
+                    key={`ambassadors-grid-${paginatedAmbassadors.length}-${currentPage}`}
+                  />
+                ) : shopsData.length > 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-gray-500">
+                      No ambassadors match your filters
+                    </p>
+                    <button
+                      onClick={() => {
+                        setSelectedCategory("all");
+                        setSearchTerm("");
+                        setCurrentPage(1);
+                      }}
+                      className="mt-2 px-4 py-2 bg-[#11F2EB] text-white rounded hover:bg-cyan-500 text-sm"
+                    >
+                      Clear Filters
+                    </button>
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-gray-500">No ambassadors found</p>
+                  </div>
+                )}
               </div>
             </div>
 
             {/* Pagination */}
-            <Pagination />
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 mt-8">
+                <button
+                  onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
+                  className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  Previous
+                </button>
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (page) => (
+                    <button
+                      key={`page-${page}`}
+                      onClick={() => handlePageChange(page)}
+                      className={`px-3 py-2 text-sm font-medium rounded-md ${
+                        page === currentPage
+                          ? "bg-gray-800 text-white"
+                          : "text-gray-700 bg-white border border-gray-300 hover:bg-gray-50"
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  )
+                )}
+
+                <button
+                  onClick={() =>
+                    handlePageChange(Math.min(totalPages, currentPage + 1))
+                  }
+                  disabled={currentPage === totalPages}
+                  className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+                >
+                  Next
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </main>
-      {/* <Footer /> */}
     </div>
   );
 }
@@ -368,19 +379,14 @@ function AmbassadorsContent() {
 function AmbassadorsLoading() {
   return (
     <div className="bg-white text-black">
-      {/* <Header /> */}
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24">
         <div className="flex items-center justify-center h-64">
           <div className="flex flex-col items-center">
-            <div
-              className="animate-spin rounded-full h-12 w-12 border-b-2"
-              style={{ borderColor: "#11F2EB" }}
-            ></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#11F2EB]"></div>
             <p className="mt-4 text-lg">Loading ambassadors...</p>
           </div>
         </div>
       </main>
-      {/* <Footer /> */}
     </div>
   );
 }
