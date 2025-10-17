@@ -151,9 +151,9 @@ export default function BoxContents({ box, loading = false }) {
                         <h3 className="font-bold text-sm transition-colors duration-300">
                           {item.name}
                         </h3>
-                        <p className="text-xs text-gray-500 transition-colors duration-300 group-hover:text-gray-700">
+                        {/* <p className="text-xs text-gray-500 transition-colors duration-300 group-hover:text-gray-700">
                           {item.brand}
-                        </p>
+                        </p> */}
                       </div>
                     </div>
                   </div>
