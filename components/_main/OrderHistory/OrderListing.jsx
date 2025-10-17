@@ -311,7 +311,7 @@ const OrderDetailsModal = ({
 
             {/* Order Information Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Order Details */}
+              {/* Order Details - Updated with Platform Fee */}
               <div className="space-y-2">
                 <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
                   <Hash className="w-4 h-4" />
@@ -326,10 +326,23 @@ const OrderDetailsModal = ({
                         {formatAmount(
                           order.totalAmountPaid -
                             (order.shippingFee || 0) -
-                            (order.taxApplied?.amount || 0)
+                            (order.taxApplied?.amount || 0) -
+                            (order.platformFee?.amount || 0)
                         )}
                       </span>
                     </div>
+
+                    {order.platformFee?.amount > 0 && (
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-gray-600">
+                          Platform Fee ({order.platformFee.percentage})
+                        </span>
+                        <span className="font-semibold text-slate-700">
+                          ${formatAmount(order.platformFee.amount)}
+                        </span>
+                      </div>
+                    )}
+
                     {order.shippingFee > 0 && (
                       <div className="flex justify-between items-center text-sm">
                         <span className="text-gray-600">Shipping</span>
@@ -338,6 +351,7 @@ const OrderDetailsModal = ({
                         </span>
                       </div>
                     )}
+
                     {order.taxApplied?.amount > 0 && (
                       <div className="flex justify-between items-center text-sm">
                         <span className="text-gray-600">Tax</span>
@@ -346,6 +360,16 @@ const OrderDetailsModal = ({
                         </span>
                       </div>
                     )}
+
+                    {order.discountApplied?.amount > 0 && (
+                      <div className="flex justify-between items-center text-sm text-[#11F2EB]">
+                        <span className="text-[#11F2EB]">Discount</span>
+                        <span className="font-semibold text-[#11F2EB]">
+                          -${formatAmount(order.discountApplied.amount)}
+                        </span>
+                      </div>
+                    )}
+
                     <div className="flex justify-between items-center text-sm border-t border-gray-200 pt-2">
                       <span className="text-gray-600 font-semibold">Total</span>
                       <span className="font-bold text-slate-900 text-lg">

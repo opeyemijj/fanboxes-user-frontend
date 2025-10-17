@@ -1958,8 +1958,11 @@ export default function SpinningWheel({
                     />
                     <div className="p-0.5 absolute left-0 top-0 w-full h-full flex items-center justify-center">
                       <span className="text-xs font-medium text-gray-700 bg-white/80 px-2 rounded-full">
-                        Conversion Rate: 1 Credit = $
-                        {cashToCreditConvRate?.value || 1} USD
+                        Conversion Rate: 1 Credit =
+                        {" " +
+                          fCurrency(
+                            cCurrency(cashToCreditConvRate?.value || 1)
+                          )}
                       </span>
                     </div>
                   </div>

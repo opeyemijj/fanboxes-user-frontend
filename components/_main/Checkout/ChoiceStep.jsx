@@ -1,9 +1,15 @@
+import { useCurrencyConvert } from "@/hooks/convertCurrency";
+import { useCurrencyFormatter } from "@/hooks/formatCurrency";
 import { Package, Truck, Hexagon, RefreshCw, ArrowRight } from "lucide-react";
 
 // Choice Step Component (Ship vs Resell)
 const ChoiceStep = (props) => {
-  console.log("propsChoicw:::", props);
+  // console.log("propsChoicw:::", props);
   const { onChoice, cart, resellValue, resellPercentage } = props;
+
+  const cCurrency = useCurrencyConvert();
+  const fCurrency = useCurrencyFormatter();
+
   const itemValue = cart.items.reduce(
     (total, item) => total + (item.value || 0),
     0
@@ -44,7 +50,9 @@ const ChoiceStep = (props) => {
               <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
                 <p className="text-green-800 text-sm font-medium">
                   Item Value:{" "}
-                  <span className="font-bold">${itemValue.toFixed(2)}</span>
+                  <span className="font-bold">
+                    {fCurrency(cCurrency(itemValue))}
+                  </span>
                 </p>
                 <p className="text-green-700 text-xs mt-1">
                   You pay only shipping costs
@@ -76,7 +84,9 @@ const ChoiceStep = (props) => {
               <div className="bg-[#11F2EB] bg-opacity-10 border border-[#11F2EB] rounded-lg p-3 mb-4">
                 <p className="text-[#11F2EB] text-sm font-medium">
                   You'll Receive:{" "}
-                  <span className="font-bold">${resellValue.toFixed(2)}</span>
+                  <span className="font-bold">
+                    {fCurrency(cCurrency(resellValue))}
+                  </span>
                 </p>
                 <p className="text-gray-600 text-xs mt-1">
                   {resellPercentage}% of item value added to your wallet

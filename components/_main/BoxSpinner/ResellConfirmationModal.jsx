@@ -9,6 +9,8 @@ import {
 } from "./GameDialogues";
 import { Button } from "@/components/Button";
 import { Loader, Hexagon } from "lucide-react";
+import { useCurrencyConvert } from "@/hooks/convertCurrency";
+import { useCurrencyFormatter } from "@/hooks/formatCurrency";
 
 const ResellConfirmationModal = ({
   isOpen,
@@ -20,6 +22,8 @@ const ResellConfirmationModal = ({
   isLoading = false,
 }) => {
   const [isProcessing, setIsProcessing] = useState(false);
+  const cCurrency = useCurrencyConvert();
+  const fCurrency = useCurrencyFormatter();
 
   // Helper function to calculate resell amount (self-contained)
   const calculateResellAmount = (originalValue, resellRule) => {
@@ -34,12 +38,19 @@ const ResellConfirmationModal = ({
 
   // Helper function to get resell display text (self-contained)
   const getResellDisplayText = (originalValue, resellRule) => {
-    if (!resellRule) return `Based on 80% resell value of $${originalValue}`;
+    if (!resellRule)
+      return `Based on 80% resell value of ${fCurrency(
+        cCurrency(originalValue)
+      )}`;
 
     if (resellRule.valueType === "percentage") {
-      return `Based on ${resellRule.value}% resell value of $${originalValue}`;
+      return `Based on ${resellRule.value}% resell value of ${fCurrency(
+        cCurrency(originalValue)
+      )}`;
     } else {
-      return `Fixed resell price of $${resellRule.value || 0}`;
+      return `Fixed resell price of ${fCurrency(
+        cCurrency(resellRule.value || 0)
+      )}`;
     }
   };
 
@@ -115,7 +126,7 @@ const ResellConfirmationModal = ({
               <div className="text-center">
                 <div className="text-sm text-gray-600 mb-1">Original Value</div>
                 <div className="text-lg font-bold text-gray-800">
-                  ${originalValue}
+                  {fCurrency(cCurrency(originalValue))}
                 </div>
               </div>
               <div className="text-center">
@@ -127,7 +138,7 @@ const ResellConfirmationModal = ({
                 <div className="text-lg font-bold text-amber-600">
                   {resellRule?.valueType === "percentage"
                     ? `${resellRule.value}%`
-                    : `$${resellRule?.value}`}
+                    : `${fCurrency(cCurrency(resellRule?.value))}`}
                 </div>
               </div>
             </div>
@@ -136,7 +147,7 @@ const ResellConfirmationModal = ({
               <div className="flex justify-between items-center mb-2">
                 <span className="text-sm text-gray-600">You will receive:</span>
                 <span className="text-lg font-bold text-green-600">
-                  ${finalAmount.toFixed(0).toLocaleString()}
+                  {fCurrency(cCurrency(finalAmount))}
                 </span>
               </div>
               <div className="flex justify-between items-center mb-1">
@@ -152,7 +163,8 @@ const ResellConfirmationModal = ({
                 </span>
               </div>
               <div className="text-xs text-gray-500">
-                {displayText} • 1 Credit = ${conversionRate} USD
+                {displayText} • 1 Credit ={" "}
+                {fCurrency(cCurrency(conversionRate))}
               </div>
             </div>
           </div>
