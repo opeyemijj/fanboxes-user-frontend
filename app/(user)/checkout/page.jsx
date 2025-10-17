@@ -13,7 +13,11 @@ import {
   getCashToCreditConversionRate,
   getResellPercentage,
 } from "@/services/boxes";
-import { getShippingFeePercentage, createOrder } from "@/services/order/index";
+import {
+  getShippingFeePercentage,
+  createOrder,
+  checkDiscountCode,
+} from "@/services/order/index";
 import { toastError, toastSuccess } from "@/lib/toast";
 import {
   selectCart,
@@ -79,6 +83,14 @@ const CheckoutScreen = () => {
     percentage: "4%", // Can be fetched from API later
     amount: 0,
   });
+  const [discountApplied, setDiscountApplied] = useState({
+    type: "none",
+    amount: 0,
+    codeUsed: "",
+    name: "",
+  });
+  const [discountError, setDiscountError] = useState("");
+  const [isApplyingDiscount, setIsApplyingDiscount] = useState(false);
 
   // FIX: Set mounted only on client
   useEffect(() => {
@@ -169,6 +181,87 @@ const CheckoutScreen = () => {
       return null;
     }
   }, [setResellRule]);
+
+  // Handle discount code application
+  const handleApplyDiscount = async (code) => {
+    if (!code.trim()) return;
+
+    setIsApplyingDiscount(true);
+    setDiscountError(""); // Clear previous errors
+
+    try {
+      // Get shop ID from cart (assuming cart has shop information)
+      const shopId = cart.shop?._id;
+      const incurredAmount = calculateIncurredAmount();
+
+      // Prepare payload for the API
+      const payload = {
+        code: code.trim(),
+        userId: cart.user?._id,
+        cartTotal: incurredAmount,
+        shopId: shopId,
+      };
+
+      console.log("Sending discount code request with payload:", payload);
+
+      // Make API call to check discount code
+      const result = await checkDiscountCode(payload);
+
+      console.log("Discount code API response:", result);
+
+      if (result.success) {
+        console.log("✅ Discount applied successfully:", result.data);
+
+        // Update discount applied state with the new structure including discountValue
+        setDiscountApplied({
+          type: result.data.coupon.type,
+          amount: result.data.discountDetails.discountAmount,
+          codeUsed: result.data.coupon.code,
+          name: result.data.coupon.name,
+          discountValue: result.data.coupon.discount, // This is the actual percentage value (e.g., 10 for 10%)
+        });
+
+        // Clear any previous discount error
+        setDiscountError("");
+      } else {
+        console.log("❌ Discount code error:", result.message);
+        setDiscountError(result.message);
+        // Clear discount if there's an error
+        setDiscountApplied({
+          type: "none",
+          amount: 0,
+          codeUsed: "",
+          name: "",
+          discountValue: 0,
+        });
+      }
+    } catch (error) {
+      console.error("Error applying discount code:", error);
+
+      // Handle different error scenarios
+      if (error.response) {
+        const serverError = error.response.data;
+        setDiscountError(
+          serverError.message || "Failed to apply discount code"
+        );
+      } else if (error.request) {
+        setDiscountError("Network error. Please check your connection.");
+      } else {
+        setDiscountError("Failed to apply discount code. Please try again.");
+      }
+
+      // Clear discount on error
+      setDiscountApplied({
+        type: "none",
+        amount: 0,
+        codeUsed: "",
+        name: "",
+        discountValue: 0,
+      });
+    } finally {
+      setIsApplyingDiscount(false);
+    }
+  };
 
   // Calculate total incurred amount (base for platform fee calculation)
   const calculateIncurredAmount = useCallback(() => {
@@ -515,8 +608,8 @@ const CheckoutScreen = () => {
       const orderPayload = {
         shippingFee: cart.shippingFee,
         totalAmountPaid: cart.totalAmountPaid,
-        discountApplied: cart.discountApplied,
-        platformFee: platformFee, // Use the platform fee state object directly
+        discountApplied: discountApplied, // Use local discount state instead of cart.discountApplied
+        platformFee: platformFee,
         status: "pending",
         items: cart.items,
         note: cart.note,
@@ -767,8 +860,8 @@ const CheckoutScreen = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Main Content */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Main Content - Reduced from lg:col-span-2 to lg:col-span-1 */}
                 <div className="lg:col-span-2 space-y-6">
                   {activeStep === 1 && (
                     <ReviewStep cCurrency={cCurrency} fCurrency={fCurrency} />
@@ -803,7 +896,7 @@ const CheckoutScreen = () => {
                   )}
                 </div>
 
-                {/* Order Summary Sidebar */}
+                {/* Order Summary Sidebar - Increased from lg:col-span-1 to lg:col-span-1 (but wider due to gap reduction) */}
                 <div className="lg:col-span-1">
                   <OrderSummary
                     activeStep={activeStep}
@@ -817,7 +910,12 @@ const CheckoutScreen = () => {
                     cart={cart}
                     paymentMethod={paymentMethod}
                     resellDataLoading={resellDataLoading}
-                    platformFee={platformFee} // Pass the entire platform fee object
+                    platformFee={platformFee}
+                    // Pass discount related props
+                    discountApplied={discountApplied}
+                    discountError={discountError}
+                    isApplyingDiscount={isApplyingDiscount}
+                    onApplyDiscount={handleApplyDiscount}
                   />
                 </div>
               </div>

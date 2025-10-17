@@ -20,8 +20,12 @@ import {
   Wallet,
   ChevronDown,
 } from "lucide-react";
+import { useCurrencyFormatter } from "@/hooks/formatCurrency";
+import { useCurrencyConvert } from "@/hooks/convertCurrency";
 
 const TransactionsListing = () => {
+  const cCurrency = useCurrencyConvert();
+  const fCurrency = useCurrencyFormatter();
   const router = useRouter();
   const searchParams = useSearchParams(); // Get search params
   const [transactionsData, setTransactionsData] = useState(null);
@@ -156,10 +160,7 @@ const TransactionsListing = () => {
   };
 
   const formatAmount = (amount) => {
-    return new Intl.NumberFormat("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(amount);
+    return fCurrency(cCurrency(amount));
   };
 
   const getTransactionIcon = (type, category) => {
@@ -387,9 +388,6 @@ const TransactionsListing = () => {
             </div>
 
             <div className="flex items-baseline mb-6">
-              <span className="text-white/80 text-xl sm:text-2xl font-semibold mr-1">
-                $
-              </span>
               <span className="text-white text-2xl sm:text-3xl lg:text-4xl font-bold">
                 {formatAmount(transactionsData?.balance?.availableBalance || 0)}
               </span>
@@ -652,7 +650,7 @@ const TransactionsListing = () => {
                               {transaction.transactionType === "credit"
                                 ? "+"
                                 : "-"}
-                              ${formatAmount(transaction.amount)}
+                              {formatAmount(transaction.amount)}
                             </p>
                           </div>
                         </div>
@@ -665,7 +663,7 @@ const TransactionsListing = () => {
                           </div>
                           <div className="text-left sm:text-right sm:ml-4">
                             <p className="text-sm font-medium text-gray-700 sm:font-normal sm:text-gray-500">
-                              Balance: $
+                              Balance:{" "}
                               {formatAmount(transaction.availableBalance)}
                             </p>
                           </div>

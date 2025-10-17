@@ -89,7 +89,7 @@ export default function TransactionDetailsModal({
                       : "text-red-300"
                   }`}
                 >
-                  {transaction.transactionType === "credit" ? "+" : "-"}$
+                  {transaction.transactionType === "credit" ? "+" : "-"}
                   {formatAmount(transaction.amount)}
                 </div>
                 <p className="text-white font-semibold mb-3 text-base">
@@ -119,7 +119,7 @@ export default function TransactionDetailsModal({
                   <div>
                     <span className="text-gray-600">Original Value:</span>
                     <p className="font-medium text-gray-900">
-                      ${transaction.metadata?.originalItemValue}
+                      {transaction.metadata?.originalItemValue}
                     </p>
                   </div>
                   <div>
@@ -128,20 +128,19 @@ export default function TransactionDetailsModal({
                       {transaction.metadata?.resellRule?.valueType ===
                       "percentage"
                         ? `${transaction.metadata.resellRule.value}%`
-                        : `$${transaction.metadata.resellRule?.value}`}
+                        : `${transaction.metadata.resellRule?.value}`}
                     </p>
                   </div>
                   <div>
                     <span className="text-gray-600">Conversion Rate:</span>
                     <p className="font-medium text-gray-900">
-                      1 Credit = ${transaction.metadata?.conversionRate || 1}{" "}
-                      USD
+                      1 Credit = {formatAmount(1) || 1}{" "}
                     </p>
                   </div>
                   <div>
                     <span className="text-gray-600">Final Amount:</span>
                     <p className="font-medium text-emerald-600">
-                      ${transaction.metadata?.calculatedAmount}
+                      {formatAmount(transaction.metadata?.calculatedAmount)}
                     </p>
                   </div>
                 </div>
@@ -175,7 +174,7 @@ export default function TransactionDetailsModal({
                     </h4>
                     <div className="flex items-center gap-3 text-xs text-gray-600">
                       <span className="font-medium text-emerald-600">
-                        ${winningItem.value}
+                        {formatAmount(winningItem.value)}
                       </span>
                       <span>Weight: {winningItem.weight}%</span>
                     </div>
@@ -209,7 +208,7 @@ export default function TransactionDetailsModal({
                     </h4>
                     <div className="flex items-center gap-3 text-xs text-gray-600">
                       <span className="font-medium text-blue-600">
-                        ${boxDetails.priceSale}
+                        {formatAmount(boxDetails.priceSale)}
                       </span>
                       <span>{boxDetails.items?.length || 0} items</span>
                     </div>
@@ -256,7 +255,7 @@ export default function TransactionDetailsModal({
                   <div className="flex justify-between items-center text-sm pt-2 border-t border-gray-200">
                     <span className="text-gray-600">Balance After</span>
                     <span className="font-semibold text-emerald-600">
-                      ${formatAmount(transaction.availableBalance)}
+                      {formatAmount(transaction.availableBalance)}
                     </span>
                   </div>
                 </div>

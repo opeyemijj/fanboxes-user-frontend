@@ -27,6 +27,8 @@ import { useDispatch } from "react-redux";
 import ResellConfirmationModal from "../BoxSpinner/ResellConfirmationModal";
 import { resellSpinForCredits } from "@/services/boxes";
 import { updateUserAvailableBalance } from "@/redux/slices/user";
+import { useCurrencyFormatter } from "@/hooks/formatCurrency";
+import { useCurrencyConvert } from "@/hooks/convertCurrency";
 
 // Pagination Component
 const SpinPagination = ({ page, limit, loading, pagination, onPageChange }) => {
@@ -176,6 +178,8 @@ const SpinDetailsModal = ({
   onShowResellModal,
 }) => {
   if (!isOpen || !spin) return null;
+  const cCurrency = useCurrencyConvert();
+  const fCurrency = useCurrencyFormatter();
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[9999]">
@@ -223,7 +227,7 @@ const SpinDetailsModal = ({
                   <Trophy className="w-8 h-8 text-[#11F2EB]" />
                 </div>
                 <div className="text-3xl font-bold mb-2 text-white">
-                  ${formatAmount(spin.boxDetails?.priceSale || 0)}
+                  {fCurrency(cCurrency(spin.boxDetails?.priceSale || 0))}
                 </div>
                 <p className="text-white font-semibold mb-3 text-base">
                   Spin Cost
@@ -392,7 +396,7 @@ const SpinDetailsModal = ({
                       <div>
                         <span className="text-gray-600">Price:</span>
                         <p className="font-semibold text-slate-700">
-                          ${formatAmount(spin.boxDetails.priceSale)}
+                          {fCurrency(cCurrency(spin.boxDetails.priceSale))}
                         </p>
                       </div>
                       <div>
@@ -420,7 +424,7 @@ const SpinDetailsModal = ({
                     <div className="flex justify-between items-center text-sm">
                       <span className="text-gray-600">Spin Cost</span>
                       <span className="font-semibold text-slate-700">
-                        ${formatAmount(spin.boxDetails?.priceSale || 0)}
+                        {fCurrency(cCurrency(spin.boxDetails?.priceSale || 0))}
                       </span>
                     </div>
                     <div className="flex justify-between items-center text-sm">
@@ -636,6 +640,8 @@ const SpinListing = ({ cashToCreditConvRate, resellRule }) => {
   const [showResellModal, setShowResellModal] = useState(false);
   const [resellLoading, setResellLoading] = useState(false);
   const spinsRef = useRef(null);
+  const cCurrency = useCurrencyConvert();
+  const fCurrency = useCurrencyFormatter();
 
   const fetchSpinHistory = useCallback(async () => {
     try {
@@ -1233,7 +1239,9 @@ const SpinListing = ({ cashToCreditConvRate, resellRule }) => {
                           </div>
                           <div className="flex-shrink-0 text-right">
                             <p className="text-lg font-semibold text-slate-700">
-                              ${formatAmount(spin.boxDetails?.priceSale || 0)}
+                              {fCurrency(
+                                cCurrency(spin.boxDetails?.priceSale || 0)
+                              )}
                             </p>
                             <p className="text-sm text-purple-600">
                               {(spin.winningItem?.odd * 100).toFixed(4)}% odds

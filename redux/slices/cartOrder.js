@@ -49,7 +49,7 @@ const slice = createSlice({
     },
 
     addItemToCart2(state, action) {
-      const { item, quantity = 1 } = action.payload;
+      const { item, quantity = 1, shop } = action.payload;
 
       const existingItem = state.cart.items.find(
         (cartItem) => cartItem.slug === item.slug
@@ -69,6 +69,7 @@ const slice = createSlice({
 
       state.cart.totalAmountPaid = calculateTotal(state.cart);
       state.cart.orderType = "direct";
+      state.cart.shop = shop;
     },
 
     addWonItemToCart(state, action) {
@@ -155,6 +156,7 @@ const slice = createSlice({
         user: null,
         spinData: null,
         orderType: "direct",
+        shop: null,
       };
       state.checkoutStep = "cart";
       state.error = null;

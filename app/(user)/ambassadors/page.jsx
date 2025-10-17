@@ -310,12 +310,23 @@ function AmbassadorsContent() {
             </h1>
           </div>
 
-          {/* Sticky Navigation Bar - Categories + Filters */}
+          {/* Categories Section - Only on mobile */}
+          <div className="block lg:hidden bg-white py-4 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto">
+              <AmbassadorCategories
+                categories={reduxCategories}
+                selectedCategory={selectedCategory}
+                onCategoryChange={handleCategoryChange}
+              />
+            </div>
+          </div>
+
+          {/* Sticky Navigation Bar - Categories + Filters on desktop, only Filters on mobile */}
           <div className="sticky top-16 z-40 bg-white py-4 shadow-sm -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto">
               <div className="flex flex-col lg:flex-row gap-4 lg:gap-8 items-start lg:items-center">
-                {/* Categories - Left Side */}
-                <div className="w-full lg:flex-1">
+                {/* Categories - Only on desktop */}
+                <div className="hidden lg:block lg:flex-1">
                   <AmbassadorCategories
                     categories={reduxCategories}
                     selectedCategory={selectedCategory}
@@ -323,7 +334,7 @@ function AmbassadorsContent() {
                   />
                 </div>
 
-                {/* Search and Sort - Right Side  */}
+                {/* Search and Sort - Right Side - Always visible */}
                 <div className="w-full lg:w-auto">
                   <div className="flex flex-col gap-4">
                     {/* Search Input */}

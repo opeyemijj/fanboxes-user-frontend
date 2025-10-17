@@ -19,6 +19,9 @@ import {
   ShoppingCart,
   DollarSign,
 } from "lucide-react";
+import { useCurrencyFormatter } from "@/hooks/formatCurrency";
+import { useCurrencyConvert } from "@/hooks/convertCurrency";
+import { fCurrency } from "@/utils/formatNumber";
 
 // Pagination Component (same as spin component)
 const OrderPagination = ({
@@ -106,8 +109,10 @@ const OrderDetailsModal = ({
   formatTime,
   formatAmount,
 }) => {
+  const cCurrency = useCurrencyConvert();
+  const fCurrency = useCurrencyFormatter();
   if (!isOpen || !order) return null;
-  console.log("OOOO::", order);
+  // console.log("OOOO::", order);
 
   const getStatusColor = (status) => {
     const statusColors = {
@@ -167,7 +172,7 @@ const OrderDetailsModal = ({
                   <Package className="w-8 h-8 text-[#11F2EB]" />
                 </div>
                 <div className="text-3xl font-bold mb-2 text-white">
-                  ${formatAmount(order.totalAmountPaid)}
+                  {fCurrency(cCurrency(order.totalAmountPaid))}
                 </div>
                 <p className="text-white font-semibold mb-3 text-base">
                   Total Amount
@@ -284,14 +289,14 @@ const OrderDetailsModal = ({
                           <div>
                             <span className="text-gray-600">Value:</span>
                             <p className="font-semibold">
-                              ${formatAmount(item.value)}
+                              {fCurrency(cCurrency(item.value))}
                             </p>
                           </div>
                           {item.associatedBox && (
                             <div>
                               <span className="text-gray-600">From Box:</span>
                               <p className="font-medium">
-                                {item.associatedBox.title}
+                                {item.associatedBox?.name}
                               </p>
                             </div>
                           )}
@@ -322,12 +327,14 @@ const OrderDetailsModal = ({
                     <div className="flex justify-between items-center text-sm">
                       <span className="text-gray-600">Subtotal</span>
                       <span className="font-semibold text-slate-700">
-                        $
-                        {formatAmount(
-                          order.totalAmountPaid -
-                            (order.shippingFee || 0) -
-                            (order.taxApplied?.amount || 0) -
-                            (order.platformFee?.amount || 0)
+                        {fCurrency(
+                          cCurrency(
+                            order.totalAmountPaid -
+                              (order.shippingFee || 0) -
+                              (order.taxApplied?.amount || 0) -
+                              (order.platformFee?.amount || 0) -
+                              (order.discountApplied?.amount || 0)
+                          )
                         )}
                       </span>
                     </div>
@@ -338,7 +345,7 @@ const OrderDetailsModal = ({
                           Platform Fee ({order.platformFee.percentage})
                         </span>
                         <span className="font-semibold text-slate-700">
-                          ${formatAmount(order.platformFee.amount)}
+                          {fCurrency(cCurrency(order.platformFee.amount))}
                         </span>
                       </div>
                     )}
@@ -347,7 +354,7 @@ const OrderDetailsModal = ({
                       <div className="flex justify-between items-center text-sm">
                         <span className="text-gray-600">Shipping</span>
                         <span className="font-semibold text-slate-700">
-                          ${formatAmount(order.shippingFee)}
+                          {fCurrency(cCurrency(order.shippingFee))}
                         </span>
                       </div>
                     )}
@@ -356,24 +363,47 @@ const OrderDetailsModal = ({
                       <div className="flex justify-between items-center text-sm">
                         <span className="text-gray-600">Tax</span>
                         <span className="font-semibold text-slate-700">
-                          ${formatAmount(order.taxApplied.amount)}
+                          {fCurrency(cCurrency(order.taxApplied.amount))}
                         </span>
                       </div>
                     )}
 
                     {order.discountApplied?.amount > 0 && (
-                      <div className="flex justify-between items-center text-sm text-[#11F2EB]">
-                        <span className="text-[#11F2EB]">Discount</span>
-                        <span className="font-semibold text-[#11F2EB]">
-                          -${formatAmount(order.discountApplied.amount)}
+                      <div className="flex justify-between items-center text-sm text-green-600">
+                        <span className="text-green-600">
+                          Discount
+                          {order.discountApplied.type &&
+                            order.discountApplied.type !== "none" && (
+                              <span className="text-green-500 text-xs ml-1">
+                                (
+                                {order.discountApplied.type === "percent"
+                                  ? `${
+                                      order.discountApplied.discountValue ||
+                                      order.discountApplied.amount
+                                    }% off`
+                                  : "fixed amount"}
+                                )
+                              </span>
+                            )}
                         </span>
+                        <div className="text-right">
+                          <span className="font-semibold text-green-600 block">
+                            -
+                            {fCurrency(cCurrency(order.discountApplied.amount))}
+                          </span>
+                          {/* {order.discountApplied.name && (
+                            <span className="text-green-500 text-xs block">
+                              {order.discountApplied.name}
+                            </span>
+                          )} */}
+                        </div>
                       </div>
                     )}
 
                     <div className="flex justify-between items-center text-sm border-t border-gray-200 pt-2">
                       <span className="text-gray-600 font-semibold">Total</span>
                       <span className="font-bold text-slate-900 text-lg">
-                        ${formatAmount(order.totalAmountPaid)}
+                        {fCurrency(cCurrency(order.totalAmountPaid))}
                       </span>
                     </div>
                   </div>
@@ -416,6 +446,24 @@ const OrderDetailsModal = ({
                         </span>
                       </div>
                     )}
+                    {/* Add discount code info if available */}
+                    {order.discountApplied?.name && (
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-gray-600">Coupon Used</span>
+                        <span className="font-medium text-green-600">
+                          {order.discountApplied.name}
+                        </span>
+                      </div>
+                    )}
+
+                    {order.discountApplied?.codeUsed && (
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-gray-600">Discount Code</span>
+                        <span className="font-medium text-green-600">
+                          {order.discountApplied.codeUsed}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -439,7 +487,7 @@ const OrderDetailsModal = ({
                   <div>
                     <span className="text-gray-600">Amount:</span>
                     <p className="font-semibold">
-                      ${formatAmount(order.transaction.amount)}
+                      {fCurrency(cCurrency(order.transaction.amount))}
                     </p>
                   </div>
                   <div>
@@ -653,6 +701,8 @@ const OrderListing = () => {
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [shouldRefetch, setShouldRefetch] = useState(false);
   const [loadingSpecificOrder, setLoadingSpecificOrder] = useState(false);
+  const cCurrency = useCurrencyConvert();
+  const fCurrency = useCurrencyFormatter();
   const ordersRef = useRef(null);
   // Check for order query parameter
   const orderId = searchParams?.get("order");
@@ -1328,7 +1378,7 @@ const OrderListing = () => {
                           </div>
                           <div className="flex-shrink-0 text-right">
                             <p className="text-lg font-semibold text-slate-700">
-                              ${formatAmount(order.totalAmountPaid)}
+                              {fCurrency(cCurrency(order.totalAmountPaid))}
                             </p>
                             <p className="text-sm text-gray-500">
                               {order.items?.length || 0} items

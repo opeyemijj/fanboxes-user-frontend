@@ -12,8 +12,6 @@ export default function AmbassadorCategories({
 
   const categoriesToUse = [allCategory, ...categories];
 
-  // console.log("categoriesToUse", categoriesToUse);
-
   return (
     <section className="my-2">
       <div className="flex flex-wrap gap-1 sm:gap-2">
@@ -21,13 +19,12 @@ export default function AmbassadorCategories({
           <Button
             key={category._id}
             onClick={() => onCategoryChange(category._id)}
-            className={`rounded-full transition-all duration-200 text-xs sm:text-sm px-2 py-1 ${
+            className={`rounded-full transition-all duration-200 ${
               selectedCategory === category._id
                 ? "text-black bg-[#11F2EB] border-[#11F2EB]"
                 : "text-white bg-[#98989F] border-[#98989F]"
-            }`}
+            } text-xs px-2 py-1 sm:text-sm sm:px-3 sm:py-2`}
             style={{
-              // Ensure border radius is maintained
               borderRadius: "9999px",
             }}
           >

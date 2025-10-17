@@ -12,6 +12,7 @@ import {
   ArrowRight,
   Package,
   Loader,
+  Info,
 } from "lucide-react";
 import {
   selectCartItems,
@@ -35,6 +36,10 @@ import { useCurrencyFormatter } from "@/hooks/formatCurrency";
 const CartPage = () => {
   const [isMounted, setIsMounted] = useState(false);
   const [shippingLoading, setShippingLoading] = useState(true);
+  const [platformFee, setPlatformFee] = useState({
+    percentage: "4%",
+    amount: 0,
+  });
 
   const dispatch = useDispatch();
   const router = useRouter();
@@ -53,6 +58,32 @@ const CartPage = () => {
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  // Calculate total incurred amount (base for platform fee calculation)
+  const calculateIncurredAmount = () => {
+    const itemsTotal = cartItems.reduce((total, item) => {
+      return total + (item.value || 0) * (item.quantity || 1);
+    }, 0);
+    return itemsTotal + (shippingFee || 0);
+  };
+
+  // Calculate platform fee
+  const calculatePlatformFeeAmount = () => {
+    const incurredAmount = calculateIncurredAmount();
+    const percentageValue = parseFloat(platformFee.percentage); // Extract number from "4%"
+    return incurredAmount * (percentageValue / 100);
+  };
+
+  // Update platform fee whenever cart items or shipping fee changes
+  useEffect(() => {
+    if (isMounted && cartItems.length > 0) {
+      const newPlatformFeeAmount = calculatePlatformFeeAmount();
+      setPlatformFee((prev) => ({
+        ...prev,
+        amount: newPlatformFeeAmount,
+      }));
+    }
+  }, [isMounted, cartItems, shippingFee]);
 
   // Debounce the cart total value
   const cartTotalValue = cartItems.reduce((total, item) => {
@@ -128,6 +159,24 @@ const CartPage = () => {
   const subtotal = cartItems.reduce((total, item) => {
     return total + item.value * item.quantity;
   }, 0);
+
+  // Calculate total including platform fee and discount
+  const calculateTotal = () => {
+    let total = subtotal + (shippingFee || 0) + (platformFee.amount || 0);
+
+    // Subtract discount if applied
+    if (discountApplied.type !== "none") {
+      if (discountApplied.type === "percentage-off") {
+        total -= ((subtotal + shippingFee) * discountApplied.amount) / 100;
+      } else {
+        total -= discountApplied.amount;
+      }
+    }
+
+    return total;
+  };
+
+  const totalAmount = calculateTotal();
 
   // Prevent hydration mismatch by not rendering until mounted
   if (!isMounted) {
@@ -287,7 +336,6 @@ const CartPage = () => {
                               )}
                               <div className="flex items-center gap-3 mt-2">
                                 <span className="font-bold text-gray-900">
-                                  {/* ${item.value?.toLocaleString() || "0"} */}
                                   {fCurrency(cCurrency(item?.value))}
                                 </span>
                                 {item.weight && (
@@ -340,10 +388,6 @@ const CartPage = () => {
 
                             <div className="text-right">
                               <p className="font-bold text-gray-900">
-                                {/* $
-                                {(
-                                  (item.value || 0) * item.quantity
-                                ).toLocaleString()} */}
                                 {fCurrency(
                                   cCurrency((item.value || 0) * item.quantity)
                                 )}
@@ -368,10 +412,7 @@ const CartPage = () => {
                 <div className="space-y-3 mb-6">
                   <div className="flex justify-between text-gray-600">
                     <span>Subtotal ({uniqueItemCount} items)</span>
-                    <span>
-                      {/* ${subtotal.toLocaleString()} */}
-                      {fCurrency(cCurrency(subtotal))}
-                    </span>
+                    <span>{fCurrency(cCurrency(subtotal))}</span>
                   </div>
 
                   <div className="flex justify-between text-gray-600">
@@ -387,6 +428,26 @@ const CartPage = () => {
                     </span>
                   </div>
 
+                  {/* Platform Fee */}
+                  {platformFee.amount > 0 && (
+                    <div className="flex justify-between text-gray-600">
+                      <span className="flex items-center">
+                        Platform Fee ({platformFee.percentage})
+                        <div className="group relative ml-1">
+                          <Info
+                            size={12}
+                            className="text-gray-400 cursor-help"
+                          />
+                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 px-2 py-1 bg-gray-800 text-white text-xs rounded w-40 text-center opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                            {platformFee.percentage} of total incurred amount
+                            <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                          </div>
+                        </div>
+                      </span>
+                      <span>{fCurrency(cCurrency(platformFee.amount))}</span>
+                    </div>
+                  )}
+
                   {discountApplied.type !== "none" && (
                     <div className="flex justify-between text-green-600">
                       <span>
@@ -397,7 +458,7 @@ const CartPage = () => {
                         )
                       </span>
                       <span>
-                        -$
+                        -
                         {discountApplied.type === "percentage-off"
                           ? fCurrency(
                               cCurrency(
@@ -406,7 +467,7 @@ const CartPage = () => {
                                   100
                               )
                             )
-                          : discountApplied.amount.toLocaleString()}
+                          : fCurrency(cCurrency(discountApplied.amount))}
                       </span>
                     </div>
                   )}
@@ -417,8 +478,7 @@ const CartPage = () => {
                         Total
                       </span>
                       <span className="text-lg font-bold text-gray-900">
-                        {/* ${cartTotal.toLocaleString()} */}
-                        {fCurrency(cCurrency(cartTotal))}
+                        {fCurrency(cCurrency(totalAmount))}
                       </span>
                     </div>
                   </div>

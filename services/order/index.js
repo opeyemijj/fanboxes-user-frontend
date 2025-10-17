@@ -46,3 +46,12 @@ export const getMyOrderHistory = async (payload = {}) => {
     });
   return data;
 };
+
+export const checkDiscountCode = async (payload) => {
+  const { data } = await http
+    .post(`/coupon-codes/check-discount`, payload)
+    .catch((e) => {
+      throw e;
+    });
+  return data;
+};
