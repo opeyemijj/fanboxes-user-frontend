@@ -99,7 +99,7 @@ export default function BoxContents({ box, loading = false }) {
   }
 
   function handleAddToCart(item) {
-    console.log("add to cart...", { item, box });
+    // console.log("add to cart...", { item, box });
 
     const payload = { item, quantity: 1, shop: box?.shopDetails };
     dispatch(addItemToCart2(payload));
@@ -152,7 +152,7 @@ export default function BoxContents({ box, loading = false }) {
                           {item.name}
                         </h3>
                         {/* <p className="text-xs text-gray-500 transition-colors duration-300 group-hover:text-gray-700">
-                          {item.brand}
+                          {item.brandDetails?.name}
                         </p> */}
                       </div>
                     </div>
@@ -198,9 +198,9 @@ export default function BoxContents({ box, loading = false }) {
                   <h2 className="text-xl font-bold text-gray-900">
                     {selectedItem.name}
                   </h2>
-                  {selectedItem.brand && (
+                  {selectedItem.brandDetails && (
                     <p className="text-gray-600 text-md">
-                      {selectedItem.brand}
+                      {selectedItem.brandDetails?.name}
                     </p>
                   )}
                 </div>
@@ -291,9 +291,9 @@ export default function BoxContents({ box, loading = false }) {
                   <h2 className="text-2xl font-bold text-gray-900">
                     {selectedItem.name}
                   </h2>
-                  {selectedItem.brand && (
+                  {selectedItem.brandDetails && (
                     <p className="text-gray-600 text-lg">
-                      {selectedItem.brand}
+                      {selectedItem.brandDetails?.name}
                     </p>
                   )}
                 </div>
