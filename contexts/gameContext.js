@@ -146,6 +146,15 @@ export const GameProvider = ({ children, box }) => {
       if (error?.response?.data?.errorCode === "INSUFFICIENT_BALANCE") {
         setInSufficientBalError(true);
       }
+
+      if (error?.response?.status === 401) {
+        toastError(
+          error?.response?.data?.message || "Please log in to spin the box."
+        );
+        router.push(`/login?dest=${pathname}`);
+        return;
+      }
+
       setCreateSpinApiError(
         error?.response?.data?.message ||
           error?.message ||
