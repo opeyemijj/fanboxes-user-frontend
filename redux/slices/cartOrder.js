@@ -59,6 +59,7 @@ const slice = createSlice({
         existingItem.quantity = (existingItem.quantity || 1) + quantity;
       } else {
         //reset entire cart to only contain newly added item
+
         state.cart.items = [
           {
             ...item,
@@ -70,6 +71,7 @@ const slice = createSlice({
       state.cart.totalAmountPaid = calculateTotal(state.cart);
       state.cart.orderType = "direct";
       state.cart.shop = shop;
+      state.cart.spinData = null;
     },
 
     addWonItemToCart(state, action) {

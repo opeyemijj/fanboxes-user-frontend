@@ -316,7 +316,7 @@ const OrderDetailsModal = ({
 
             {/* Order Information Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Order Details - Updated with Platform Fee */}
+              {/* Order Details - Updated to handle post-spin orders */}
               <div className="space-y-2">
                 <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
                   <Hash className="w-4 h-4" />
@@ -324,88 +324,170 @@ const OrderDetailsModal = ({
                 </h3>
                 <div className="bg-gray-50 rounded-lg p-4">
                   <div className="space-y-3">
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-gray-600">Subtotal</span>
-                      <span className="font-semibold text-slate-700">
-                        {fCurrency(
-                          cCurrency(
-                            order.totalAmountPaid -
-                              (order.shippingFee || 0) -
-                              (order.taxApplied?.amount || 0) -
-                              (order.platformFee?.amount || 0) -
-                              (order.discountApplied?.amount || 0)
-                          )
-                        )}
-                      </span>
-                    </div>
-
-                    {order.platformFee?.amount > 0 && (
-                      <div className="flex justify-between items-center text-sm">
-                        <span className="text-gray-600">
-                          Platform Fee ({order.platformFee.percentage})
-                        </span>
-                        <span className="font-semibold text-slate-700">
-                          {fCurrency(cCurrency(order.platformFee.amount))}
-                        </span>
-                      </div>
-                    )}
-
-                    {order.shippingFee > 0 && (
-                      <div className="flex justify-between items-center text-sm">
-                        <span className="text-gray-600">Shipping</span>
-                        <span className="font-semibold text-slate-700">
-                          {fCurrency(cCurrency(order.shippingFee))}
-                        </span>
-                      </div>
-                    )}
-
-                    {order.taxApplied?.amount > 0 && (
-                      <div className="flex justify-between items-center text-sm">
-                        <span className="text-gray-600">Tax</span>
-                        <span className="font-semibold text-slate-700">
-                          {fCurrency(cCurrency(order.taxApplied.amount))}
-                        </span>
-                      </div>
-                    )}
-
-                    {order.discountApplied?.amount > 0 && (
-                      <div className="flex justify-between items-center text-sm text-green-600">
-                        <span className="text-green-600">
-                          Discount
-                          {order.discountApplied.type &&
-                            order.discountApplied.type !== "none" && (
-                              <span className="text-green-500 text-xs ml-1">
-                                (
-                                {order.discountApplied.type === "percent"
-                                  ? `${
-                                      order.discountApplied.discountValue ||
-                                      order.discountApplied.amount
-                                    }% off`
-                                  : "fixed amount"}
-                                )
-                              </span>
+                    {/* Post-spin order (only shipping paid) */}
+                    {order.spinData ? (
+                      <>
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="text-gray-600">Won Item Value</span>
+                          <span className="font-semibold text-slate-700">
+                            {fCurrency(
+                              cCurrency(
+                                order.items?.reduce(
+                                  (total, item) =>
+                                    total +
+                                    (item.value || 0) * (item.quantity || 1),
+                                  0
+                                ) || 0
+                              )
                             )}
-                        </span>
-                        <div className="text-right">
-                          <span className="font-semibold text-green-600 block">
-                            -
-                            {fCurrency(cCurrency(order.discountApplied.amount))}
                           </span>
-                          {/* {order.discountApplied.name && (
-                            <span className="text-green-500 text-xs block">
-                              {order.discountApplied.name}
-                            </span>
-                          )} */}
                         </div>
-                      </div>
-                    )}
 
-                    <div className="flex justify-between items-center text-sm border-t border-gray-200 pt-2">
-                      <span className="text-gray-600 font-semibold">Total</span>
-                      <span className="font-bold text-slate-900 text-lg">
-                        {fCurrency(cCurrency(order.totalAmountPaid))}
-                      </span>
-                    </div>
+                        <div className="flex justify-between items-center text-sm text-green-600">
+                          <span className="text-green-600">
+                            🎉 You Won This Item!
+                          </span>
+                          <span className="font-semibold text-green-600">
+                            FREE
+                          </span>
+                        </div>
+
+                        {/* Shipping for post-spin order */}
+                        {order.shippingFee > 0 && (
+                          <div className="flex justify-between items-center text-sm border-t border-gray-200 pt-2">
+                            <span className="text-gray-600">Shipping Fee</span>
+                            <span className="font-semibold text-slate-700">
+                              {fCurrency(cCurrency(order.shippingFee))}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Total for post-spin order */}
+                        <div className="flex justify-between items-center text-sm border-t border-gray-200 pt-2">
+                          <span className="text-gray-600 font-semibold">
+                            Total Paid
+                          </span>
+                          <span className="font-bold text-slate-900 text-lg">
+                            {fCurrency(cCurrency(order.shippingFee || 0))}
+                          </span>
+                        </div>
+
+                        {/* Note for post-spin orders */}
+                        <div className="text-xs text-gray-500 bg-blue-50 p-2 rounded border border-blue-100">
+                          💡 You only paid for shipping! The item was won from a
+                          spin.
+                        </div>
+                      </>
+                    ) : (
+                      /* Regular order (full breakdown) */
+                      <>
+                        {/* Items Total */}
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="text-gray-600">
+                            Items (
+                            {order.items?.reduce(
+                              (total, item) => total + (item.quantity || 1),
+                              0
+                            )}
+                            )
+                          </span>
+                          <span className="font-semibold text-slate-700">
+                            {fCurrency(
+                              cCurrency(
+                                order.items?.reduce(
+                                  (total, item) =>
+                                    total +
+                                    (item.value || 0) * (item.quantity || 1),
+                                  0
+                                ) || 0
+                              )
+                            )}
+                          </span>
+                        </div>
+
+                        {/* Discount */}
+                        {order.discountApplied?.amount > 0 && (
+                          <div className="flex justify-between items-center text-sm text-green-600">
+                            <span className="text-green-600">
+                              Discount
+                              {order.discountApplied.type &&
+                                order.discountApplied.type !== "none" && (
+                                  <span className="text-green-500 text-xs ml-1">
+                                    (
+                                    {order.discountApplied.type === "percent"
+                                      ? `${
+                                          order.discountApplied.discountValue ||
+                                          order.discountApplied.amount
+                                        }% off`
+                                      : "fixed amount"}
+                                    )
+                                  </span>
+                                )}
+                            </span>
+                            <div className="text-right">
+                              <span className="font-semibold text-green-600 block">
+                                -
+                                {fCurrency(
+                                  cCurrency(order.discountApplied.amount)
+                                )}
+                              </span>
+                              {order.discountApplied.name && (
+                                <span className="text-green-500 text-xs block">
+                                  {order.discountApplied.name}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Subtotal (Items - Discount) */}
+                        <div className="flex justify-between items-center text-sm font-medium text-gray-700 border-t border-gray-200 pt-2">
+                          <span>Subtotal</span>
+                          <span className="font-semibold text-slate-700">
+                            {fCurrency(
+                              cCurrency(
+                                (order.items?.reduce(
+                                  (total, item) =>
+                                    total +
+                                    (item.value || 0) * (item.quantity || 1),
+                                  0
+                                ) || 0) - (order.discountApplied?.amount || 0)
+                              )
+                            )}
+                          </span>
+                        </div>
+
+                        {/* Shipping */}
+                        {order.shippingFee > 0 && (
+                          <div className="flex justify-between items-center text-sm">
+                            <span className="text-gray-600">Shipping</span>
+                            <span className="font-semibold text-slate-700">
+                              {fCurrency(cCurrency(order.shippingFee))}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Tax */}
+                        {order.taxApplied?.amount > 0 && (
+                          <div className="flex justify-between items-center text-sm">
+                            <span className="text-gray-600">Tax</span>
+                            <span className="font-semibold text-slate-700">
+                              {fCurrency(cCurrency(order.taxApplied.amount))}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Total */}
+                        <div className="flex justify-between items-center text-sm border-t border-gray-200 pt-2">
+                          <span className="text-gray-600 font-semibold">
+                            Total
+                          </span>
+                          <span className="font-bold text-slate-900 text-lg">
+                            {fCurrency(cCurrency(order.totalAmountPaid))}
+                          </span>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
@@ -446,6 +528,21 @@ const OrderDetailsModal = ({
                         </span>
                       </div>
                     )}
+
+                    {/* Order Type Badge */}
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-gray-600">Order Type</span>
+                      <span
+                        className={`font-medium px-2 py-1 rounded-full text-xs ${
+                          order.spinData
+                            ? "bg-purple-100 text-purple-800"
+                            : "bg-green-100 text-green-800"
+                        }`}
+                      >
+                        {order.spinData ? "Spin Win" : "Direct Purchase"}
+                      </span>
+                    </div>
+
                     {/* Add discount code info if available */}
                     {order.discountApplied?.name && (
                       <div className="flex justify-between items-center text-sm">

@@ -78,11 +78,7 @@ const CheckoutScreen = () => {
     cashToCreditConvRate: null,
   });
 
-  // Platform fee state - centralized configuration
-  const [platformFee, setPlatformFee] = useState({
-    percentage: "4%", // Can be fetched from API later
-    amount: 0,
-  });
+  // REMOVED: Platform fee state
   const [discountApplied, setDiscountApplied] = useState({
     type: "none",
     amount: 0,
@@ -192,13 +188,17 @@ const CheckoutScreen = () => {
     try {
       // Get shop ID from cart (assuming cart has shop information)
       const shopId = cart.shop?._id;
-      const incurredAmount = calculateIncurredAmount();
+
+      // Calculate items total for discount calculation
+      const itemsTotal = cart.items.reduce((total, item) => {
+        return total + (item.value || 0) * (item.quantity || 1);
+      }, 0);
 
       // Prepare payload for the API
       const payload = {
         code: code.trim(),
         userId: cart.user?._id,
-        cartTotal: incurredAmount,
+        cartTotal: itemsTotal, // Use items total instead of incurred amount
         shopId: shopId,
       };
 
@@ -263,53 +263,9 @@ const CheckoutScreen = () => {
     }
   };
 
-  // Calculate total incurred amount (base for platform fee calculation)
-  const calculateIncurredAmount = useCallback(() => {
-    if (isCartEmpty) return 0;
-
-    let incurredAmount = 0;
-    if (isPostSpinOrder) {
-      // For post-spin orders, only shipping is incurred
-      incurredAmount = cart.shippingFee || 0;
-    } else {
-      // For regular orders, items total + shipping
-      const itemsTotal = cart.items.reduce((total, item) => {
-        return total + (item.value || 0) * (item.quantity || 1);
-      }, 0);
-      incurredAmount = itemsTotal + (cart.shippingFee || 0);
-    }
-    return incurredAmount;
-  }, [cart.items, cart.shippingFee, isCartEmpty, isPostSpinOrder]);
-
-  // Calculate and update platform fee amount
-  const updatePlatformFeeAmount = useCallback(() => {
-    const incurredAmount = calculateIncurredAmount();
-    const percentageValue = parseFloat(platformFee.percentage); // Extract number from "4%"
-    const feeAmount = incurredAmount * (percentageValue / 100);
-
-    setPlatformFee((prev) => ({
-      ...prev,
-      amount: feeAmount,
-    }));
-
-    console.log(
-      `Platform fee updated: ${platformFee.percentage} of $${incurredAmount} = $${feeAmount}`
-    );
-  }, [calculateIncurredAmount, platformFee.percentage]);
-
-  // Update platform fee when cart items, shipping fee, or order type changes
-  useEffect(() => {
-    if (mounted && !isCartEmpty) {
-      updatePlatformFeeAmount();
-    }
-  }, [
-    mounted,
-    isCartEmpty,
-    cart.items,
-    cart.shippingFee,
-    isPostSpinOrder,
-    updatePlatformFeeAmount,
-  ]);
+  // REMOVED: calculateIncurredAmount function
+  // REMOVED: updatePlatformFeeAmount function
+  // REMOVED: Platform fee useEffect
 
   // Main initialization effect with improved sequencing
   useEffect(() => {
@@ -605,11 +561,27 @@ const CheckoutScreen = () => {
     dispatch(setLoading(true));
 
     try {
+      // Calculate items total
+      const itemsTotal = cart.items.reduce((total, item) => {
+        return total + (item.value || 0) * (item.quantity || 1);
+      }, 0);
+
+      // Calculate items total after discount
+      let itemsTotalAfterDiscount = itemsTotal;
+      if (discountApplied.type === "percent") {
+        itemsTotalAfterDiscount =
+          itemsTotal * (1 - discountApplied.discountValue / 100);
+      } else if (discountApplied.type === "fixed") {
+        itemsTotalAfterDiscount = itemsTotal - discountApplied.amount;
+      }
+
+      // Calculate final total (items after discount + shipping)
+      const totalAmount = itemsTotalAfterDiscount + (cart.shippingFee || 0);
+
       const orderPayload = {
         shippingFee: cart.shippingFee,
-        totalAmountPaid: cart.totalAmountPaid,
-        discountApplied: discountApplied, // Use local discount state instead of cart.discountApplied
-        platformFee: platformFee,
+        totalAmountPaid: isPostSpinOrder ? cart?.totalAmountPaid : totalAmount,
+        discountApplied: discountApplied,
         status: "pending",
         items: cart.items,
         note: cart.note,
@@ -910,7 +882,6 @@ const CheckoutScreen = () => {
                     cart={cart}
                     paymentMethod={paymentMethod}
                     resellDataLoading={resellDataLoading}
-                    platformFee={platformFee}
                     // Pass discount related props
                     discountApplied={discountApplied}
                     discountError={discountError}

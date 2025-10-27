@@ -18,7 +18,6 @@ const OrderSummary = ({
   isPostSpinOrder,
   paymentMethod,
   resellDataLoading,
-  platformFee = { percentage: "4%", amount: 0 },
   // New discount props
   discountApplied = {
     type: "none",
@@ -40,39 +39,39 @@ const OrderSummary = ({
   const fCurrency = useCurrencyFormatter();
   const [discountCode, setDiscountCode] = useState("");
 
+  // Calculate items total (sum of items * quantity)
   const itemsTotal = cart.items.reduce((total, item) => {
     if (isPostSpinOrder) return 0;
     return total + (item.value || 0) * (item.quantity || 1);
   }, 0);
 
-  // Calculate total incurred amount (base for platform fee calculation)
-  const calculateIncurredAmount = () => {
+  // Calculate items total after discount
+  const calculateItemsTotalAfterDiscount = () => {
+    if (isPostSpinOrder) return 0;
+
+    let discountedItemsTotal = itemsTotal;
+
+    if (discountApplied.type === "percent") {
+      // Apply percentage discount to items total only
+      discountedItemsTotal =
+        itemsTotal * (1 - discountApplied.discountValue / 100);
+    } else if (discountApplied.type === "fixed") {
+      // Apply fixed discount to items total only
+      discountedItemsTotal = itemsTotal - discountApplied.amount;
+    }
+
+    return Math.max(0, discountedItemsTotal); // Ensure not negative
+  };
+
+  const itemsTotalAfterDiscount = calculateItemsTotalAfterDiscount();
+
+  // Calculate final total (items after discount + shipping)
+  const calculateTotal = () => {
     if (isPostSpinOrder) {
       return cart.shippingFee || 0;
     } else {
-      return itemsTotal + (cart.shippingFee || 0);
+      return itemsTotalAfterDiscount + (cart.shippingFee || 0);
     }
-  };
-
-  const incurredAmount = calculateIncurredAmount();
-
-  // Calculate subtotal (items + shipping + platform fee)
-  const calculateSubtotal = () => {
-    return incurredAmount + (platformFee.amount || 0);
-  };
-
-  const subtotal = calculateSubtotal();
-
-  // Calculate total including discount
-  const calculateTotal = () => {
-    let total = subtotal;
-
-    // Subtract discount (only for regular orders)
-    if (!isPostSpinOrder) {
-      total -= discountApplied.amount || 0;
-    }
-
-    return total;
   };
 
   const totalAmount = calculateTotal();
@@ -136,10 +135,9 @@ const OrderSummary = ({
     }
   };
 
-  // Format discount display text - FIXED: Use discountValue for percentage
+  // Format discount display text
   const formatDiscountText = () => {
     if (discountApplied.type === "percent") {
-      // Use discountValue from API response for percentage display
       const percentageValue = discountApplied.discountValue || 0;
       return `-${percentageValue}% off`;
     } else {
@@ -221,10 +219,39 @@ const OrderSummary = ({
 
         {/* Items total - only show for regular orders */}
         {!isPostSpinOrder && (
-          <div className="flex justify-between text-sm text-gray-600">
-            <span>Items ({cart.items.length})</span>
-            <span>{formatPrice(itemsTotal)}</span>
-          </div>
+          <>
+            <div className="flex justify-between text-sm text-gray-600">
+              <span>Items ({cart.items.length})</span>
+              <span>{formatPrice(itemsTotal)}</span>
+            </div>
+
+            {/* Discount - only show if discount is applied */}
+            {discountApplied.amount > 0 && (
+              <div className="flex justify-between text-sm text-green-600 font-medium">
+                <span>Discount</span>
+                <span className="flex items-center">
+                  {paymentMethod === "wallet" ? (
+                    <>
+                      -
+                      <Hexagon className="w-3.5 h-3.5 mx-0.5 text-green-600" />{" "}
+                      {/* Fixed: green color */}
+                      {discountApplied.amount.toFixed(2)}
+                    </>
+                  ) : (
+                    formatPrice(discountApplied.amount, true)
+                  )}
+                </span>
+              </div>
+            )}
+
+            {/* Items total after discount */}
+            {discountApplied.amount > 0 && (
+              <div className="flex justify-between text-sm font-medium text-gray-700 border-t border-gray-200 pt-2">
+                <span>Items Total After Discount</span>
+                <span>{formatPrice(itemsTotalAfterDiscount)}</span>
+              </div>
+            )}
+          </>
         )}
 
         {/* Shipping fee */}
@@ -240,49 +267,6 @@ const OrderSummary = ({
           )}
         </div>
 
-        {/* Platform Fee - Always show if there's any incurred amount */}
-        {platformFee.amount > 0 && (
-          <div className="flex justify-between text-sm text-gray-600">
-            <span className="flex items-center">
-              Platform Fee ({platformFee.percentage})
-              <div className="group relative ml-1">
-                <Info size={12} className="text-gray-400 cursor-help" />
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 px-2 py-1 bg-gray-800 text-white text-xs rounded w-40 text-center opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                  {platformFee.percentage} of total incurred amount
-                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
-                </div>
-              </div>
-            </span>
-            <span>{formatPrice(platformFee.amount)}</span>
-          </div>
-        )}
-
-        {/* Subtotal */}
-        {!isPostSpinOrder && (
-          <div className="flex justify-between text-sm font-medium text-gray-700 border-t border-gray-200 pt-2">
-            <span>Subtotal</span>
-            <span>{formatPrice(subtotal)}</span>
-          </div>
-        )}
-
-        {/* Discount - only for regular orders */}
-        {!isPostSpinOrder && discountApplied.amount > 0 && (
-          <div className="flex justify-between text-sm text-green-600 font-medium">
-            <span>Discount</span>
-            <span className="flex items-center">
-              {paymentMethod === "wallet" ? (
-                <>
-                  -
-                  <Hexagon className="w-3.5 h-3.5 mx-0.5 text-green-600" />
-                  {discountApplied.amount.toFixed(2)}
-                </>
-              ) : (
-                formatPrice(discountApplied.amount, true)
-              )}
-            </span>
-          </div>
-        )}
-
         <hr className="my-1.5" />
 
         <div className="flex justify-between text-base font-semibold text-gray-900">
@@ -292,7 +276,7 @@ const OrderSummary = ({
 
         {isPostSpinOrder && (
           <div className="text-center text-xs text-[#11F2EB] bg-[#11F2EB] bg-opacity-10 p-1.5 rounded">
-            🎉 You only pay for shipping + platform fee!
+            🎉 You only pay for shipping!
           </div>
         )}
 

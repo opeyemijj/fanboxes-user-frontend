@@ -12,7 +12,6 @@ import {
   ArrowRight,
   Package,
   Loader,
-  Info,
 } from "lucide-react";
 import {
   selectCartItems,
@@ -26,6 +25,7 @@ import {
   setCheckoutStep,
   updateShippingFee,
   selectDirectBuyItems,
+  selectCart,
 } from "@/redux/slices/cartOrder";
 import { useRouter } from "next/navigation";
 import { getShippingFeePercentage } from "@/services/order";
@@ -36,10 +36,6 @@ import { useCurrencyFormatter } from "@/hooks/formatCurrency";
 const CartPage = () => {
   const [isMounted, setIsMounted] = useState(false);
   const [shippingLoading, setShippingLoading] = useState(true);
-  const [platformFee, setPlatformFee] = useState({
-    percentage: "4%",
-    amount: 0,
-  });
 
   const dispatch = useDispatch();
   const router = useRouter();
@@ -58,32 +54,6 @@ const CartPage = () => {
   useEffect(() => {
     setIsMounted(true);
   }, []);
-
-  // Calculate total incurred amount (base for platform fee calculation)
-  const calculateIncurredAmount = () => {
-    const itemsTotal = cartItems.reduce((total, item) => {
-      return total + (item.value || 0) * (item.quantity || 1);
-    }, 0);
-    return itemsTotal + (shippingFee || 0);
-  };
-
-  // Calculate platform fee
-  const calculatePlatformFeeAmount = () => {
-    const incurredAmount = calculateIncurredAmount();
-    const percentageValue = parseFloat(platformFee.percentage); // Extract number from "4%"
-    return incurredAmount * (percentageValue / 100);
-  };
-
-  // Update platform fee whenever cart items or shipping fee changes
-  useEffect(() => {
-    if (isMounted && cartItems.length > 0) {
-      const newPlatformFeeAmount = calculatePlatformFeeAmount();
-      setPlatformFee((prev) => ({
-        ...prev,
-        amount: newPlatformFeeAmount,
-      }));
-    }
-  }, [isMounted, cartItems, shippingFee]);
 
   // Debounce the cart total value
   const cartTotalValue = cartItems.reduce((total, item) => {
@@ -160,9 +130,9 @@ const CartPage = () => {
     return total + item.value * item.quantity;
   }, 0);
 
-  // Calculate total including platform fee and discount
+  // Calculate total including discount
   const calculateTotal = () => {
-    let total = subtotal + (shippingFee || 0) + (platformFee.amount || 0);
+    let total = subtotal + (shippingFee || 0);
 
     // Subtract discount if applied
     if (discountApplied.type !== "none") {
@@ -427,26 +397,6 @@ const CartPage = () => {
                       )}
                     </span>
                   </div>
-
-                  {/* Platform Fee */}
-                  {platformFee.amount > 0 && (
-                    <div className="flex justify-between text-gray-600">
-                      <span className="flex items-center">
-                        Platform Fee ({platformFee.percentage})
-                        <div className="group relative ml-1">
-                          <Info
-                            size={12}
-                            className="text-gray-400 cursor-help"
-                          />
-                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 px-2 py-1 bg-gray-800 text-white text-xs rounded w-40 text-center opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                            {platformFee.percentage} of total incurred amount
-                            <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
-                          </div>
-                        </div>
-                      </span>
-                      <span>{fCurrency(cCurrency(platformFee.amount))}</span>
-                    </div>
-                  )}
 
                   {discountApplied.type !== "none" && (
                     <div className="flex justify-between text-green-600">
