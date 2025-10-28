@@ -43,7 +43,7 @@ export default function FilterSidebar({
               value="most-popular"
               className="hover:bg-[#11F2EB]/10 focus:bg-[#11F2EB]/10 cursor-pointer capitalize"
             >
-              Most popular
+              Most Popular
             </SelectItem>
             <SelectItem
               value="newest"
