@@ -1059,6 +1059,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogClose,
   DialogDescription,
 } from "./GameDialogues";
 import ClientSeedModal from "./ClientSeedModal";
@@ -1705,13 +1706,21 @@ export default function SpinningWheel({
                       }
                       transition-all duration-500
                     `}
+                    style={
+                      style.isWinningItemAtWinningSpot
+                        ? { width: 200, height: 180, top: -20, left: -22 }
+                        : {}
+                    }
                   >
                     <img
                       src={item.images[0]?.url || "/placeholder.svg"}
                       alt={item.name}
                       width={itemSize}
                       height={itemSize}
-                      className="object-contain w-full h-full p-3"
+                      // className="object-contain w-full h-full p-3"
+                      className={`object-contain w-full h-full transition-all duration-300 ${
+                        style.isWinningItemAtWinningSpot ? "scale-125" : "p-2"
+                      }`}
                     />
                     <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 bg-black/70 text-white text-xs px-2 py-1 rounded">
                       {fCurrency(cCurrency(item?.value))}
@@ -1728,6 +1737,10 @@ export default function SpinningWheel({
                           🏆
                         </motion.div>
                         <motion.div
+                          // style={{
+                          //   width: 400,
+                          //   height: 400
+                          // }}
                           animate={{
                             scale: [1, 1.05, 1],
                             opacity: [0.3, 0.6, 0.3],
@@ -1839,12 +1852,18 @@ export default function SpinningWheel({
       {/* Winner Modal - HIGH Z-INDEX with Golden Confetti */}
       <AnimatePresence>
         {showModal && winningItem && !isSpinning && (
-          <Dialog open={showModal} onOpenChange={() => {}}>
-            <DialogContent className="sm:max-w-[500px] max-w-[95vw] bg-gradient-to-br from-cyan-50 to-blue-50 z-[9999] fixed p-0 overflow-hidden rounded-2xl">
+          <Dialog
+            open={showModal}
+            onOpenChange={(open) => {
+              if (!open) handleModalClose(); // call your function when closing
+            }}
+          >
+            <DialogContent className="sm:max-w-[500px] max-w-[95vw] bg-gradient-to-br from-cyan-50 to-blue-50 z-[100000] fixed p-0 overflow-hidden rounded-2xl">
               {/* Golden Confetti Animation */}
               <GoldenConfetti isActive={showConfetti} />
 
               {/* Close Button */}
+
               <button
                 onClick={handleModalClose}
                 className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white/80 hover:bg-white transition-colors z-20 shadow-sm"

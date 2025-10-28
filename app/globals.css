@@ -148,3 +148,31 @@ textarea:focus {
   outline: 2px solid #11f2eb;
   outline-offset: 2px;
 }
+
+
+/*  Gabriel  */
+@font-face {
+  font-family: 'SofiaProBold';
+  src: url('/fonts/SofiaPro/SofiaProBold.otf') format('opentype');
+  font-weight: 700;            /* use correct weight if bold */
+  font-style: normal;
+  font-display: swap;          /* optional, helps loading UX */
+}
+@font-face {
+  font-family: 'SofiaProRegular';
+  src: url('/fonts/SofiaPro/SofiaProRegular.otf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+.sofia-pro-bold-font {
+  font-family: 'SofiaProBold';
+}
+.sofia-pro-regula-font {
+  font-family: 'SofiaProRegular', sans-serif;
+}
+
+/* specifically target shadcn dialog close */
+[data-state="open"] .absolute.top-4.right-4.text-muted-foreground {
+  display: none !important;
+}

@@ -61,7 +61,7 @@ export default function HeroCarousel() {
     if (bannerItems.length <= 1) return;
 
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % bannerItems.length);
+      // setCurrentSlide((prev) => (prev + 1) % bannerItems.length);
     }, 5000);
 
     return () => clearInterval(timer);
@@ -125,7 +125,7 @@ export default function HeroCarousel() {
               <div className="relative z-20 text-white flex flex-col justify-center items-start p-8 md:p-12 h-full max-w-2xl">
                 {/* Title and Highlight */}
                 {(banner.title || banner.highlight) && (
-                  <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-tight mb-3">
+                  <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-tight mb-3 sofia-pro-bold-font">
                     {banner.title && <span>{banner.title} </span>}
                     {banner.highlight && (
                       <span className="text-[#11F2EB]">{banner.highlight}</span>
@@ -135,7 +135,7 @@ export default function HeroCarousel() {
 
                 {/* Description */}
                 {banner.description && (
-                  <p className="text-base md:text-lg leading-relaxed opacity-90 mb-6 max-w-lg">
+                  <p className="text-base md:text-lg leading-relaxed opacity-90 mb-6 max-w-lg sofia-pro-regula-font">
                     {banner.description}
                   </p>
                 )}

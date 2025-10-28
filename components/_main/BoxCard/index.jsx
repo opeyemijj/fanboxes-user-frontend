@@ -19,11 +19,11 @@ export default function BoxCard({ box, isNew }) {
             className="object-cover"
           />
           {isNew && (
-            <div className="absolute top-3 left-3 bg-black text-white text-xs font-bold px-2 py-1 rounded-full">
+            <div className="absolute top-3 left-3 bg-black text-white text-xs font-bold px-2 py-1 rounded-[7px]">
               NEW
             </div>
           )}
-          <Button className="absolute bottom-3 right-3 bg-black text-white rounded-full h-8 w-20 text-sm flex items-center justify-center">
+          <Button className="absolute bottom-3 right-3 bg-black text-white rounded-[7px] h-8 w-20 text-sm flex items-center justify-center">
             VIEW <span className="ml-1">→</span>
           </Button>
         </div>

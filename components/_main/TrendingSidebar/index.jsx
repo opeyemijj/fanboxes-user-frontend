@@ -121,9 +121,7 @@ export default function TrendingSidebar({
           <div className="relative mb-6">
             <Input
               placeholder={
-                activeTab === "boxes"
-                  ? "Search products..."
-                  : "Search ambassadors..."
+             'Search'
               }
               className="pr-10"
               value={searchQuery}

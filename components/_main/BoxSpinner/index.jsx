@@ -26,6 +26,8 @@ export default function BoxSpinner({ box }) {
     setSelectedPrize(null);
   };
 
+  console.log('====>', box?.shopDetails)
+
   return (
     <>
       <div className="container mx-auto px-5">
@@ -34,7 +36,7 @@ export default function BoxSpinner({ box }) {
           <div className="flex items-center space-x-3 sm:space-x-4">
             <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-[#11F2EB] rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
               <Image
-                src={box?.shopDetails?.logo?.url || "/placeholder.svg"}
+                src={box?.shopDetails?.logo?.url || "/favicon.png"}
                 alt={box?.name}
                 width={64}
                 height={64}
@@ -43,13 +45,21 @@ export default function BoxSpinner({ box }) {
             </div>
             <div>
               <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold leading-tight">
-                {box?.shopDetails?.title}
+                {box?.shopDetails?.title ?
+              <>{box?.shopDetails?.title}</>
+              :
+              'Fanboxes box'
+              }
+                
               </h1>
+              {box?.name &&
               <p className="text-gray-500 text-sm sm:text-base mt-1">
                 {box?.name}
               </p>
+              }
             </div>
           </div>
+          {box?.shopDetails &&
           <div className="flex flex-wrap gap-2 sm:gap-3 w-full sm:w-auto justify-start sm:justify-end">
             <Button
               variant="outline"
@@ -68,6 +78,8 @@ export default function BoxSpinner({ box }) {
               </Button>
             </Link>
           </div>
+          }
+
         </div>
 
         {/* Spinning Area */}
