@@ -176,3 +176,9 @@ textarea:focus {
 [data-state="open"] .absolute.top-4.right-4.text-muted-foreground {
   display: none !important;
 }
+
+
+.data-\[state\=open\]\:fade-in-0[data-state="open"] {
+  --tw-enter-opacity: 0;
+  z-index: 10000 !important;
+}

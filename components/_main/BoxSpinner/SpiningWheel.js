@@ -1864,7 +1864,7 @@ export default function SpinningWheel({
 
               {/* Close Button */}
 
-              <button
+              {/* <button
                 onClick={handleModalClose}
                 className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white/80 hover:bg-white transition-colors z-20 shadow-sm"
               >
@@ -1881,7 +1881,7 @@ export default function SpinningWheel({
                     d="M6 18L18 6M6 6l12 12"
                   />
                 </svg>
-              </button>
+              </button> */}
 
               <div className="flex flex-col items-center pt-6 pb-4 px-6 relative z-10">
                 <DialogHeader className="mb-3">

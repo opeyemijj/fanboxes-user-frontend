@@ -21,7 +21,7 @@ export default function FilterSidebar({
       <div>
         <div className="relative">
           <Input
-            placeholder="Search boxes..."
+            placeholder="Search"
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
             className="pr-10 bg-gray-50"
@@ -38,24 +38,24 @@ export default function FilterSidebar({
           <SelectTrigger className="filter-select w-full bg-gray-50 text-sm">
             <SelectValue placeholder="Sort by" />
           </SelectTrigger>
-          <SelectContent className="bg-white border border-gray-200 shadow-lg">
+          <SelectContent className="bg-white border border-gray-200 shadow-lg capitalize" >
             <SelectItem
               value="most-popular"
-              className="hover:bg-[#11F2EB]/10 focus:bg-[#11F2EB]/10 cursor-pointer"
+              className="hover:bg-[#11F2EB]/10 focus:bg-[#11F2EB]/10 cursor-pointer capitalize"
             >
-              MOST POPULAR
+              Most popular
             </SelectItem>
             <SelectItem
               value="newest"
-              className="hover:bg-[#11F2EB]/10 focus:bg-[#11F2EB]/10 cursor-pointer"
+              className="hover:bg-[#11F2EB]/10 focus:bg-[#11F2EB]/10 cursor-pointer capitalize"
             >
-              NEWEST
+              Newest
             </SelectItem>
             <SelectItem
               value="alphabetical"
-              className="hover:bg-[#11F2EB]/10 focus:bg-[#11F2EB]/10 cursor-pointer"
+              className="hover:bg-[#11F2EB]/10 focus:bg-[#11F2EB]/10 cursor-pointer capitalize"
             >
-              ALPHABETICAL
+              Alphabetical
             </SelectItem>
           </SelectContent>
         </Select>
