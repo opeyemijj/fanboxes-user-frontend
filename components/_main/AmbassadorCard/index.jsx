@@ -42,7 +42,7 @@ export default function AmbassadorCard({ ambassador, isNew, keyVal }) {
           )}
 
           {/* View Button */}
-          <Button className="absolute bottom-4 right-4 bg-black/70 text-white rounded-full h-10 w-20 opacity-100">
+          <Button className="absolute bottom-4 right-4 bg-black/70 text-white rounded-[7px] h-10 w-20 opacity-100">
             <span className="flex items-center text-sm">
               VIEW <span className="ml-2">→</span>
             </span>

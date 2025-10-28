@@ -42,25 +42,25 @@ export default function AmbassadorFilterSidebar({
             <SelectContent className="bg-white border border-gray-200 shadow-lg">
               <SelectItem
                 value="most-popular"
-                className="hover:bg-[#11F2EB]/10 focus:bg-[#11F2EB]/10 cursor-pointer"
+                className="hover:bg-[#11F2EB]/10 focus:bg-[#11F2EB]/10 cursor-pointer capitalize"
               >
                 MOST POPULAR
               </SelectItem>
               <SelectItem
                 value="newest"
-                className="hover:bg-[#11F2EB]/10 focus:bg-[#11F2EB]/10 cursor-pointer"
+                className="hover:bg-[#11F2EB]/10 focus:bg-[#11F2EB]/10 cursor-pointer capitalize"
               >
                 NEWEST
               </SelectItem>
               <SelectItem
                 value="alphabetical"
-                className="hover:bg-[#11F2EB]/10 focus:bg-[#11F2EB]/10 cursor-pointer"
+                className="hover:bg-[#11F2EB]/10 focus:bg-[#11F2EB]/10 cursor-pointer capitalize"
               >
                 ALPHABETICAL
               </SelectItem>
               <SelectItem
                 value="category"
-                className="hover:bg-[#11F2EB]/10 focus:bg-[#11F2EB]/10 cursor-pointer"
+                className="hover:bg-[#11F2EB]/10 focus:bg-[#11F2EB]/10 cursor-pointer capitalize"
               >
                 BY CATEGORY
               </SelectItem>

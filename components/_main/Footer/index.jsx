@@ -158,8 +158,13 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Disclaimer Text */}
-          <div className="mt-12 pt-8 border-t border-gray-200">
+          
+        </div>
+      </div>
+
+      <div className="bg-black py-4">
+       {/* Disclaimer Text */}
+       <div className="mt-12 pt-8 border-t border-gray-200" style={{marginLeft: 48}}>
             <p className="text-xs text-gray-400 max-w-4xl leading-relaxed">
               All product and company names are trademarks or registered
               trademarks of their respective holders. Use of them does not imply
@@ -177,17 +182,14 @@ export default function Footer() {
               available in your country'.
             </p>
           </div>
-        </div>
-      </div>
 
       {/* Copyright Section */}
-      <div className="bg-gray-50 py-4">
-        <div className="container mx-auto px-6 lg:px-12">
+        <div className="container mx-auto px-6 lg:px-12 mt-10">
           <p className="text-left text-xs text-gray-400 font-medium">
             COPYRIGHT © FANBOXES LIMITED
           </p>
-        </div>
       </div>
+     </div>
     </footer>
   );
 }

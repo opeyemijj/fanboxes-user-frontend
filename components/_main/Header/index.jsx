@@ -712,15 +712,15 @@ function Header() {
           <div className="flex items-center justify-between h-20">
             <div className="flex items-center space-x-6 lg:space-x-8">
               {/* Logo */}
-              <Link href="/" className="flex items-center space-x-2">
+              <Link href="/" className="flex items-center space-x-8">
                 <Image
-                  src="/favicon.png"
+                  src="/logo_v1_black.png"
                   alt="Logo"
-                  width={28}
+                  width={140}
                   height={28}
-                  className="h-7 w-7 lg:h-8 lg:w-8"
+                  // className="h-7 w-7 lg:h-9 lg:w-4"
                 />
-                <span className="font-bold text-xl lg:text-2xl">fanboxes</span>
+                {/* <span className="font-bold text-xl lg:text-2xl">fanboxes</span> */}
               </Link>
               <nav className="hidden lg:flex items-center space-x-4">
                 <Link href="/mystery-boxes" prefetch={false}>
