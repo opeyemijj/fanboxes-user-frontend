@@ -479,6 +479,11 @@ export const followShop = async (shopId) => {
   const { data } = await http.put(`/shops/${shopId}/follow`);
   return data;
 };
+export const getInfluencer = async (slug) => {
+  const { data } = await http.get(`/shops-by-id/${slug}`);
+  console.log('x shot', data)
+  return data;
+};
 // export const contactUs = async (payload) => {
 //   const { data } = await http.post(`/contact-us`, payload);
 //   return data;
