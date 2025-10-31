@@ -19,7 +19,7 @@ export default function Footer() {
                       href="/mystery-boxes"
                       className="hover:text-[#11F2EB] transition-colors"
                     >
-                      Boxes
+                      boxes
                     </Link>
                   </li>
                   <li>
@@ -32,7 +32,7 @@ export default function Footer() {
                   </li>
                   <li>
                     <Link
-                      href="/terms-and-conditions"
+                      href="#"
                       className="hover:text-[#11F2EB] transition-colors"
                     >
                       How it works
@@ -40,7 +40,7 @@ export default function Footer() {
                   </li>
                   <li>
                     <Link
-                      href="/privacy-policy"
+                      href="#"
                       className="hover:text-[#11F2EB] transition-colors"
                     >
                       Our policy
@@ -56,7 +56,7 @@ export default function Footer() {
                   </li>
                   <li>
                     <Link
-                      href="/faqs"
+                      href="#"
                       className="hover:text-[#11F2EB] transition-colors"
                     >
                       FAQ
@@ -158,13 +158,8 @@ export default function Footer() {
             </div>
           </div>
 
-          
-        </div>
-      </div>
-
-      <div className="bg-black py-4">
-       {/* Disclaimer Text */}
-       <div className="mt-12 pt-8 border-t border-gray-200" style={{marginLeft: 48}}>
+          {/* Disclaimer Text */}
+          <div className="mt-12 pt-8 border-t border-gray-200">
             <p className="text-xs text-gray-400 max-w-4xl leading-relaxed">
               All product and company names are trademarks or registered
               trademarks of their respective holders. Use of them does not imply
@@ -182,14 +177,17 @@ export default function Footer() {
               available in your country'.
             </p>
           </div>
+        </div>
+      </div>
 
       {/* Copyright Section */}
-        <div className="container mx-auto px-6 lg:px-12 mt-10">
+      <div className="bg-gray-50 py-4">
+        <div className="container mx-auto px-6 lg:px-12">
           <p className="text-left text-xs text-gray-400 font-medium">
             COPYRIGHT © FANBOXES LIMITED
           </p>
+        </div>
       </div>
-     </div>
     </footer>
   );
 }
