@@ -1,12 +1,9 @@
-import Image from "next/image";
-import Link from "next/link";
-import { Button } from "@/components/Button";
+import Image from "next/image"
+import Link from "next/link"
+import { Button } from "@/components/Button"
 
 export default function BoxCard({ box, isNew }) {
-  const boxSlug =
-    box.slug ||
-    `${box.title?.toLowerCase().replace(/\s+/g, "-")}-${box.id}` ||
-    `box-${box.id}`;
+  const boxSlug = box.slug || `${box.title?.toLowerCase().replace(/\s+/g, "-")}-${box.id}` || `box-${box.id}`
 
   return (
     <div className="group">
@@ -14,7 +11,7 @@ export default function BoxCard({ box, isNew }) {
         <div className="relative rounded-lg overflow-hidden aspect-video bg-gray-100 flex items-center justify-center cursor-pointer">
           <Image
             src={box?.image?.url || "/placeholder.png"}
-            alt={box?.name || "Box image"}
+            alt={`${box?.name || "Mystery box"} - ${box.shopDetails?.title ? `by ${box.shopDetails.title}` : "Premium collectibles and surprises"}`}
             fill
             className="object-cover"
           />
@@ -30,12 +27,8 @@ export default function BoxCard({ box, isNew }) {
       </Link>
       <div className="mt-2">
         <span className="font-bold">{box.name}</span>
-        {box.shopDetails && (
-          <span className="text-sm text-gray-500 ml-2">
-            {box.shopDetails?.title}
-          </span>
-        )}
+        {box.shopDetails && <span className="text-sm text-gray-500 ml-2">{box.shopDetails?.title}</span>}
       </div>
     </div>
-  );
+  )
 }
