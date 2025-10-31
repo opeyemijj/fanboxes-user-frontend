@@ -6,6 +6,20 @@ import { updateShippingAddress } from "@/redux/slices/user";
 import { toastError, toastSuccess, toastWarning, toastInfo } from "@/lib/toast";
 import AddressManager from "./AddressManager";
 
+const InputField = ({ label, ...props }) => (
+  <div>
+    <label className="mb-2 block text-sm font-medium text-gray-700">
+      {label}
+    </label>
+    <input
+      {...props}
+      className="w-full rounded-lg border border-gray-200 px-4 py-3
+               focus:border-[#11F2EB] focus:ring-2 focus:ring-[#11F2EB]
+               transition-colors"
+    />
+  </div>
+);
+
 const AddressDetailsView = ({ user }) => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [addressData, setAddressData] = useState({
@@ -129,6 +143,8 @@ const AddressDetailsView = ({ user }) => {
         async (position) => {
           const { latitude, longitude } = position.coords;
 
+          console.log('positon:::::====>', postion.coords)
+
           try {
             const response = await fetch(
               `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`
@@ -226,19 +242,7 @@ const AddressDetailsView = ({ user }) => {
     );
   }
 
-  const InputField = ({ label, ...props }) => (
-    <div>
-      <label className="mb-2 block text-sm font-medium text-gray-700">
-        {label}
-      </label>
-      <input
-        {...props}
-        className="w-full rounded-lg border border-gray-200 px-4 py-3
-                 focus:border-[#11F2EB] focus:ring-2 focus:ring-[#11F2EB]
-                 transition-colors"
-      />
-    </div>
-  );
+
 
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -361,13 +365,17 @@ const AddressDetailsView = ({ user }) => {
                     value={addressData.address}
                     onChange={handleAddressChange}
                     placeholder="Street address, apartment number"
+                  
                   />
+
+
                   <InputField
                     label="City"
                     name="city"
                     value={addressData.city}
                     onChange={handleAddressChange}
                     placeholder="City"
+                  
                   />
                   <InputField
                     label="ZIP Code"
@@ -375,6 +383,7 @@ const AddressDetailsView = ({ user }) => {
                     value={addressData.zip}
                     onChange={handleAddressChange}
                     placeholder="ZIP code"
+                  
                   />
                 </div>
 
@@ -385,6 +394,7 @@ const AddressDetailsView = ({ user }) => {
                     value={addressData.state}
                     onChange={handleAddressChange}
                     placeholder="State"
+              
                   />
                   <InputField
                     label="Country"
@@ -392,7 +402,8 @@ const AddressDetailsView = ({ user }) => {
                     value={addressData.country}
                     onChange={handleAddressChange}
                     placeholder="Country"
-                  />
+                   
+                  /> 
                 </div>
               </div>
             </div>

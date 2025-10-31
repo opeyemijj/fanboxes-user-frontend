@@ -4,6 +4,8 @@ import { Button } from "@/components/Button";
 import {
   Bell,
   Instagram,
+  Youtube,
+  Twitch,
   Music,
   Loader2,
   Share2,
@@ -12,7 +14,7 @@ import {
 } from "lucide-react";
 import { followInfluencer } from "@/services/influencer/index";
 import { toastSuccess, toastError } from "@/lib/toast";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
 export default function AmbassadorProfile({ ambassador, userId }) {
@@ -33,6 +35,7 @@ export default function AmbassadorProfile({ ambassador, userId }) {
 
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
+
 
   // Update isFollowing state when ambassador or userId changes
   useEffect(() => {
@@ -129,6 +132,43 @@ export default function AmbassadorProfile({ ambassador, userId }) {
     setShowShareDropdown(false);
   };
 
+
+
+  // const dropdownRef = useRef(null);
+  const dropdownRef = useRef(null);
+  const [position, setPosition] = useState("down"); // down = normal, up = flip up
+
+  useEffect(() => {
+    const dropdown = dropdownRef.current;
+    if (!dropdown) return;
+
+    const rect = dropdown.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.top;
+    const dropdownHeight = rect.height;
+
+    console.log('spaceBelow', spaceBelow)
+    console.log('dropdownHeight + 20', dropdownHeight + 20)
+    console.log('dropdownHeight + 20', dropdownHeight + 20)
+
+    // if not enough space below → flip upward
+    if (spaceBelow < dropdownHeight + 400) {
+      setPosition("up");
+    } else {
+      setPosition("down");
+    }
+  }, [showShareDropdown]);
+
+
+
+
+
+
+  // const handleShare = (platform: string) => {
+  //   console.log(`Sharing via ${platform}`);
+  // };
+
+
+
   const TikTokIcon = () => (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
       <path d="M19.589 6.686a4.793 4.793 0 0 1-3.77-4.245V2h-3.445v13.672a2.896 2.896 0 0 1-5.201 1.743l-.002-.001.002.001a2.895 2.895 0 0 1 3.183-4.51v-3.5a6.329 6.329 0 0 0-5.394 10.692 6.33 6.33 0 0 0 10.857-4.424V8.687a8.182 8.182 0 0 0 4.773 1.526V6.79a4.831 4.831 0 0 1-1.003-.104z" />
@@ -153,67 +193,86 @@ export default function AmbassadorProfile({ ambassador, userId }) {
     </svg>
   );
 
+  const SnapchatIcon = () => (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className="text-yellow-400"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M12 0C9.614 0 7.696 1.99 7.696 4.44v.72c-.005.12-.011.24-.02.36a4.423 4.423 0 0 1-2.647 3.722c-.31.133-.488.493-.398.818.094.335.404.562.749.562.012 0 .024 0 .036-.001.548-.027 1.086-.086 1.614-.177-.258 1.092-.778 2.267-1.74 3.022-.366.288-.866.454-1.434.537a.735.735 0 0 0-.627.723c0 .377.29.689.662.736a5.936 5.936 0 0 0 1.05.076c.23 0 .465-.007.7-.02.332 1.57 1.636 3.184 3.44 3.933-.002.079-.003.158-.003.237 0 1.57 1.2 2.85 2.679 2.85s2.679-1.28 2.679-2.85c0-.078-.001-.157-.003-.236 1.804-.75 3.108-2.364 3.44-3.934.235.014.47.02.7.02.36 0 .718-.023 1.05-.076a.738.738 0 0 0 .662-.736.735.735 0 0 0-.627-.723c-.568-.083-1.068-.249-1.434-.537-.962-.755-1.482-1.93-1.74-3.022.528.091 1.066.15 1.614.177.012.001.024.001.036.001.345 0 .655-.227.749-.562.09-.325-.088-.685-.398-.818a4.424 4.424 0 0 1-2.647-3.722 13.92 13.92 0 0 1-.02-.36v-.72C16.304 1.99 14.386 0 12 0z" />
+    </svg>
+  );
+  
+
   const ShareDropdown = () => (
-    <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 z-10 overflow-hidden backdrop-blur-sm bg-white/95">
-      <div className="p-3 border-b border-gray-100">
-        <h3 className="text-sm font-semibold text-gray-900">
-          Share this profile
-        </h3>
-      </div>
-      <div className="p-2">
-        <button
-          onClick={() => handleShare("whatsapp")}
-          className="w-full px-3 py-3 text-left hover:bg-green-50 rounded-lg flex items-center space-x-3 text-sm transition-all duration-200 group"
-        >
-          <div className="p-2 bg-green-100 rounded-lg group-hover:bg-green-200 transition-colors">
-            <MessageCircle className="h-4 w-4 text-green-600" />
-          </div>
-          <div className="flex flex-col">
-            <span className="font-medium text-gray-900">WhatsApp</span>
-            <span className="text-xs text-gray-500">Share via WhatsApp</span>
-          </div>
-        </button>
-
-        <button
-          onClick={() => handleShare("facebook")}
-          className="w-full px-3 py-3 text-left hover:bg-blue-50 rounded-lg flex items-center space-x-3 text-sm transition-all duration-200 group mt-1"
-        >
-          <div className="p-2 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors">
-            <FacebookIcon />
-          </div>
-          <div className="flex flex-col">
-            <span className="font-medium text-gray-900">Facebook</span>
-            <span className="text-xs text-gray-500">Share on Facebook</span>
-          </div>
-        </button>
-
-        <button
-          onClick={() => handleShare("x")}
-          className="w-full px-3 py-3 text-left hover:bg-black/5 rounded-lg flex items-center space-x-3 text-sm transition-all duration-200 group mt-1"
-        >
-          <div className="p-2 bg-gray-100 rounded-lg group-hover:bg-gray-200 transition-colors">
-            <XIcon />
-          </div>
-          <div className="flex flex-col">
-            <span className="font-medium text-gray-900">X</span>
-            <span className="text-xs text-gray-500">Post on X</span>
-          </div>
-        </button>
-
-        <button
-          onClick={() => handleShare("copy")}
-          className="w-full px-3 py-3 text-left hover:bg-gray-50 rounded-lg flex items-center space-x-3 text-sm transition-all duration-200 group mt-1"
-        >
-          <div className="p-2 bg-gray-100 rounded-lg group-hover:bg-gray-200 transition-colors">
-            <Copy className="h-4 w-4 text-gray-600" />
-          </div>
-          <div className="flex flex-col">
-            <span className="font-medium text-gray-900">Copy Link</span>
-            <span className="text-xs text-gray-500">Copy to clipboard</span>
-          </div>
-        </button>
-      </div>
+    <div
+    ref={dropdownRef}
+    className={`absolute right-0 w-56 bg-white rounded-xl shadow-xl border border-gray-100 z-10 overflow-hidden backdrop-blur-sm bg-white/95
+      ${position === "up" ? "bottom-full mb-2" : "top-full mt-2"}
+    `}
+  >
+    <div className="p-3 border-b border-gray-100">
+      <h3 className="text-sm font-semibold text-gray-900">
+        Share this profile
+      </h3>
     </div>
+    <div className="p-2">
+      <button
+        onClick={() => handleShare("whatsapp")}
+        className="w-full px-3 py-3 text-left hover:bg-green-50 rounded-lg flex items-center space-x-3 text-sm transition-all duration-200 group"
+      >
+        <div className="p-2 bg-green-100 rounded-lg group-hover:bg-green-200 transition-colors">
+          <MessageCircle className="h-4 w-4 text-green-600" />
+        </div>
+        <div className="flex flex-col">
+          <span className="font-medium text-gray-900">WhatsApp</span>
+          <span className="text-xs text-gray-500">Share via WhatsApp</span>
+        </div>
+      </button>
+
+      <button
+        onClick={() => handleShare("facebook")}
+        className="w-full px-3 py-3 text-left hover:bg-blue-50 rounded-lg flex items-center space-x-3 text-sm transition-all duration-200 group mt-1"
+      >
+        <div className="p-2 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors">
+          <FacebookIcon />
+        </div>
+        <div className="flex flex-col">
+          <span className="font-medium text-gray-900">Facebook</span>
+          <span className="text-xs text-gray-500">Share on Facebook</span>
+        </div>
+      </button>
+
+      <button
+        onClick={() => handleShare("x")}
+        className="w-full px-3 py-3 text-left hover:bg-black/5 rounded-lg flex items-center space-x-3 text-sm transition-all duration-200 group mt-1"
+      >
+        <div className="p-2 bg-gray-100 rounded-lg group-hover:bg-gray-200 transition-colors">
+          <XIcon />
+        </div>
+        <div className="flex flex-col">
+          <span className="font-medium text-gray-900">X</span>
+          <span className="text-xs text-gray-500">Post on X</span>
+        </div>
+      </button>
+
+      <button
+        onClick={() => handleShare("copy")}
+        className="w-full px-3 py-3 text-left hover:bg-gray-50 rounded-lg flex items-center space-x-3 text-sm transition-all duration-200 group mt-1"
+      >
+        <div className="p-2 bg-gray-100 rounded-lg group-hover:bg-gray-200 transition-colors">
+          <Copy className="h-4 w-4 text-gray-600" />
+        </div>
+        <div className="flex flex-col">
+          <span className="font-medium text-gray-900">Copy Link</span>
+          <span className="text-xs text-gray-500">Copy to clipboard</span>
+        </div>
+      </button>
+    </div>
+  </div>
   );
 
   return (
@@ -261,37 +320,95 @@ export default function AmbassadorProfile({ ambassador, userId }) {
             {/* Social Icons - Stack below on mobile, inline on desktop */}
             <div className="flex items-center space-x-3 justify-center sm:justify-start">
               {/* Instagram Button */}
-              <Button
-                variant="outline"
-                size="icon"
-                className="rounded-full bg-transparent"
-                onClick={() => handleSocialClick(ambassador?.instagramLink)}
-                disabled={!ambassador?.instagramLink}
-              >
-                <Instagram className="h-4 w-4" />
-              </Button>
+
+              {ambassador?.instagramLink?.length > 0 && (
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="rounded-full bg-transparent"
+                  onClick={() => handleSocialClick(ambassador?.instagramLink)}
+                  disabled={!ambassador?.instagramLink}
+                >
+                  <Instagram className="h-4 w-4" />
+                </Button>
+              )}
 
               {/* TikTok Button */}
-              <Button
-                variant="outline"
-                size="icon"
-                className="rounded-full bg-transparent"
-                onClick={() => handleSocialClick(ambassador?.tiktokLink)}
-                disabled={!ambassador?.tiktokLink}
-              >
-                <TikTokIcon />
-              </Button>
+              {ambassador?.tiktokLink?.length > 0 && (
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="rounded-full bg-transparent"
+                  onClick={() => handleSocialClick(ambassador?.tiktokLink)}
+                  disabled={!ambassador?.tiktokLink}
+                >
+                  <TikTokIcon />
+                </Button>
+              )}
 
               {/* Facebook Button */}
-              <Button
-                variant="outline"
-                size="icon"
-                className="rounded-full bg-transparent"
-                onClick={() => handleSocialClick(ambassador?.facebookLink)}
-                disabled={!ambassador?.facebookLink}
-              >
-                <span className="text-sm font-bold">f</span>
-              </Button>
+              {ambassador?.facebookLink?.length > 0 && (
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="rounded-full bg-transparent"
+                  onClick={() => handleSocialClick(ambassador?.facebookLink)}
+                  disabled={!ambassador?.facebookLink}
+                >
+                  <FacebookIcon />
+                </Button>
+              )}
+
+              {/* X icon */}
+              {ambassador?.xLink?.length > 0 && (
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="rounded-full bg-transparent"
+                  onClick={() => handleSocialClick(ambassador?.xLink)}
+                  disabled={!ambassador?.xLink}
+                >
+                  <XIcon />
+                </Button>
+              )}
+              {/* Youtube icon */}
+              {ambassador?.youtubeLink?.length > 0 && (
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="rounded-full bg-transparent"
+                  onClick={() => handleSocialClick(ambassador?.youtubeLink)}
+                  disabled={!ambassador?.youtubeLink}
+                >
+                  <Youtube />
+                </Button>
+              )}
+
+              {/* Twitch icon */}
+              {ambassador?.twitchLink?.length > 0 && (
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="rounded-full bg-transparent"
+                  onClick={() => handleSocialClick(ambassador?.twitchLink)}
+                  disabled={!ambassador?.twitchLink}
+                >
+                  <Twitch />
+                </Button>
+              )}
+
+              {/* Snap chat link */}
+              {ambassador?.snapchatLink?.length > 0 && (
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="rounded-full bg-transparent"
+                  onClick={() => handleSocialClick(ambassador?.snapchatLink)}
+                  disabled={!ambassador?.snapchatLink}
+                >
+                  <SnapchatIcon />
+                </Button>
+              )}
 
               {/* Share Button with Dropdown */}
               <div className="relative">
