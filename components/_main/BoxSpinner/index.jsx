@@ -8,7 +8,10 @@ import PrizePopup from "../PrizePopup";
 
 import FanboxGame from "./FanboxGame";
 // import boxConfig from "../data/box-config.json";
-
+import { followShop, getInfluencer } from "../../../services/index";
+import { useSelector } from "react-redux";
+import { useEffect } from "react";
+import LoadingSpinner from "../../ui/LoadingSpinner";
 function SpinGame({ boxConfig }) {
   // console.log("boxConfig", boxConfig);
   return <FanboxGame boxConfig={boxConfig} />;
@@ -17,16 +20,45 @@ function SpinGame({ boxConfig }) {
 export default function BoxSpinner({ box }) {
   box.prizeItems = box?.items || [];
   console.log({ box });
-  const [isSpinning, setIsSpinning] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
   const [showPrizePopup, setShowPrizePopup] = useState(false);
   const [selectedPrize, setSelectedPrize] = useState(null);
+  const [ambassador, setAmbassador] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+
+  const user = useSelector((state) => state?.user?.user || null);
+
+  // Get ambasaador
+  const getAmbassadorData = async () => {
+    const response = await getInfluencer(box.shop);
+
+    if (!response?.data) return setIsLoading(false);;
+
+    let _ambassadorFollowers = response?.data?.followers || [];
+
+    setIsFollowing(_ambassadorFollowers.includes(user?._id) ? true : false);
+    setAmbassador(response?.data);
+    setIsLoading(false);
+
+  };
+
+  useEffect(() => {
+    getAmbassadorData();
+  }, [box, user]);
 
   const closePrizePopup = () => {
     setShowPrizePopup(false);
     setSelectedPrize(null);
   };
 
-  console.log('====>', box?.shopDetails)
+  //@  Hit the follwo button
+  const onFollowHandler = async () => {
+    setIsLoading(true);
+    await followShop(box.shop);
+    getAmbassadorData();
+  };
+
+  console.log("isFollowing", isFollowing);
 
   return (
     <>
@@ -45,41 +77,54 @@ export default function BoxSpinner({ box }) {
             </div>
             <div>
               <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold leading-tight">
-                {box?.shopDetails?.title ?
-              <>{box?.shopDetails?.title}</>
-              :
-              'Fanboxes box'
-              }
-                
+              {box?.name}
               </h1>
-              {box?.name &&
-              <p className="text-gray-500 text-sm sm:text-base mt-1">
-                {box?.name}
-              </p>
-              }
+              {box?.name && (
+                <p className="text-gray-500 text-sm sm:text-base mt-1">
+                  
+
+                  {box?.shopDetails?.title ? (
+                  <>{box?.shopDetails?.title}</>
+                ) : (
+                  "Fanboxes box"
+                )}
+                </p>
+              )}
             </div>
           </div>
-          {box?.shopDetails &&
-          <div className="flex flex-wrap gap-2 sm:gap-3 w-full sm:w-auto justify-start sm:justify-end">
-            <Button
-              variant="outline"
-              className="bg-gray-100 border-gray-200 rounded-full text-xs sm:text-sm px-3 py-1.5 sm:px-4 sm:py-2"
-            >
-              <span className="mr-1 sm:mr-2 text-xs">🔔</span>
-              GET UPDATES
-            </Button>
-            <Link href={`/ambassadors/${box?.shopDetails?.slug}`}>
+          {box?.shopDetails && (
+            <div className="flex flex-wrap gap-2 sm:gap-3 w-full sm:w-auto justify-start sm:justify-end">
               <Button
+                onClick={onFollowHandler}
                 variant="outline"
                 className="bg-gray-100 border-gray-200 rounded-full text-xs sm:text-sm px-3 py-1.5 sm:px-4 sm:py-2"
               >
-                VIEW PROFILE
-                <span className="ml-1 sm:ml-2 text-xs">→</span>
+                {isLoading ? (
+                  <LoadingSpinner />
+                ) : (
+                  <>
+                    {!isFollowing ? (
+                      <>
+                        <span className="mr-1 sm:mr-2 text-xs">🔔</span>
+                        {"GET UPDATES"}
+                      </>
+                    ) : (
+                      <>{"Following"}</>
+                    )}
+                  </>
+                )}
               </Button>
-            </Link>
-          </div>
-          }
-
+              <Link href={`/ambassadors/${box?.shopDetails?.slug}`}>
+                <Button
+                  variant="outline"
+                  className="bg-gray-100 border-gray-200 rounded-full text-xs sm:text-sm px-3 py-1.5 sm:px-4 sm:py-2"
+                >
+                  VIEW PROFILE
+                  <span className="ml-1 sm:ml-2 text-xs">→</span>
+                </Button>
+              </Link>
+            </div>
+          )}
         </div>
 
         {/* Spinning Area */}

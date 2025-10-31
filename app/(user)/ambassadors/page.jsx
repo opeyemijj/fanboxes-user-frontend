@@ -15,6 +15,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useInitialDataFetch } from "@/hooks/useInitialDataFetch";
 import { useSearchParams } from "next/navigation";
 import Head from "next/head";
+import Head from "next/head";
 
 // Fisher-Yates shuffle algorithm
 const shuffleArray = (array) => {
@@ -306,21 +307,6 @@ function AmbassadorsContent() {
 
   return (
     <div className="bg-white text-black">
-      <Head>
-        <title>Events | SpyceChain</title>
-        <meta
-          name="description"
-          content="Discover and join exciting events happening on SpyceChain."
-        />
-        <meta property="og:title" content="Events | SpyceChain" />
-        <meta
-          property="og:description"
-          content="Explore trending events and community activities on SpyceChain."
-        />
-        <meta property="og:image" content="/images/spycechain-banner.png" />
-        <meta name="twitter:card" content="summary_large_image" />
-      </Head>
-
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24">
         <div className="flex flex-col gap-8">
           {/* Header */}
