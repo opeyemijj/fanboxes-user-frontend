@@ -32,14 +32,13 @@ export default function BoxSpinner({ box }) {
   const getAmbassadorData = async () => {
     const response = await getInfluencer(box.shop);
 
-    if (!response?.data) return setIsLoading(false);;
+    if (!response?.data) return setIsLoading(false);
 
     let _ambassadorFollowers = response?.data?.followers || [];
 
     setIsFollowing(_ambassadorFollowers.includes(user?._id) ? true : false);
     setAmbassador(response?.data);
     setIsLoading(false);
-
   };
 
   useEffect(() => {
@@ -77,17 +76,15 @@ export default function BoxSpinner({ box }) {
             </div>
             <div>
               <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold leading-tight">
-              {box?.name}
+                {box?.name}
               </h1>
               {box?.name && (
                 <p className="text-gray-500 text-sm sm:text-base mt-1">
-                  
-
                   {box?.shopDetails?.title ? (
-                  <>{box?.shopDetails?.title}</>
-                ) : (
-                  "Fanboxes box"
-                )}
+                    <>{box?.shopDetails?.title}</>
+                  ) : (
+                    "Fanboxes"
+                  )}
                 </p>
               )}
             </div>
