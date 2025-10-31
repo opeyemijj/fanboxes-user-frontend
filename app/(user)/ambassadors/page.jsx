@@ -15,7 +15,6 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useInitialDataFetch } from "@/hooks/useInitialDataFetch";
 import { useSearchParams } from "next/navigation";
 import Head from "next/head";
-import Head from "next/head";
 
 // Fisher-Yates shuffle algorithm
 const shuffleArray = (array) => {
