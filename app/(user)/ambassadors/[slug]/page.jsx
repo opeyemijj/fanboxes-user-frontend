@@ -65,7 +65,7 @@ export async function generateMetadata({ params }) {
   const pageUrl = `${baseUrl}/ambassador/${params.slug}`;
 
   return {
-    title: `${ambassador.title}'s Profile | FanBox | nw`,
+    title: `${ambassador.title}'s Profile `,
     description:
       ambassador.description ||
       `Check out ${ambassador.title}'s exclusive boxes and profile on FanBox`,
