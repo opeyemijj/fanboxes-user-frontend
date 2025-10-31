@@ -77,15 +77,17 @@ export default function BoxSpinner({ box }) {
             </div>
             <div>
               <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold leading-tight">
-                {box?.shopDetails?.title ? (
+              {box?.name}
+              </h1>
+              {box?.name && (
+                <p className="text-gray-500 text-sm sm:text-base mt-1">
+                  
+
+                  {box?.shopDetails?.title ? (
                   <>{box?.shopDetails?.title}</>
                 ) : (
                   "Fanboxes box"
                 )}
-              </h1>
-              {box?.name && (
-                <p className="text-gray-500 text-sm sm:text-base mt-1">
-                  {box?.name}
                 </p>
               )}
             </div>
